@@ -19,7 +19,7 @@ alfa=30;
 % varargout{2}=beta;
 
 %model3.R(T)=(T/Tc)^alfa.
-p=4;
+p=2;
 r=(ttes.^p+ites.^p).^(1/p);
 ftes=r.^alfa;
 ftes(find(r>1))=1;
