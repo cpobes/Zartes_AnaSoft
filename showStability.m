@@ -8,11 +8,15 @@ stab=StabilityCheck(TES);%
 
 hold off
 %contourf(X,Y,FtesTI(X,Y));%evitar llamada a FtesTI.
-contourf(X,Y,TES.R0/TES.Rn);
+contourf(X*TES.Tc,Y*TES.Ic,TES.R0/TES.Rn);
 hold on
 colormap gray
 colormap(flipud(colormap))
 alpha(0.1)
+%freezeColors %funciona para distintos axes en la misma fig pero no para el
+%mismo axes.
 %contourf(Trange,Irange,~stab.stab);
-contourf(X,Y,~stab.stab);
+contourf(X*TES.Tc,Y*TES.Ic,~stab.stab);
+%contourcmap('cool')
 colormap cool
+alpha(0.1)
