@@ -2,7 +2,7 @@ function [ftes,varargout] = FtesTI(ttes,ites)
 %version de RtesTI pero normalizada. Hacemos Rn=1.
 
 Dr=0.2;%0.01
-alfa=30;
+alfa=50;
 
 %model1
 %Rtes=Rn./(1+exp(-(sqrt((Ttes/Tc).^2+(Ites/Ic).^2).^4-1)./Dr));
@@ -19,7 +19,7 @@ alfa=30;
 % varargout{2}=beta;
 
 %model3.R(T)=(T/Tc)^alfa.
-p=2;
+p=4;
 r=(ttes.^p+ites.^p).^(1/p);
 ftes=r.^alfa;
 ftes(find(r>1))=1;

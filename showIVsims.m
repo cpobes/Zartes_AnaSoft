@@ -24,14 +24,19 @@ TESparam=SetOP(X*Tc,Y*Ic,TESparam);
 stab=StabilityCheck(TESparam);
 
 subplot(1,2,2)
-contourf(X,Y,FtesTI(X,Y));
+%contourf(X,Y,FtesTI(X,Y));
+contourf(X*Tc,Y*Ic,TESparam.R0/Rn);
 hold on
 
 colormap gray
 colormap(flipud(colormap))
 alpha(0.1)
-contourf(Trange,Irange,~stab.stab);
+%contourf(Trange,Irange,~stab.stab);
+contourf(X*Tc,Y*Ic,~stab.stab);
 colormap cool
-plot3(ttes,ites,rtes,'.r','markersize',15)
+%plot3(ttes,ites,rtes,'.r','markersize',15)
+plot3(Ttes,Ites,rtes,'.y','markersize',15)
+Tb=Ttes(1);%ojo, esto no vale para barrido en bajada.
+plotNSslopes(Tb,TESparam)
 hold off
 

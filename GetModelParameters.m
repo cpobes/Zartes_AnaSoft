@@ -8,7 +8,13 @@ function param=GetModelParameters(p)
 %I0=(P0/R0)^.5;
 %G=1.66e-12;%1.7e-12;
 %T0=0.155;%;0.07;
-global R0 P0 I0 T0 G C ai bi
+%global R0 P0 I0 T0 G C ai bi
+Rn=35.8e-3;
+R0=0.1*Rn;%0.0147;
+T0=402e-3;
+V0=9.25e-7;I0=2.94e-4;P0=V0*I0;
+G=4.3e-9;
+
 %derived parameters
 %for simple model p(1)=Zinf, p(2)=Z0, p(3)=taueff
 rp=real(p);
