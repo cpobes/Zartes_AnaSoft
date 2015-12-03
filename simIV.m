@@ -2,7 +2,7 @@ function [Ttes,Ites,xf]=simIV(Tb,varargin)
 
 %scan parameters
 %Imax=2e-3; %en mA %2e-3;
-Imax=20e-3;
+Imax=5e-3;
 Imin=0;%0.5e-3;
 
 %parametros del TES
@@ -20,7 +20,8 @@ else
     n=TESparam.n;K=TESparam.K;
 end
 crs=Rsh/(Rsh+Rpar);crn=Rsh/(Rsh+Rpar+Rn);
-Ib=Imin:1e-2*Imax:Imax;
+relatstep=1e-2;
+Ib=Imin:relatstep*Imax:Imax;
 %Ib=Imax:-1e-2*Imax:Imin;
 
 
