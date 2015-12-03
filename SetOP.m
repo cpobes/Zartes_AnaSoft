@@ -9,4 +9,6 @@ NEWparam.beta=b;
 NEWparam.R0=NEWparam.Rn*r;
 NEWparam.I0=I0;
 NEWparam.T0=T0;
-NEWparam.G=n*K*T0.^(n-1);
+lg=(n-1)*log(T0)+log(n)+log(K);
+NEWparam.G=exp(lg);
+%NEWparam.G=n*K*T0.^(n-1);

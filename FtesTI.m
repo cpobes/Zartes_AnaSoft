@@ -19,12 +19,21 @@ alfa=50;
 % varargout{2}=beta;
 
 %model3.R(T)=(T/Tc)^alfa.
+%profiler notes. las operaciones '.^' son costosas. Reescribo para
+%minimizarlas.
 p=4;
-r=(ttes.^p+ites.^p).^(1/p);
-ftes=r.^alfa;
-ftes(find(r>1))=1;
-varargout{1}=alfa*ttes.^p./(ites.^p+ttes.^p);%alfa
-varargout{2}=alfa*ites.^p./(ites.^p+ttes.^p);%beta
+%r=(ttes.^p+ites.^p).^(1/p);
+r=exp(log(exp(p*log(ttes))+exp(p*log(ites)))/p);
+%ftes=r.^alfa;
+lf=alfa*log(r);%esto acelera algo el codigo.
+ftes=exp(lf);
+ftes(r>1)=1;
+lv1=log(alfa)+p*(ttes./r);%esto acelera algo el codigo.
+varargout{1}=exp(lv1);
+%varargout{1}=alfa*(ttes./r).^p;
+varargout{2}=alfa-varargout{1};
+% varargout{1}=alfa*ttes.^p./(ites.^p+ttes.^p);%alfa
+% varargout{2}=alfa*ites.^p./(ites.^p+ttes.^p);%beta
 
 %para visualizar la superficie:
 %Trange=[0:1e-3:1.5e-1];Irange=[0:1e-7:1e-4];

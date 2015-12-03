@@ -2,7 +2,7 @@ function [Ttes,Ites,xf]=simIV(Tb,varargin)
 
 %scan parameters
 %Imax=2e-3; %en mA %2e-3;
-Imax=3e-3;
+Imax=20e-3;
 Imin=0;%0.5e-3;
 
 %parametros del TES
@@ -19,19 +19,20 @@ else
     Ic=TESparam.Ic;Tc=TESparam.Tc;
     n=TESparam.n;K=TESparam.K;
 end
-
-Ib=Imin:1e-2*Imax:Imax;cr=Rsh/(Rsh+Rpar);
-%Ib=Imax:-1e-2*Imax:Imin;cr=Rsh/(Rsh+Rpar+Rn);
+crs=Rsh/(Rsh+Rpar);crn=Rsh/(Rsh+Rpar+Rn);
+Ib=Imin:1e-2*Imax:Imax;
+%Ib=Imax:-1e-2*Imax:Imin;
 
 
 %normalized parameters:
 tb=Tb/Tc;ib=Ib/Ic;ub=tb^n;
-rp=Rpar/Rsh;rn=Rn/Rsh;
-A=(Tc^n*K)/(Ic^2*Rn);
+%rp=Rpar/Rsh;rn=Rn/Rsh;%used only when calling NormalizedGMS directly.
+%A=(Tc^n*K)/(Ic^2*Rn);
 
-options = optimset( 'TolFun', 1.0e-12, 'TolX',1.0e-12,'jacobian','off','algorithm','levenberg-marquardt','maxfunevals',500);%,'plotfcn',@optimplotfirstorderopt);
+%options = optimset( 'TolFun', 1.0e-12, 'TolX',1.0e-12,'jacobian','off','algorithm','levenberg-marquardt','maxfunevals',500);%,'plotfcn',@optimplotfirstorderopt);
+options = optimset( 'TolFun', 1.0e-12, 'TolX',1.0e-12,'jacobian','off');
 for i=1:length(Ib)
-    y0=[cr*ib(i) tb];%%%!!!ub<->tb.
+    y0=[crs*ib(i) tb];%%%!!!ub<->tb.
         %TESparam.T0=Tb;TESparam.I0=cr*Ib(i);
         %cond=StabilityCheck(TESparam);
         %estab(i)=cond.stab;
@@ -54,6 +55,7 @@ Ttes=ttes*Tc;
 % TESparam.Ic=Ic;TESparam.Tc=Tc;
 
 showIVsims(Ttes,Ites,Ib,TESparam)
+
 
 %Ttes(find(abs(Ttes>5)))=0;
 %Ites(find(abs(Ites>.5)))=0;
