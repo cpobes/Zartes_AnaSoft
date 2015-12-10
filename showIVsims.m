@@ -31,19 +31,22 @@ trange=[0:step:1.5];irange=[0:step:1.5];
 TESparam=SetOP(X*Tc,Y*Ic,TESparam);
 stab=StabilityCheck(TESparam);
 
+%%%pintamos contornos y estabilidad.
 subplot(1,2,2)
-%contourf(X,Y,FtesTI(X,Y));
-contourf(X*Tc,Y*Ic,TESparam.R0/Rn);
-hold on
+% %contourf(X,Y,FtesTI(X,Y));
+% contourf(X*Tc,Y*Ic,TESparam.R0/Rn);
+% hold on
+% colormap gray
+% colormap(flipud(colormap))
+% alpha(0.1)
+% %contourf(Trange,Irange,~stab.stab);
+% contourf(X*Tc,Y*Ic,~stab.stab);
+% colormap cool
+showStability(TESparam)
 
-colormap gray
-colormap(flipud(colormap))
-alpha(0.1)
-%contourf(Trange,Irange,~stab.stab);
-contourf(X*Tc,Y*Ic,~stab.stab);
-colormap cool
+%%%pintamos curvas IV y pendientes 'N' y 'S'
 %plot3(ttes,ites,rtes,'.r','markersize',15)
-plot3(Ttes,Ites,rtes,'.y','markersize',15)
+plot3(Ttes,Ites,rtes,'.k','markersize',15)
 %Tb=min(Ttes);%ojo, Ttes(1) no vale para barrido en bajada.
 Tb=Ttes(Ites==0);
 plotNSslopes(Tb,TESparam)
