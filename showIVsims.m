@@ -25,8 +25,9 @@ xlabel('Vtes(V)');ylabel('Ptes(W)');
 subplot(2,4,6);plot(rtes,Ptes,'.-'),grid on%,hold on
 xlabel('Rtes(%)');ylabel('Ptes(W)');
 
-Trange=[0:1e-2:1.5];Irange=[0:1e-2:1.5];
-[X,Y]=meshgrid(Trange,Irange);
+step=1e-3;
+trange=[0:step:1.5];irange=[0:step:1.5];
+[X,Y]=meshgrid(trange,irange);
 TESparam=SetOP(X*Tc,Y*Ic,TESparam);
 stab=StabilityCheck(TESparam);
 

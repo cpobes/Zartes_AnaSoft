@@ -2,7 +2,7 @@ function [Ttes,Ites,xf]=simIV(Tb,varargin)
 
 %scan parameters
 %Imax=2e-3; %en mA %2e-3;
-Imax=5e-3;
+Imax=10e-3;
 Imin=0;%0.5e-3;
 
 %parametros del TES
@@ -40,7 +40,7 @@ for i=1:length(Ib)
      problem=DefineSolverProblem(ib(i),tb,y0,TESparam,options);  
     %f = @(y) NormalizedGeneralModelSteadyState(y,ib(i),tb,A,rp,rn,n); % function of dummy variable y
     %[out,fval,flag]=fsolve(f,y0,options);
-    [out,fval,flag]=fsolve(problem);
+    [out,~,flag]=fsolve(problem);
     xf(i)=flag;
     ites(i)=out(1);
     ttes(i)=out(2);
