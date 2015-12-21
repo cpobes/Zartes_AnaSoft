@@ -3,19 +3,20 @@ function showIVsims(Ttes,Ites,Ib,TESparam)
 Rsh=TESparam.Rsh;Rpar=TESparam.Rpar;Rn=TESparam.Rn;
 Ic=TESparam.Ic;Tc=TESparam.Tc;
 
-%Vtes=Ib*Rsh-Ites*(Rsh+Rpar);
-Rtes=Rn*FtesTI(Ttes/Tc,Ites/Ic);
-Vtes=Ites.*Rtes;
-Ptes=Ites.*Vtes;
-%Rtes=Vtes./Ites;
-rtes=Rtes/Rn;
-%rtes=FtesTI(ttes,ites);
 ites=Ites/Ic;
 ttes=Ttes/Tc;
+%Vtes=Ib*Rsh-Ites*(Rsh+Rpar);
+rtes=FtesTI(ttes,ites);
+Rtes=rtes*Rn;
+Vtes=Ites.*Rtes;
+Ptes=Ites.*Vtes;
+
 %subplot(1,2,1) 
 %
-Rf=7e3;%ojo, este parametro puede cambiar.
-Vout=Ites*Rf*66/22;%
+Rf=0.7e3;%ojo, este parametro puede cambiar.
+Mq=3;%cociente de inductancias mutuas 66/22.
+Vout=Ites*Rf*Mq;%
+
 subplot(2,4,1);plot(Ib,Vout,'.-'),grid on%,hold on
 xlabel('Ibias(A)');ylabel('Vout(V)');
 subplot(2,4,5);plot(Vtes,Ites,'.-'),grid on%,hold on

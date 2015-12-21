@@ -29,7 +29,7 @@ h(2)=image(trange*TES.Tc,irange*TES.Ic,stc);
 %contourcmap('cool')
 %colormap cool
 
-maps.a=gray(64);
+maps.a=gray(10);
 maps.a=flipud(maps.a);
 %maps.b=cool(64);
 maps.b=[[0 1 0];[1 1 0];[1 0 0]];
