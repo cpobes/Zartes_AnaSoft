@@ -25,9 +25,10 @@ Kb=1.38e-23; %cte boltzman
 nn_nounits=0.107;
 ns_nounits=0.29;
 Gk=7.748e-5;  %quantum conductance as 2*e2/h
+%%%Conductividades y resistividades%%%
 sn=1.72e8;%50e8; %conductividad del Au a 1K en (ohm*m)^-1
 ss=0.167e8;%15e8; %valor razonable? para la conductividad del Mo a 1K.
-rhon=5.8e-9;
+rhon=5.8e-9;%5.8e-9;
 rhos=60e-9;
 rhon0=10.5e-9;
 rhos0=130e-9;
@@ -43,7 +44,7 @@ catch
     %ds;dn;t;T0;
 end
 
-taumar= (t/(2*pi*(Lf/2)^2)*(1./(dn*nn)+1./(ds*ns)))
+%debug taumar= (t/(2*pi*(Lf/2)^2)*(1./(dn*nn)+1./(ds*ns)))%debug
 
 %ds/ss,dn/sn;
 [Ds,Dn]=meshgrid(ds,dn);
@@ -69,14 +70,15 @@ d0=1./((pi/2)*(T0*ns*Lf^2*Kb));
 
 ss0=1.89e7; %(martinis: 1.89e7 (1/52.91e-9) maria:1/130e-9:0.77e7);
 %fs=ss0/(4*Gk/(Lf)^2);
-fs=1/(4*Gk/(Lf)^2)/rhos0;
+f=1/(4*Gk/(Lf)^2); %hay un factor 2 de diferencia con el Gk de Martinis.
+fs=f/rhos0;
 RRRn=2;%RRRn=2;
 %rhon=60e-9;rhon0=rhon*RRRn;
-fn=1/(4*Gk/(Lf)^2)/rhon0;
+fn=f/rhon0;
 %RRRs=rhos0/rhos;RRRn=rhon0/rhon;
 
 %t2=1./(1./t+bool*(1/3).*(ds/(RRRs*fs)+dn/(RRRn*fn))); %+0*(dn/(RRRn*84.4e-9)) eliminamos la parte de dn en los ajustes porque esta sí es despreciable
-t2=1./(1./t+bool*(1/3).*(ds*rhos+dn*rhon));
+t2=1./(1./t+bool*(1/3).*(ds*rhos+dn*rhon)/f);
 % rho0s=130e-9(maria) -> f=6.8nm; rho0s=52.91 (martinis)-> f=16.75nm;
 %t2=1./(1./t+bool*(1/3).*(ds/(RRRs*13e-9)+dn/(RRRn*152e-9)));
 

@@ -2,7 +2,7 @@ function [ftes,varargout] = FtesTI(ttes,ites)
 %version de RtesTI pero normalizada. Hacemos Rn=1.
 
 Dr=0.2;%0.01
-alfa=50;
+alfa=100;
 
 %model1
 %Rtes=Rn./(1+exp(-(sqrt((Ttes/Tc).^2+(Ites/Ic).^2).^4-1)./Dr));
@@ -21,9 +21,11 @@ alfa=50;
 %model3.R(T)=(T/Tc)^alfa.
 %profiler notes. las operaciones '.^' son costosas. Reescribo para
 %minimizarlas.
-p=4;
+p=.8;
 %r=(ttes.^p+ites.^p).^(1/p);
-r=exp(log(exp(p*log(ttes))+exp(p*log(ites)))/p);
+%r=(ttes.^p+(1-ttes).^p).^(1/p);
+r=exp(log(exp(p*log(ttes))+exp(p*log(ites)))/p);%%%distancia_p
+%r=exp(log(exp(p*log(ttes))+exp(3*log(1-ttes)))/p);
 %ftes=r.^alfa;
 lf=alfa*log(r);%esto acelera algo el codigo.
 ftes=exp(lf);

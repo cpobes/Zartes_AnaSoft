@@ -3,6 +3,8 @@ function [TF,f]=TF_HP(Rtes,Rf,L)
 %En primera aproximación Zbox=Rk, pero si se tiene en cuenta la Lbox cambia
 %un poco la TF esperada. También se puede añadir la RC en paralelo y se
 %nota también un poco, pero sólo a alta frecuencia. 
+%sólo funciona para estado normal y superconductor del TES.
+
 invMs=24.1;
 invMf=66;
 Rsh=2e-3;

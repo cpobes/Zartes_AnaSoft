@@ -4,12 +4,12 @@ function TF=BuildLinearModel()
 %parametros
 
 %P0=77e-15;%80e-15;%77e-15; % potencia disipada en equilibrio
-Rsh=2e-3;Rpar=0.5e-3;
-R0=80e-3;%210e-3;%79e-3; % R de equilibrio
+Rsh=2e-3;Rpar=0.31e-3;
+R0=15e-3;%210e-3;%79e-3; % R de equilibrio
 I0=1e-6;
 P0=I0^2*R0;
 %I0=(P0/R0)^.5; % corriente de equilibrio
-T0= 0.150;%0.07; %pto. operacion.aprox Tc.(0.155)
+T0= 0.41;%0.07; %pto. operacion.aprox Tc.(0.155)
 %G=1.7e-12;%1.66e-12;%1.7e-12; %conductancia termica con el baño
 G=1.7e-12;C=2.3e-15;
 L=400e-9;

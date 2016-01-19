@@ -1,3 +1,4 @@
+%%%old
 %Intento de simular IVs. La superficie R(T,I) se define en RtesTI y los
 %parámetros del circuito y ecuaciones en IVsolver. Tomo un vector
 %de corrientes de polarización para los que resolver las ecuaciones y un set de

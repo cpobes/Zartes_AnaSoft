@@ -21,7 +21,7 @@ ED=380*Kb;%*2*pi/h; %Debye energy for molibdenum.in units of hbar=1.
 %variables:
 tauN=2*pi*vn*dn./(t*vs^2);
 tauS=2*pi*ds./(t*vs);
-tau_inv=1./tauS+1./tauN
+%tau_inv=1./tauS+1./tauN%debug.
 % Kf=(2*pi/t)*(Lf/2)^2;
 % tauN=Kf*dn*nn;
 % tauS=Kf*ds*ns;

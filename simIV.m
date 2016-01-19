@@ -2,7 +2,7 @@ function [Ttes,Ites,xf]=simIV(Tb,varargin)
 
 %scan parameters
 %Imax=2e-3; %en mA %2e-3;
-Imax=10e-3;
+Imax=20e-3;
 Imin=0;%0.5e-3;
 
 %parametros del TES

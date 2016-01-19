@@ -37,8 +37,8 @@ if strcmp(f,'atan')
     %alfaT4=T.*p(3).*(atan((T-p(2))/p(3))+pi/2)./(p(3)^2+(T-p(3).^2);
 end
 if strcmp(f,'asy')%pruebas con funciones asimétricas de pocos parámetros.
-    %R=p(1)*(1-exp(-(T-p(2)).^2/(2*p(3)^2))).*heaviside(T-p(2));%rayleigh
-    R=(1)*(1-exp(-((T-p(2))/p(3)).^p(4))); %weibull
+    %R=p(1)*(1-exp(-(T-p(2)).^2/(2*p(3)^2))).*heaviside(T-p(2cdf.rayleigh
+    R=p(1)*(1-exp(-((T-p(2))/p(3)).^p(4))); %cdf.weibull
 end
 if strcmp(f,'ere')%exp + recta + exp. funcion a 6 parametros.
     %p=[R0,Tc1,D1,Rn,Tc2,D2];
