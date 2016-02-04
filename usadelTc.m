@@ -11,8 +11,10 @@ e=1.602e-19;
 Lf=0.524e-9; %Fermi length. 0.524e-9 en Au.
 ns=0.29e29/e; %densidad de estados pasado a st/Jm3
 nn=0.107e29/e;
-vs=1/(ns*(Lf/2)^2); %fermi velocity Mo. in units of hbar=1.si no, dividir pot hbar.
-vn=vs*nn/ns; %fermi velocity Au
+vs=1/(ns*(Lf/2)^2) %fermi velocity Mo. in units of hbar=1.si no, dividir pot hbar.
+%vs=1.98e6*(h/(2*pi))
+vn=vs*nn/ns %fermi velocity Au
+%vn=0.28e6*(h/(2*pi)); %tesis maria 1.38e6
 Kb=1.38e-23; %boltzman constant
 ED=380*Kb;%*2*pi/h; %Debye energy for molibdenum.in units of hbar=1.
 

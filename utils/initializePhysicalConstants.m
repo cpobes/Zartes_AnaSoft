@@ -56,7 +56,9 @@ Data = {'Na', 'Avogadro''s Number', 6.022e23, 'mol^-1';
     'T_o', 'Zero of Celsius Scale', 273.15, 'K';
     'G','Gravitation Constant',6.67384e-11,'m^3*Kg^-1*s^-2';
     'c','speed of light',299792458,'m*s^-1';
-    'Pm','proton mass',1.672621777e-27,'Kg'
+    'Pm','proton mass',1.672621777e-27,'Kg';
+    'me','electron mass',9.10938215e-31,'Kg';
+    'h','Plank''s constant',6.626e-34,'J*s'
     };
 
 %% Load Data into the CONSTS structre.

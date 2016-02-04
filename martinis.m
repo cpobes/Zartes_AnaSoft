@@ -12,7 +12,7 @@ end
         dn=115e-9; %espesor oro por defecto;
         ds=50e-9; %espesor Mo por defecto.
         t=0.3; %transparencia por defecto
-        T0=0.915; %Tbulk por defecto.
+        T0=915; %Tbulk por defecto.
         bool=1; %0: formula simple, 1:formula con t'.
         RRRs=2;
         
@@ -50,7 +50,9 @@ end
 [Ds,Dn]=meshgrid(ds,dn);
 alfa=Dn*nn_nounits./(Ds*ns_nounits);
 %dn*nn./(ds*ns);
-d0=1./((pi/2)*(T0*ns*Lf^2*Kb));
+d0=1./((pi/2)*(T0*ns*Lf^2*Kb))
+%nch=2*(Dn+Ds)./Lf*1e15;%A
+%d0=nch./((2*pi)*(Kb*T0*ns))
 
 %tau=(2*t./(pi*Lf^2)).*(1./(Dn*nn)+1./(Ds*ns)),E=Kb*0,alfa
 %tau/Kb
@@ -82,4 +84,4 @@ t2=1./(1./t+bool*(1/3).*(ds*rhos+dn*rhon)/f);
 % rho0s=130e-9(maria) -> f=6.8nm; rho0s=52.91 (martinis)-> f=16.75nm;
 %t2=1./(1./t+bool*(1/3).*(ds/(RRRs*13e-9)+dn/(RRRn*152e-9)));
 
-Tc=T0.*(Ds./(d0*1.13*(1+1./alfa).*t2)).^alfa;
+Tc=T0.*(Ds./(d0*1.13.*(1+1./alfa).*t2)).^alfa;
