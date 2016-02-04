@@ -1,5 +1,5 @@
 function zbox=Zbox(f)
-
+%función de transferencia de la Ibox de magnicon.
 Rbox=1e4;
 Lbox=2e-3;
 Cbox=100e-12;
