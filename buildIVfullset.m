@@ -11,6 +11,8 @@ Rf=1e3;
 Rpar=0.31e-3;
 Rsh=2e-3;
 Rn=35.8e-3;
+invMs=24.1;
+invMf=66;
 
 figure
 subplot(2,2,1)
@@ -19,7 +21,7 @@ for i=1:length(h)
     x=get(h(i),'xdata');
     y=get(h(i),'ydata');
     plot(x,y,'.-'),hold on
-    ites=y*22/(66*Rf);
+    ites=y*invMs/(invMf*Rf);
     vtes=(x-ites)*Rsh-ites*Rpar;
     ptes=vtes.*ites;
     Rtes=vtes./ites;

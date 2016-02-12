@@ -2,7 +2,7 @@ function [ftes,varargout] = FtesTI(ttes,ites)
 %version de RtesTI pero normalizada. Hacemos Rn=1.
 
 Dr=0.2;%0.01
-alfa=100;
+alfa=30;
 
 %model1
 %Rtes=Rn./(1+exp(-(sqrt((Ttes/Tc).^2+(Ites/Ic).^2).^4-1)./Dr));

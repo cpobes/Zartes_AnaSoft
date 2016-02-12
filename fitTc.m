@@ -8,7 +8,7 @@ function R=fitTc(p,T); %,varargin
 %    f='erf';
 %end
 
-f='ere' %erf,e+r,exp, log,atan, asy.
+f='e+r'; %erf,e+r,exp, log,atan, asy.
 if strcmp(f,'e+r')
     R=heaviside(T-p(2)).*(p(1)+p(1)*(T-p(2))/p(3))+p(1)*(1-heaviside(T-p(2))).*exp((T-p(2))/p(3));
     %si forzamos f(Tc)=g(Tc) y f'(Tc)=g'(Tc) se reduce de 5 a 3 parámetros los

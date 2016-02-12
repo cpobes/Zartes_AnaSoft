@@ -30,4 +30,13 @@ function fz=fitZ(p,f)
 %alternative definition ztes=Zinf-(Z0-Zinf)/(-1+w*tau*i)
 %pasamos directamente Zinf=p(1), Z0=p(2), tau=p(3).
 %manejamos magnitudes complejas directamente.
+%p=[Zinf Z0 tau];
 fz=p(1)-(p(2)-p(1))./(-1+2*pi*f*p(3)*1i);
+
+%modelo 2 bloques Caso A cuadernos maria.ec(70)section 4.4.1.
+%incluyo dos parámetros mas, el cociente de capacidades y un tau_A
+%p=[Zinf Z0 tau_eff c tau_A]; c=CA/C0, tauA=CA/Gtes.
+%El caso B es igual, solo que los parámetros tienen una interpretacion
+%diferente.
+%
+%%%fz=p(1)-(p(2)-p(1))./(-1+2*pi*f*p(3)*1i.*(1-p(4)*(2*pi*f*p(5)*1i)./(1+2*pi*f*p(5)*1i)));

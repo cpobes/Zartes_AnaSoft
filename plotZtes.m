@@ -1,4 +1,4 @@
-function plotZtes(TFm,TFs,f,L,varargin)
+function varargout=plotZtes(TFm,TFs,f,L,varargin)
 %plot Ztes from measured TF and superconducting TF.
 
 
@@ -8,8 +8,9 @@ Rth=Rsh+Rpar;
 %L=78e-7;
 if nargin>4
     ind=varargin{1};
-    Ztes=(TFs(1:ind)./TFm(1:ind)-1).*(Rth+i*2*pi*L*f(1:ind));
+    Ztes=(TFs(1:ind)./TFm(1:ind)-1).*(Rth+1i*2*pi*L*f(1:ind));
 else
-    Ztes=(TFs./TFm-1).*(Rth+i*2*pi*L*f);
+    Ztes=(TFs./TFm-1).*(Rth+1i*2*pi*L*f);
 end
-plot(Ztes)
+varargout{1}=Ztes;
+plot(Ztes,'r')
