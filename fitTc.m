@@ -1,4 +1,4 @@
-function R=fitTc(p,T); %,varargin
+function [R,varargout]=fitTc(p,T); %,varargin
 %p=(RR,Tc,DeltaT)
 %R=p(1)*(atan(((T-p(2)))/p(3))+pi/2)/pi;
 %alfaT4=T.*p3(3).*(atan((T-p3(2))/p3(3))+pi/2)./(p3(3)^2+(T-p3(3).^2);
@@ -8,19 +8,22 @@ function R=fitTc(p,T); %,varargin
 %    f='erf';
 %end
 
-f='e+r'; %erf,e+r,exp, log,atan, asy.
+f='erf'; %erf,e+r,exp, log,atan, asy.
 if strcmp(f,'e+r')
+    %p=[R0 Top DT];
     R=heaviside(T-p(2)).*(p(1)+p(1)*(T-p(2))/p(3))+p(1)*(1-heaviside(T-p(2))).*exp((T-p(2))/p(3));
     %si forzamos f(Tc)=g(Tc) y f'(Tc)=g'(Tc) se reduce de 5 a 3 parámetros los
     %2 ajustes.
     %T1/2=p(2)+p(3)*(Rn/(2*p(1))-1)
-    alfa=p(2)/p(3);
+    param.alfai=p(2)/p(3);
+    param.model='e+r';
 end
 if strcmp(f,'erf')
     R=p(1)*(erf((T-p(2))/p(3))+1)/2;
-    alfaTc=2*p(2)/(sqrt(pi)*p(3));
-    alfaT=2*T/(sqrt(pi)*p(3)).*(exp(-((T-p(2))/p(3)).^2))./(erf((T-p(2))/p(3))+1);
-    alfaOp=2*(p(2)-p(3)/sqrt(2))/(p(3)*sqrt(pi*exp(1))*(1+erf(-1/sqrt(2))));
+    param.alfaTc=2*p(2)/(sqrt(pi)*p(3));
+    param.alfaT=2*T/(sqrt(pi)*p(3)).*(exp(-((T-p(2))/p(3)).^2))./(erf((T-p(2))/p(3))+1);
+    param.alfaOp=2*(p(2)-p(3)/sqrt(2))/(p(3)*sqrt(pi*exp(1))*(1+erf(-1/sqrt(2))));
+    param.model='erf';
     %defino en este caso alfaop como el alfa a la Temp a la que la segunda
     %derivada de la R(T) alcanza un extremo.
 end
@@ -47,4 +50,7 @@ if strcmp(f,'ere')%exp + recta + exp. funcion a 6 parametros.
         p(1)*(heaviside(T-p(2))-heaviside(T-p(5))).*(1+(T-p(2))/p(3))+...
         p(4)*heaviside(T-p(5)).*(1-exp(-(T-T3)/p(6)));
     
+    param.alfai=p(2)/p(3);
+    param.model='ere';
 end
+varargout{1}=param;

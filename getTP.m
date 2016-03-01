@@ -1,7 +1,7 @@
 function param=getTP(p)
 Rn=fitTc(p,1.2); %consideramos que a 2K se ha alcanzado ya Rn.%ojo, obtengo NaN para algun 'p' a T=2.
 T=0:1e-6:2; %array de temperaturas.
-R=fitTc(p,T);
+[R,param]=fitTc(p,T);
 %Rn=1.064;
 %R=data{2}(ind,8);
 %T=data{2}(ind,3);
@@ -17,6 +17,6 @@ param.T10=T10;
 
 %OJO, estos son model dependent.
 %para 'ere'
-param.alfa05=p(1)*T(indc)/(p(3)*fitTc(p,T(indc)));
-param.alfai=p(2)/p(3);
+%param.alfa05=p(1)*T(indc)/(p(3)*fitTc(p,T(indc)));
+%param.alfai=p(2)/p(3);
 %faltaria implementar el calculo de alfa a una T dada.

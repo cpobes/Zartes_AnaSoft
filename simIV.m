@@ -2,8 +2,12 @@ function [Ttes,Ites,xf]=simIV(Tb,varargin)
 
 %scan parameters
 %Imax=2e-3; %en mA %2e-3;
-Imax=20e-3;
+Imax=1.0e-3;
 Imin=0;%0.5e-3;
+Ib=linspace(Imax,Imin,500);
+%relatstep=-1e-2;
+%Ib=Imin:relatstep*Imax:Imax;
+%Ib=Imax:-1e-2*Imax:Imin;
 
 %parametros del TES
 if nargin==1
@@ -18,12 +22,10 @@ else
     Rsh=TESparam.Rsh;Rpar=TESparam.Rpar;Rn=TESparam.Rn;
     Ic=TESparam.Ic;Tc=TESparam.Tc;
     n=TESparam.n;K=TESparam.K;
+    Circuitparam=varargin{2};
 end
-crs=Rsh/(Rsh+Rpar);crn=Rsh/(Rsh+Rpar+Rn);
-relatstep=1e-2;
-Ib=Imin:relatstep*Imax:Imax;
-%Ib=Imax:-1e-2*Imax:Imin;
 
+crs=Rsh/(Rsh+Rpar);crn=Rsh/(Rsh+Rpar+Rn);
 
 %normalized parameters:
 tb=Tb/Tc;ib=Ib/Ic;ub=tb^n;
@@ -33,7 +35,9 @@ tb=Tb/Tc;ib=Ib/Ic;ub=tb^n;
 %options = optimset( 'TolFun', 1.0e-12, 'TolX',1.0e-12,'jacobian','off','algorithm','levenberg-marquardt','maxfunevals',500);%,'plotfcn',@optimplotfirstorderopt);
 options = optimset( 'TolFun', 1.0e-12, 'TolX',1.0e-12,'jacobian','off');
 for i=1:length(Ib)
-    y0=[crs*ib(i) tb];%%%!!!ub<->tb.
+     y0up=[crs*ib(i) tb];%%%!!!ub<->tb.
+     y0down=[crn*ib(i) 1.5];%%%1.5^n<->1.5
+     y0=y0down;%poner y0up para trazar subiendo.
         %TESparam.T0=Tb;TESparam.I0=cr*Ib(i);
         %cond=StabilityCheck(TESparam);
         %estab(i)=cond.stab;
@@ -55,7 +59,7 @@ Ttes=ttes*Tc;
 % TESparam.Rsh=Rsh;TESparam.Rpar=Rpar;TESparam.Rn=Rn;
 % TESparam.Ic=Ic;TESparam.Tc=Tc;
 
-showIVsims(Ttes,Ites,Ib,TESparam)
+showIVsims(Ttes,Ites,Ib,TESparam,Circuitparam)
 
 
 %Ttes(find(abs(Ttes>5)))=0;

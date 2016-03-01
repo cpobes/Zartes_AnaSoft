@@ -1,4 +1,4 @@
-function showIVsims(Ttes,Ites,Ib,TESparam)
+function showIVsims(Ttes,Ites,Ib,TESparam,Circuitparam)
 
 Rsh=TESparam.Rsh;Rpar=TESparam.Rpar;Rn=TESparam.Rn;
 Ic=TESparam.Ic;Tc=TESparam.Tc;
@@ -13,8 +13,14 @@ Ptes=Ites.*Vtes;
 
 %subplot(1,2,1) 
 %
-Rf=0.7e3;%ojo, este parametro puede cambiar.
-Mq=3;%cociente de inductancias mutuas 66/22.
+%%%Empiezo a usar Circuitparam como estructura con los parametros del
+%%%circuito y del squid.
+Rf=Circuitparam.Rf;
+invMf=Circuitparam.invMf;
+invMin=Circuitparam.invMin;
+Rf=1e3;%ojo, este parametro puede cambiar.
+Mq=invMf/invMin;%cociente de inductancias mutuas 66/22.
+
 Vout=Ites*Rf*Mq;%
 
 subplot(2,4,1);plot(Ib,Vout,'.-'),grid on%,hold on
@@ -26,11 +32,13 @@ xlabel('Vtes(V)');ylabel('Ptes(W)');
 subplot(2,4,6);plot(rtes,Ptes,'.-'),grid on%,hold on
 xlabel('Rtes(%)');ylabel('Ptes(W)');
 
-step=1e-3;
-trange=[0:step:1.5];irange=[0:step:1.5];
-[X,Y]=meshgrid(trange,irange);
-TESparam=SetOP(X*Tc,Y*Ic,TESparam);
-stab=StabilityCheck(TESparam);
+
+%%%ya se ejecuta en showStability().
+% step=1e-3;
+% trange=[0:step:1.5];irange=[0:step:1.5];
+% [X,Y]=meshgrid(trange,irange);
+% TESparam=SetOP(X*Tc,Y*Ic,TESparam);
+% stab=StabilityCheck(TESparam);
 
 %%%pintamos contornos y estabilidad.
 subplot(1,2,2)
@@ -52,4 +60,7 @@ plot3(Ttes,Ites,rtes,'.k','markersize',15)
 Tb=Ttes(Ites==0);
 plotNSslopes(Tb,TESparam)
 hold off
+
+figure
+plot(rtes,Ttes,'.-')
 

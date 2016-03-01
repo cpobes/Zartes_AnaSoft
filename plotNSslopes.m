@@ -1,5 +1,5 @@
 function plotNSslopes(Tb,TES)
-Imin=0;Imax=10e-3;
+Imin=0;Imax=1e-3;
 Ib=Imin:1e-3*Imax:Imax;
 %parametros
 Rsh=TES.Rsh;
@@ -22,4 +22,5 @@ It=ItS(FtesTI(TtS/TES.Tc,ItS/TES.Ic)<1e-1);
 Tt=[Tt TtN(FtesTI(TtN/TES.Tc,ItN/TES.Ic)>0.999)];
 It=[It ItN(FtesTI(TtN/TES.Tc,ItN/TES.Ic)>0.999)];
 
-plot(Tt,It,'.r')
+ind=find(Tt<1.3*TES.Tc);
+plot(Tt(ind),It(ind),'.r')
