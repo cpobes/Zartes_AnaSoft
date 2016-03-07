@@ -30,8 +30,17 @@ function fz=fitZ(p,f)
 %alternative definition ztes=Zinf-(Z0-Zinf)/(-1+w*tau*i)
 %pasamos directamente Zinf=p(1), Z0=p(2), tau=p(3).
 %manejamos magnitudes complejas directamente.
-%p=[Zinf Z0 tau];
-fz=p(1)-(p(2)-p(1))./(-1+2*pi*f*p(3)*1i);
+%%%p=[Zinf Z0 tau];
+w=2*pi*f;
+D=(1+(w.^2)*(p(3).^2));
+fz=p(1)-(p(2)+p(1))./(-1+2*pi*f*p(3)*1i);
+%rfz=real(fz);imz=imag(fz);
+
+rfz=p(1)-(p(1)-p(2))./D;
+%%rfz=p(1)-(p(1)-p(2))./D+(p(4)-p(5))*w*p(3)./D;
+imz=-(p(1)-p(2))*w*p(3)./D;
+%%imz=p(4)-(p(1)-p(2))*w*p(3)./D-(p(4)-p(5))./D;
+fz=[rfz imz];
 
 %modelo 2 bloques Caso A cuadernos maria.ec(70)section 4.4.1.
 %incluyo dos parámetros mas, el cociente de capacidades y un tau_A
@@ -39,4 +48,6 @@ fz=p(1)-(p(2)-p(1))./(-1+2*pi*f*p(3)*1i);
 %El caso B es igual, solo que los parámetros tienen una interpretacion
 %diferente.
 %
-%%%fz=p(1)-(p(2)-p(1))./(-1+2*pi*f*p(3)*1i.*(1-p(4)*(2*pi*f*p(5)*1i)./(1+2*pi*f*p(5)*1i)));
+% fz=p(1)+(p(1)-p(2))./(-1+2*pi*f*p(3)*1i.*(1-p(4)*(2*pi*f*p(5)*1i)./(1+2*pi*f*p(5)*1i)));
+% rfz=real(fz);imz=imag(fz);
+% fz=[rfz imz];

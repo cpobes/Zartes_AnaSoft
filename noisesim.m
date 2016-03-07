@@ -1,4 +1,4 @@
-function noise=noisesim(model)
+function noise=noisesim(model,varargin)
 %simulacion de componentes de ruido.
 %de donde salen las distintas componentes de la fig13.24 de la pag.201 de
 %la tesis de maria? ahi estan dadas en pA/rhz.
@@ -15,6 +15,8 @@ function noise=noisesim(model)
 
 gamma=0.5;
 Kb=1.38e-23;
+
+if nargin==1
 C=2.3e-15;%p220
 L=78e-9;%400e-9;%inductancia. arbitrario.
 G=1.7e-12;% p220 maria.
@@ -34,6 +36,28 @@ I0=1e-6;%1uA. deducido de valores de p220.
 V0=I0*R0;%
 P0=I0*V0;
 L0=P0*alfa/(G*T0);
+else
+    TES=varargin{1};
+    OP=varargin{2};
+    Circuit=varargin{3};
+    C=TES.OP.C;
+    L=Circuit.L;
+    G=TES.G;
+    alfa=TES.OP.ai;
+    bI=TES.OP.bi;
+    Rn=TES.Rn;
+    Rs=Circuit.Rsh;
+    Rpar=Circuit.Rpar;
+    RL=Rs+Rpar;
+    R0=OP.R0;
+    beta=(R0-Rs)/(R0+Rs);
+    T0=OP.T0;
+    Ts=OP.Tbath
+    P0=OP.P0;
+    I0=OP.I0;
+    V0=OP.V0;
+    L0=P0*alfa/(G*T0);
+end
 
 tau=C/G;
 taueff=tau/(1+beta*L0);
@@ -64,7 +88,7 @@ stes=4*Kb*T0*I0^2*R0*(1+2*bI)*(1+4*pi^2*f.^2*tau^2).*abs(sI).^2/L0^2;
 i_ph=sqrt(stfn);
 i_jo=sqrt(stes);
 i_sh=sqrt(ssh);
-noise.ph=i_ph;noise.jo=i_jo;noise.sh=i_sh;noise.sum=i_ph+i_jo+i_sh;
+noise.ph=i_ph;noise.jo=i_jo;noise.sh=i_sh;noise.sum=sqrt(stfn+stes+ssh);%noise.sum=i_ph+i_jo+i_sh;
 else
     error('no valid model')
 end
