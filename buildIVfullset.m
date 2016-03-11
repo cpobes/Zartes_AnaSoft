@@ -1,4 +1,4 @@
-function buildIVfullset(h)
+function buildIVfullset(h,Circuit)
 %funcion para pintar todo un set de parametros de IVs a partir de los datos
 %de una grafica medida. Sirve para poder pintar de golpe todos los datos
 %Vout-Ibias y poder eliminar curvas 'malas' a mano y a partir del handle de
@@ -7,12 +7,12 @@ function buildIVfullset(h)
 %h=get(f,'children');
 
 %parametros
-Rf=1e3;
-Rpar=0.31e-3;
-Rsh=2e-3;
-Rn=35.8e-3;
-invMs=24.1;
-invMf=66;
+Rf=Circuit.Rf;%1e3;
+Rpar=Circuit.Rpar;%0.31e-3;
+Rsh=Circuit.Rsh;%2e-3;
+Rn=Circuit.Rn;%35.8e-3;
+invMin=Circuit.invMin;%24.1;
+invMf=Circuit.invMf;%66;
 
 figure
 subplot(2,2,1)
@@ -21,7 +21,7 @@ for i=1:length(h)
     x=get(h(i),'xdata');
     y=get(h(i),'ydata');
     plot(x,y,'.-'),hold on
-    ites=y*invMs/(invMf*Rf);
+    ites=y*invMin/(invMf*Rf);
     vtes=(x-ites)*Rsh-ites*Rpar;
     ptes=vtes.*ites;
     Rtes=vtes./ites;

@@ -2,8 +2,8 @@ function [u,t]=makeInputSin(f,varargin)
 %Para el circuito de polarización de nuestros TES genera la entrada 'u' de
 %corriente para un sistema linealizado. Se hace la entrada de potencia
 %cero.
-Rsh=2e-3;L=400e-9;
-dI=5e-6;
+Rsh=2e-3;L=77e-9;
+dI=5e-6;%amplitud en corriente.
 A=dI*Rsh/L;
 %tomamos unos 10 ciclos y mil puntos
 %nargin

@@ -1,24 +1,26 @@
-function zs=plotIVfiles(Rf)
+function zs=plotIVfiles(Circuit,TbathArray)
 %plot IVs at different Tbath from files.
-Rsh=2e-3;
-Rpar=0.12e-3;
+%Falta implementar el uso de colores y markers diferentes.
 
-[file,path]=uigetfile('C:\Users\Carlos\Desktop\ATHENA\medidas\TES\2015\Dec2015\Z(w)\*','','Multiselect','on');
+Tbath=TbathArray;
+
+[file,path]=uigetfile('C:\Users\Carlos\Desktop\ATHENA\medidas\TES\2016\Feb2016\IVs\*','','Multiselect','on');
 
 T=strcat(path,file);
 
 if (iscell(T))
 for i=1:length(T),
     data{i}=importdata(T{i});
-    ibs{i}=data{i}(:,1);%%%
-    vouts{i}=data{i}(:,2);%%%
-    plotIVs(vouts{i},ibs{i},Rf),hold on,
+    %ibs{i}=data{i}(:,1);%%%
+    %vouts{i}=data{i}(:,2);%%%
+    IVmeasure(i)=BuildIVmeasureStruct(data{i},Tbath(i));%%%
+    plotIVs(Circuit,IVmeasure(i)),hold on,
 end
 else
     data=importdata(T);
-    
-    ibs=data(:,1);%%%
-    vouts=data(:,2);%%%
-    plotIVs(vouts,ibs,Rf)
+    %ibs=data(:,1);%%%
+    %vouts=data(:,2);%%%
+    IVmeasure=BuildIVmeasureStruct(data,Tbath);
+    plotIVs(Circuit,IVmeasure)
 end
 grid on
