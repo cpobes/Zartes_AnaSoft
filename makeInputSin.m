@@ -5,6 +5,7 @@ function [u,t]=makeInputSin(f,varargin)
 Rsh=2e-3;L=77e-9;
 dI=5e-6;%amplitud en corriente.
 A=dI*Rsh/L;
+A=1;%no cambia nada pasar amplitud A=1 porque se compara salida y entrada.
 %tomamos unos 10 ciclos y mil puntos
 %nargin
 if(nargin>1) N=varargin{1};else N=10;end

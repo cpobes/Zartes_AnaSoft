@@ -18,18 +18,18 @@ Ptes=Ites.*Vtes;
 Rf=Circuitparam.Rf;
 invMf=Circuitparam.invMf;
 invMin=Circuitparam.invMin;
-Rf=1e3;%ojo, este parametro puede cambiar.
+%Rf=1e3;%ojo, este parametro puede cambiar.
 Mq=invMf/invMin;%cociente de inductancias mutuas 66/22.
 
 Vout=Ites*Rf*Mq;%
 
-subplot(2,4,1);plot(Ib,Vout,'.-'),grid on%,hold on
+subplot(2,4,1);plot(Ib,Vout,'.-'),grid on,hold on
 xlabel('Ibias(A)');ylabel('Vout(V)');
-subplot(2,4,5);plot(Vtes,Ites,'.-'),grid on%,hold on
+subplot(2,4,5);plot(Vtes,Ites,'.-'),grid on,hold on
 xlabel('Vtes(V)');ylabel('Ites(A)');
-subplot(2,4,2);plot(Vtes,Ptes,'.-'),grid on%,hold on
+subplot(2,4,2);plot(Vtes,Ptes,'.-'),grid on,hold on
 xlabel('Vtes(V)');ylabel('Ptes(W)');
-subplot(2,4,6);plot(rtes,Ptes,'.-'),grid on%,hold on
+subplot(2,4,6);plot(rtes,Ptes,'.-'),grid on,hold on
 xlabel('Rtes(%)');ylabel('Ptes(W)');
 
 
@@ -55,12 +55,13 @@ showStability(TESparam)
 
 %%%pintamos curvas IV y pendientes 'N' y 'S'
 %plot3(ttes,ites,rtes,'.r','markersize',15)
+%hold on%
 plot3(Ttes,Ites,rtes,'.k','markersize',15)
 %Tb=min(Ttes);%ojo, Ttes(1) no vale para barrido en bajada.
 Tb=Ttes(Ites==0);
 plotNSslopes(Tb,TESparam)
-hold off
+%hold off
 
-figure
-plot(rtes,Ttes,'.-')
+% figure(5)
+% plot(Ttes,Rtes,'.-')
 

@@ -1,10 +1,10 @@
-function [Ttes,Ites,xf]=simIV(Tb,varargin)
+function [IVsim,xf]=simIV(Tb,varargin)
 
 %scan parameters
 %Imax=2e-3; %en mA %2e-3;
-Imax=1.0e-3;
+Imax=0.50e-3;
 Imin=0;%0.5e-3;
-Ib=linspace(Imax,Imin,500);
+Ib=linspace(Imax,Imin,100);
 %relatstep=-1e-2;
 %Ib=Imin:relatstep*Imax:Imax;
 %Ib=Imax:-1e-2*Imax:Imin;
@@ -33,10 +33,12 @@ tb=Tb/Tc;ib=Ib/Ic;ub=tb^n;
 %A=(Tc^n*K)/(Ic^2*Rn);
 
 %options = optimset( 'TolFun', 1.0e-12, 'TolX',1.0e-12,'jacobian','off','algorithm','levenberg-marquardt','maxfunevals',500);%,'plotfcn',@optimplotfirstorderopt);
-options = optimset( 'TolFun', 1.0e-12, 'TolX',1.0e-12,'jacobian','off');
+options = optimset( 'TolFun', 1.0e-15, 'TolX',1.0e-15,'jacobian','off','algorithm','levenberg-marquardt');
 for i=1:length(Ib)
      y0up=[crs*ib(i) tb];%%%!!!ub<->tb.
-     y0down=[crn*ib(i) 1.5];%%%1.5^n<->1.5
+     it0=crn*ib(i);
+     tt0=(((Ic*it0).^2*Rn/K+Tb^n).^(1/n))/Tc;
+     y0down=[it0 tt0];%%%1.5^n<->1.5
      y0=y0down;%poner y0up para trazar subiendo.
         %TESparam.T0=Tb;TESparam.I0=cr*Ib(i);
         %cond=StabilityCheck(TESparam);
@@ -60,6 +62,7 @@ Ttes=ttes*Tc;
 % TESparam.Ic=Ic;TESparam.Tc=Tc;
 
 showIVsims(Ttes,Ites,Ib,TESparam,Circuitparam)
+IVsim=BuildIVsimStruct(Ttes,Ites,TESparam);
 
 
 %Ttes(find(abs(Ttes>5)))=0;
