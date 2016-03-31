@@ -34,6 +34,8 @@ tb=Tb/Tc;ib=Ib/Ic;ub=tb^n;
 
 %options = optimset( 'TolFun', 1.0e-12, 'TolX',1.0e-12,'jacobian','off','algorithm','levenberg-marquardt','maxfunevals',500);%,'plotfcn',@optimplotfirstorderopt);
 options = optimset( 'TolFun', 1.0e-15, 'TolX',1.0e-15,'jacobian','off','algorithm','levenberg-marquardt');
+ites=zeros(1,length(Ib));
+ttes=zeros(1,length(Ib));
 for i=1:length(Ib)
      y0up=[crs*ib(i) tb];%%%!!!ub<->tb.
      it0=crn*ib(i);
@@ -47,7 +49,7 @@ for i=1:length(Ib)
     %f = @(y) NormalizedGeneralModelSteadyState(y,ib(i),tb,A,rp,rn,n); % function of dummy variable y
     %[out,fval,flag]=fsolve(f,y0,options);
     [out,~,flag]=fsolve(problem);
-    xf(i)=flag;
+    %xf(i)=flag;
     ites(i)=out(1);
     ttes(i)=out(2);
     %ttes(i)=log(out(2))/n;

@@ -1,4 +1,4 @@
-function zs=plotIVfiles(Circuit,TbathArray)
+function IVmeasure=plotIVfiles(Circuit,TbathArray)
 %plot IVs at different Tbath from files.
 %Falta implementar el uso de colores y markers diferentes.
 
@@ -9,6 +9,8 @@ Tbath=TbathArray;
 T=strcat(path,file);
 
 if (iscell(T))
+    IVmeasure=zeros(1,length(T));
+    data=zeros(1,length(T));
 for i=1:length(T),
     data{i}=importdata(T{i});
     %ibs{i}=data{i}(:,1);%%%

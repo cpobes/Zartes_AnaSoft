@@ -35,16 +35,17 @@ taueff=tau0./(L0-1);
 tauel=L./Rdyn;
 invtauetc2=(R0/L).*(2+beta).*(L0./tau0);
 
-%cond1.Stability 1.
+%%%TESIS Lindeman p68-69. ecs
+%cond1.Stability 1. ec4.23.
 conds.stab1=1./taueff<1./tauel;
 %1/taueff,1/tauel
 
-%cond2. Stability2
+%cond2. Stability2. ec4.24.
 conds.stab2=1./(taueff.*tauel)<invtauetc2;
 %1/(taueff*tauel),invtauetc2
 
 conds.stab=conds.stab1&conds.stab2;
-%cond3. Oscillatory
 
+%cond3. Oscillatory/exponential.
 conds.expo=(1./taueff+1./tauel).^2>4*invtauetc2;
 %(1/taueff+1/tauel)^2,4*invtauetc2

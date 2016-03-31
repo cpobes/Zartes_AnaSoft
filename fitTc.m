@@ -1,4 +1,4 @@
-function [R,varargout]=fitTc(p,T); %,varargin
+function [R,varargout]=fitTc(p,T) %,varargin
 %p=(RR,Tc,DeltaT)
 %R=p(1)*(atan(((T-p(2)))/p(3))+pi/2)/pi;
 %alfaT4=T.*p3(3).*(atan((T-p3(2))/p3(3))+pi/2)./(p3(3)^2+(T-p3(3).^2);
