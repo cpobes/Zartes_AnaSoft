@@ -10,7 +10,7 @@ K=TES.K;
 
 %N state
 ItN=Ib*Rsh/(Rsh+Rpar+Rn);
-TtN=(ItN.^2*Rn/K+Tb^n).^(1/n);
+TtN=(ItN.^2*Rn/K+Tb.^n).^(1/n);
 %S state
 ItS=Ib*Rsh/(Rsh+Rpar);
 TtS=Tb*ones(1,length(Ib));

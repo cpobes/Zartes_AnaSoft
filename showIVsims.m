@@ -56,7 +56,7 @@ showStability(TESparam)
 %%%pintamos curvas IV y pendientes 'N' y 'S'
 %plot3(ttes,ites,rtes,'.r','markersize',15)
 %hold on%
-plot3(Ttes,Ites,rtes,'.k','markersize',15)
+plot3(Ttes,Ites,rtes,'.-k','markersize',15)
 %Tb=min(Ttes);%ojo, Ttes(1) no vale para barrido en bajada.
 Tb=Ttes(Ites==0);
 plotNSslopes(Tb,TESparam)

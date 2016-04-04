@@ -2,7 +2,7 @@ function [ftes,varargout] = FtesTI(ttes,ites)
 %version de RtesTI pero normalizada. Hacemos Rn=1.
 
 %Definimos la norma modulo 'p'.
-p=0.8;
+p=0.9;
 r=exp(log(exp(p*log(ttes))+exp(p*log(ites)))/p);%%%distancia_p. Esto en realidad supone tomar ya una forma para Ic(Ttes). Si queremos probar otras expresiones, hay que modificar las definiciones de alfa y beta.
 
 %BCS model for i(t)
@@ -49,7 +49,7 @@ varargout{2}=alfa-varargout{1};
 
 elseif strcmp(model,'erf')
 %%%%Model 4. f='erf'
-delta=0.03;
+delta=0.01;
 ftes=(erf((r-1)/delta)+1)/2;
 alfar=(1/(delta))*r.*normpdf(r,1,delta/sqrt(2))./ftes;
 varargout{1}=alfar.*(ttes./r).^p;

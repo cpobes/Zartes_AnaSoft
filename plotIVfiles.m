@@ -9,14 +9,15 @@ Tbath=TbathArray;
 T=strcat(path,file);
 
 if (iscell(T))
-    IVmeasure=zeros(1,length(T));
-    data=zeros(1,length(T));
+    %IVmeasure=zeros(1,length(T));
+    data{:}=zeros(1,length(T));
 for i=1:length(T),
     data{i}=importdata(T{i});
     %ibs{i}=data{i}(:,1);%%%
     %vouts{i}=data{i}(:,2);%%%
     IVmeasure(i)=BuildIVmeasureStruct(data{i},Tbath(i));%%%
     plotIVs(Circuit,IVmeasure(i)),hold on,
+    
 end
 else
     data=importdata(T);
