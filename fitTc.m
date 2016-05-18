@@ -8,7 +8,7 @@ function [R,varargout]=fitTc(p,T) %,varargin
 %    f='erf';
 %end
 
-f='erf'; %erf,e+r,exp, log,atan, asy.
+f='e+r'; %erf,e+r,exp, log,atan, asy.
 if strcmp(f,'e+r')
     %p=[R0 Top DT];
     R=heaviside(T-p(2)).*(p(1)+p(1)*(T-p(2))/p(3))+p(1)*(1-heaviside(T-p(2))).*exp((T-p(2))/p(3));
@@ -19,6 +19,7 @@ if strcmp(f,'e+r')
     param.model='e+r';
 end
 if strcmp(f,'erf')
+    %p=[Rn Tc1/2 DT];
     R=p(1)*(erf((T-p(2))/p(3))+1)/2;
     param.alfaTc=2*p(2)/(sqrt(pi)*p(3));
     param.alfaT=2*T/(sqrt(pi)*p(3)).*(exp(-((T-p(2))/p(3)).^2))./(erf((T-p(2))/p(3))+1);

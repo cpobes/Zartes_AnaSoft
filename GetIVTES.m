@@ -4,9 +4,14 @@ function IVstruct=GetIVTES(Circuit,IVmeasure,varargin)
 %Get ites and vtes from measured vout and ibias and values of Rf and Rsh.
 
 
+
 for i=1:length(IVmeasure)
     Tbath=IVmeasure(i).Tbath;
 
+    %!
+    %IVmeasure(i).voutc=IVmeasure.vout;
+    %IVmeasure(i).ibias=IVmeasure.ib;
+    
     invMf=Circuit.invMf;
     invMin=Circuit.invMin;
     Rpar=Circuit.Rpar;
@@ -19,12 +24,12 @@ for i=1:length(IVmeasure)
         Rn=TES.Rn; %Si no cargamos la estructura TES, la Rn podemos pasarla a través de la estructura Circuit. Pasar TES tiene sentido para usar la 'K' y 'n' para deducir la Ttes.
     end
 
-    ites=IVmeasure(i).voutc*invMin/(invMf*Rf);
-    Vs=(IVmeasure(i).ibias-ites)*Rsh;%(ibias*1e-6-ites)*Rsh;if Ib in uA.
+    ites=IVmeasure(i).vout*invMin/(invMf*Rf);
+    Vs=(IVmeasure(i).ib-ites)*Rsh;%(ibias*1e-6-ites)*Rsh;if Ib in uA.
     vtes=Vs-ites*Rpar;
     ptes=vtes.*ites;
-    IVstruct(i).ibias=IVmeasure(i).ibias;
-    IVstruct(i).voutc=IVmeasure(i).voutc;
+    IVstruct(i).ib=IVmeasure(i).ib;
+    IVstruct(i).vout=IVmeasure(i).vout;
     IVstruct(i).Rtes=vtes./ites;
     IVstruct(i).rtes=IVstruct(i).Rtes/Rn;
     IVstruct(i).ites=ites;

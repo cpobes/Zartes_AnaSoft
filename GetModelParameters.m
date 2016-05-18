@@ -1,4 +1,4 @@
-function param=GetModelParameters(p,Itemp,Vtemp,Ib,Rf,TES)
+function param=GetModelParameters(p,IVmeasure,Ib,TES,Circuit)
 %extrae los parámetros térmicos del sistema a partir de un modelo térmico y
 %conociendo el punto de operación y la 'G'
 
@@ -13,25 +13,36 @@ function param=GetModelParameters(p,Itemp,Vtemp,Ib,Rf,TES)
 Rn=TES.Rn;
 T0=TES.Tc;
 G0=TES.G0;
-ind=find(abs(Itemp-Ib)<1e-10);
-Vout=Vtemp(ind);
-[I0,V0]=GetIVTES(Vout,Ib,Rf);
+ind=find(abs(IVmeasure.ib-Ib)<1e-10);
+Vout=IVmeasure.vout(ind);
+%[I0,V0]=GetIVTES(Vout,Ib,Rf);
+IVaux.ib=Ib;
+IVaux.vout=Vout;
+IVaux.Tbath=IVmeasure.Tbath;
+IVstruct=GetIVTES(Circuit,IVaux);%%%
+
+I0=IVstruct.ites;
+V0=IVstruct.vtes;
 %Rn=25.0e-3;
 %R0=0.46*Rn;%0.0147;
 %T0=145e-3;
 %V0=0.507e-6;I0=43.78e-6;
-P0=V0*I0;
+P0=V0.*I0;
 %G=716e-12;
 R0=V0/I0;
 R0/Rn
 
 %derived parameters
 %for simple model p(1)=Zinf, p(2)=Z0, p(3)=taueff
-rp=real(p);
+%rp=real(p);
+rp=p;
 param.bi=(rp(1)/R0)-1;
 param.L0=(rp(2)-rp(1))/(rp(2)+R0);
 param.tau0=rp(3)*(param.L0-1);
 param.C=param.tau0*G0;
 param.ai=param.L0*G0*T0/P0;
 param.rp=R0/Rn;
+param.Zinf=rp(1);
+param.Z0=rp(2);
+param.taueff=rp(3);
 

@@ -1,21 +1,40 @@
-function param=FitZfiles(Zinf,Z0,Ibs,fS,TFS,L,ind,Itemp,Vtemp,Rf,TES,varargin)
+function param=FitZfiles(fitinputs,TFSstr,IVmeasure,TES,Circuit,varargin)
 
-if nargin>11,
-    for i=1:length(varargin)
-        h(i)=varargin{i};
+
+L=Circuit.L;
+Rf=Circuit.Rf;
+Itemp=IVmeasure.ib;
+Vtemp=IVmeasure.vout;
+
+Zinf=fitinputs.zinfs;
+Z0=fitinputs.z0s;
+Ibs=fitinputs.ibs;
+
+fS=TFSstr.f;
+TFS=TFSstr.tf;
+
+if nargin>5,%%
+    ind=varargin{1};
+    if nargin>6,
+    for i=1:length(varargin)-1
+        h(i)=varargin{i+1};
+    end
     end
 else
+    ind=1:length(TFSstr.f);
 h(1)=figure;
 h(2)=figure;
 end
 
-zt=plotZfiles(TFS,L,ind,h(1),h(2))
-tau0=1e-3;
+zt=plotZfiles(TFS,Circuit,ind,h(1),h(2))
+tau0=1e-4;
 
 for i=1:length(Zinf)
     p0=[Zinf(i) Z0(i) tau0];
-    [p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,p0,fS,[real(zt{i}) imag(zt{i})]);%%%
-    param(i)=GetModelParameters(p,Itemp,Vtemp,Ibs(i),Rf,TES);
+    [p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,p0,fS,[real(zt{i}) imag(zt{i})]);%%%uncomment for real parameters.
+    %[p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,p0,fS,zt{i});%%%uncommetn for complex parameters
+    
+    param(i)=GetModelParameters(p,IVmeasure,Ibs(i),TES,Circuit);
     %plot(fitZ(p,fS),'r')
     fZ=fitZ(p,fS);figure(h(1)),plot(fZ(:,1),fZ(:,2),'r');hold on
     figure(h(2)),semilogx(fS,fZ(:,1),'k',fS,fZ(:,2),'k'),hold on

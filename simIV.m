@@ -2,9 +2,9 @@ function [IVsim,xf]=simIV(Tb,varargin)
 
 %scan parameters
 %Imax=2e-3; %en mA %2e-3;
-Imax=0.50e-3;
+Imax=0.5e-3;
 Imin=0;%0.5e-3;
-Ib=linspace(Imin,Imax,500);
+Ib=linspace(Imin,Imax,100);
 %relatstep=-1e-2;
 %Ib=Imin:relatstep*Imax:Imax;
 %Ib=Imax:-1e-2*Imax:Imin;

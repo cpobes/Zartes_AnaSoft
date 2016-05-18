@@ -36,11 +36,12 @@ D=(1+(w.^2)*(p(3).^2));
 fz=p(1)-(p(2)+p(1))./(-1+2*pi*f*p(3)*1i);
 %rfz=real(fz);imz=imag(fz);
 
+
 rfz=p(1)-(p(1)-p(2))./D;
 %%rfz=p(1)-(p(1)-p(2))./D+(p(4)-p(5))*w*p(3)./D;
 imz=-(p(1)-p(2))*w*p(3)./D;
 %%imz=p(4)-(p(1)-p(2))*w*p(3)./D-(p(4)-p(5))./D;
-fz=[rfz imz];
+fz=[rfz imz];%%%uncomment for real parameters.
 
 %modelo 2 bloques Caso A cuadernos maria.ec(70)section 4.4.1.
 %incluyo dos parámetros mas, el cociente de capacidades y un tau_A

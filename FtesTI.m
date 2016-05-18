@@ -2,14 +2,14 @@ function [ftes,varargout] = FtesTI(ttes,ites)
 %version de RtesTI pero normalizada. Hacemos Rn=1.
 
 %Definimos la norma modulo 'p'.
-p=0.9;
+p=0.82;
 r=exp(log(exp(p*log(ttes))+exp(p*log(ites)))/p);%%%distancia_p. Esto en realidad supone tomar ya una forma para Ic(Ttes). Si queremos probar otras expresiones, hay que modificar las definiciones de alfa y beta.
 
 %BCS model for i(t)
 %r=(ttes+ites.^(2/3)).^1; %i=(1-t)^(3/2) -> i^(2/3)+t=1 -> (i^(2/3)+t)^n=r.
 %Se puede hacer n=1.
 
-model='power';
+model='TFM';
 if strcmp(model,'1')
 %model1. %Dr=0.2;%0.01%for model 1 and model 2.
 %Rtes=Rn./(1+exp(-(sqrt((Ttes/Tc).^2+(Ites/Ic).^2).^4-1)./Dr));
@@ -54,6 +54,33 @@ ftes=(erf((r-1)/delta)+1)/2;
 alfar=(1/(delta))*r.*normpdf(r,1,delta/sqrt(2))./ftes;
 varargout{1}=alfar.*(ttes./r).^p;
 varargout{2}=alfar-varargout{1};
+
+elseif strcmp(model,'recta')
+    %%%modelo lineal en toda la transición.
+    delta=0.007;
+    ftes=(r-1)/delta+0.5;%%%R(Tc)=Rn/2.
+    ftes(ftes<0)=0;
+    ftes(ftes>1)=1;
+    alfar=r./((r-1)+delta/2);
+    varargout{1}=alfar.*(ttes./r).^p;
+    varargout{2}=alfar-varargout{1};
+    
+elseif strcmp(model,'ere')
+    %%%modelo expo+recta+expo.
+    param=[0.1 0.95 0.01 0.9 1.05 0.01];
+        T3=param(5)-param(6)*log(param(3)*param(4)/(param(6)*param(1)));
+    ftes=param(1)*(1-heaviside(r-param(2))).*exp((r-param(2))/param(3))+...
+        param(1)*(heaviside(r-param(2))-heaviside(r-param(5))).*(1+(r-param(2))/param(3))+...
+        param(4)*heaviside(r-param(5)).*(1-exp(-(r-T3)/param(6)));
+     alfar=r./((r-1)+0.01/2);%%%from 'recta'
+    varargout{1}=alfar.*(ttes./r).^p;
+    varargout{2}=alfar-varargout{1};
+elseif strcmp(model,'TFM') %two fluid model
+    ci=0.8;cr=1;
+    ic=real((1-ttes).^1.5);%GL
+    ftes=max(cr*(1-ci*ic./ites),0);
+    varargout{1}=1.5*ci*cr*ites.*ttes.*(1-ttes).^.5./ftes;%ec 37 ullom review
+    varargout{2}=cr./ftes-1; %ec 38 Ullom review
 end
 
 
