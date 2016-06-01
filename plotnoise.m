@@ -1,4 +1,4 @@
-function plotnoise(varargin)
+function noise=plotnoise(varargin)
 if nargin==0
     models={'wouter', 'irwin'};
 else

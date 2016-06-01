@@ -4,7 +4,7 @@ function [IVsim,xf]=simIV(Tb,varargin)
 %Imax=2e-3; %en mA %2e-3;
 Imax=0.5e-3;
 Imin=0;%0.5e-3;
-Ib=linspace(Imin,Imax,100);
+Ib=linspace(Imin,Imax,500);
 %relatstep=-1e-2;
 %Ib=Imin:relatstep*Imax:Imax;
 %Ib=Imax:-1e-2*Imax:Imin;
@@ -39,7 +39,7 @@ ttes=zeros(1,length(Ib));
 for i=1:length(Ib)
      y0up=[crs*ib(i) tb];%%%!!!ub<->tb.
      it0=crn*ib(i);
-     tt0=(((Ic*it0).^2*Rn*0.8/K+Tb^n).^(1/n))/Tc;
+     tt0=(((Ic*it0).^2*Rn*0.9/K+Tb^n).^(1/n))/Tc;
      y0down=[it0 tt0];%%%1.5^n<->1.5
      y0=y0down;%poner y0up para trazar subiendo.
         %TESparam.T0=Tb;TESparam.I0=cr*Ib(i);

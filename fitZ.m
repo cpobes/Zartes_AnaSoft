@@ -51,4 +51,4 @@ fz=[rfz imz];%%%uncomment for real parameters.
 %
 % fz=p(1)+(p(1)-p(2))./(-1+2*pi*f*p(3)*1i.*(1-p(4)*(2*pi*f*p(5)*1i)./(1+2*pi*f*p(5)*1i)));
 % rfz=real(fz);imz=imag(fz);
-% fz=[rfz imz];
+ %fz=[rfz imz];

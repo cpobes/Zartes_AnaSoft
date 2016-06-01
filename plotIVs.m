@@ -1,5 +1,5 @@
 function plotIVs(Circuit,IVmeasure)
-%Versión para usar como parámetros de entradauna estructura IVmeasure con
+%Versión para usar como parámetros de entrada una estructura IVmeasure con
 %toda la información necesaria.
 
 IVstruct=GetIVTES(Circuit,IVmeasure);
@@ -7,8 +7,8 @@ IVstruct=GetIVTES(Circuit,IVmeasure);
 % plot(vtes,ites,'.--'),grid on,hold on
 % xlabel('Vtes(V)');ylabel('Ites(A)');
 
-ibias=IVmeasure.ibias;
-vout=IVmeasure.voutc;%valor corregido de Vout.
+ibias=IVmeasure.ib;
+vout=IVmeasure.vout;%valor corregido de Vout.
 
 %curva Vout-Ibias
 subplot(2,2,1);plot(ibias,vout,'.--','DisplayName',num2str(IVmeasure.Tbath)),grid on,hold on

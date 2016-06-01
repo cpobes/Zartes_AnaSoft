@@ -9,7 +9,8 @@ r=exp(log(exp(p*log(ttes))+exp(p*log(ites)))/p);%%%distancia_p. Esto en realidad
 %r=(ttes+ites.^(2/3)).^1; %i=(1-t)^(3/2) -> i^(2/3)+t=1 -> (i^(2/3)+t)^n=r.
 %Se puede hacer n=1.
 
-model='TFM';
+%%%available models:'power', 'erf', 'recta', 'ere', 'TFM'
+model='TFM';%'recta';
 if strcmp(model,'1')
 %model1. %Dr=0.2;%0.01%for model 1 and model 2.
 %Rtes=Rn./(1+exp(-(sqrt((Ttes/Tc).^2+(Ites/Ic).^2).^4-1)./Dr));

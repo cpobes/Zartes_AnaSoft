@@ -7,9 +7,12 @@ if nargin==0
     [~,data]=loadppms();
     T=data.T;R1=data.R1;R2=data.R2;ind=1:length(data.T);
     fit=0;
+    varargout{1}=data;
     hold off;
 else
-    T=varargin{1};R1=varargin{2};R2=varargin{3};ind=varargin{4};
+    data=varargin{1};
+    T=data.T;R1=data.R1;R2=data.R2;ind=data.ind;
+    p01=varargin{2}.p01;p02=varargin{2}.p02;
     fit=1;
 end
 
@@ -30,9 +33,9 @@ ylabel('R(\Omega)')
 if fit
     %definición manual de p0. Va mal con 'ere'.Mejorar.
    % p01=[0.1 0.89 0.01 1.7 0.9 0.01];
-    p01=[1.0 0.96 0.01];
+    %p01=[0.015 0.116 0.01 0.002];%%%p(4) es un offset para el dilucion.
     %p02=[0.1 0.96 0.01 1.1 0.97 0.01];
-    p02=[1.1 0.96 0.01];
+    %p02=[1.1 0.96 0.01 0.002];
     
     [p1,aux1,aux2,aux3,out]=lsqcurvefit(@fitTc,p01,T(ind),R1(ind));
     [p2,aux1,aux2,aux3,out]=lsqcurvefit(@fitTc,p02,T(ind),R2(ind));

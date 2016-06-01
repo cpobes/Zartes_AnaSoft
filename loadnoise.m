@@ -12,6 +12,11 @@ end
 T=strcat(path,file);
 
 for i=1:length(T),
-    data{i}=importdata(T{i},'\t',skip);%
-    if(skip) data{i}=data{i}.data;end
+    if iscell(T)
+        data{i}=importdata(T{i},'\t',skip);%
+        if(skip) data{i}=data{i}.data;end
+    else
+        data=importdata(T,'\t',skip);%
+        if(skip) data=data.data;end
+    end
 end
