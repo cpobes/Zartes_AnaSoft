@@ -1,9 +1,12 @@
 function [ftes,varargout] = FtesTI(ttes,ites)
-%version de RtesTI pero normalizada. Hacemos Rn=1.
+%version de RtesTI pero normalizada. Hacemos Rn=1. También pasamos la
+%temperatura y corrientes normalizadas: ttes=T/Tc, ites=I/Ic.
 
 %Definimos la norma modulo 'p'.
 p=0.82;
-r=exp(log(exp(p*log(ttes))+exp(p*log(ites)))/p);%%%distancia_p. Esto en realidad supone tomar ya una forma para Ic(Ttes). Si queremos probar otras expresiones, hay que modificar las definiciones de alfa y beta.
+%%%distancia_p. Esto en realidad supone tomar ya una forma para Ic(Ttes). 
+%%%Si queremos probar otras expresiones, hay que modificar las definiciones de alfa y beta.
+r=exp(log(exp(p*log(ttes))+exp(p*log(ites)))/p);
 
 %BCS model for i(t)
 %r=(ttes+ites.^(2/3)).^1; %i=(1-t)^(3/2) -> i^(2/3)+t=1 -> (i^(2/3)+t)^n=r.
