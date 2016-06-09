@@ -16,9 +16,9 @@ if nargin==1
 elseif nargin==2
     
     names=options.names;
-    values=ooptions.values;
+    values=options.values;
 
 end
 
-set(handle,names,values);
+set(handle,names,values(1:length(handle),:));
     

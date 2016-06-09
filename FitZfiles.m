@@ -1,4 +1,4 @@
-function param=FitZfiles(fitinputs,TFSstr,IVmeasure,TES,Circuit,varargin)
+function [param,resN]=FitZfiles(fitinputs,TFSstr,IVmeasure,TES,Circuit,varargin)
 
 
 L=Circuit.L;
@@ -29,12 +29,14 @@ end
 zt=plotZfiles(TFS,Circuit,ind,h(1),h(2))
 tau0=1e-4;
 
-for i=1:length(Zinf)
+for i=1:length(zt)
     p0=[Zinf(i) Z0(i) tau0];
-    [p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,p0,fS,[real(zt{i}) imag(zt{i})]);%%%uncomment for real parameters.
+    %[p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,p0,fS,[real(zt{i}) imag(zt{i})]);%%%uncomment for real parameters.
+    [p,aux1,aux2,aux3,out]=lsqcurvefit(@fitReZ,p0,fS,[real(zt{i})]);%%%uncomment for real part only.
     %[p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,p0,fS,zt{i});%%%uncommetn for complex parameters
     
     param(i)=GetModelParameters(p,IVmeasure,Ibs(i),TES,Circuit);
+    resN(i)=aux1;
     %plot(fitZ(p,fS),'r')
     fZ=fitZ(p,fS);figure(h(1)),plot(fZ(:,1),fZ(:,2),'r');hold on
     figure(h(2)),semilogx(fS,fZ(:,1),'k',fS,fZ(:,2),'k'),hold on
