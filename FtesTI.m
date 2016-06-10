@@ -13,7 +13,7 @@ r=exp(log(exp(p*log(ttes))+exp(p*log(ites)))/p);
 %Se puede hacer n=1.
 
 %%%available models:'power', 'erf', 'recta', 'ere', 'TFM'
-model='TFM';%'recta';
+model='tanh';%'recta';
 if strcmp(model,'1')
 %model1. %Dr=0.2;%0.01%for model 1 and model 2.
 %Rtes=Rn./(1+exp(-(sqrt((Ttes/Tc).^2+(Ites/Ic).^2).^4-1)./Dr));
@@ -85,6 +85,11 @@ elseif strcmp(model,'TFM') %two fluid model
     ftes=max(cr*(1-ci*ic./ites),0);
     varargout{1}=1.5*ci*cr*ites.*ttes.*(1-ttes).^.5./ftes;%ec 37 ullom review
     varargout{2}=cr./ftes-1; %ec 38 Ullom review
+elseif strcmp(model,'tanh')
+    delta=0.005/(2*log10(3));
+    ftes=0.5*(1+tanh((ttes-1+ites.^(2/3))/delta));
+    varargout{1}=sech(ttes-1+ites.^(2/3)).^2./(ftes).*ttes/delta;
+    varargout{2}=sech(ttes-1+ites.^(2/3)).^2./(ftes).*(ites).^(2/3)/delta/1.5;
 end
 
 
