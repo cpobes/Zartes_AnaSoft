@@ -1,3 +1,16 @@
+LAB*/
+Last*/
+*Backup*/
+*.mdl
+*.mex32
+*.png
+slprj/
+varios/
+utils/multicmap*
+*.mexw32
+*.jpg
+*.bmp
+*.asv
 IGH-log2
 *.fig
 matlab.mat
