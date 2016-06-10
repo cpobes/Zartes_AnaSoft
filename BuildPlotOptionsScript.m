@@ -51,6 +51,18 @@ elseif strcmp(style,'IVsZTES13')
     
     opt.names={'Color' 'LineStyle' 'LineWidth'  'Marker' 'MarkerSize' 'displayname'};
 opt.values=[ lineColorArray lineStyleArray lineWidthArray MarkerArray MarkerSizeArray displaynameArray];
+
+elseif strcmp(style,'3param')
+    lineStyleArray([1:3],1)={'--'};
+    lineColorArray([1:3],1)={'b';'r';'k'};
+    lineWidthArray([1:3],1)={2};
+    MarkerArray([1:3],1)={'o';'^';'square'};
+    MarkerSizeArray([1:3],1)={8};
+    
+    displaynameArray={ '90mK''104mK' '108mK'}';
+    
+        opt.names={'Color' 'LineStyle' 'LineWidth'  'Marker' 'MarkerSize' 'displayname'};
+opt.values=[ lineColorArray lineStyleArray lineWidthArray MarkerArray MarkerSizeArray displaynameArray];
 end
 %opt.names={'Color' 'LineStyle' 'LineWidth'  'MarkerSize' 'displayname'};
 %opt.values=[lineColorArray lineStyleArray lineWidthArray MarkerSizeArray];
