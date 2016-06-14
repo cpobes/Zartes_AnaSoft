@@ -1,6 +1,6 @@
 function showIVsims(Ttes,Ites,Ib,TESparam,Circuitparam)
 
-Rsh=TESparam.Rsh;Rpar=TESparam.Rpar;Rn=TESparam.Rn;
+Rsh=Circuitparam.Rsh;Rpar=Circuitparam.Rpar;Rn=TESparam.Rn;
 Ic=TESparam.Ic;Tc=TESparam.Tc;
 
 ites=Ites/Ic;
@@ -51,7 +51,7 @@ subplot(1,2,2)
 % %contourf(Trange,Irange,~stab.stab);
 % contourf(X*Tc,Y*Ic,~stab.stab);
 % colormap cool
-showStability(TESparam)
+showStability(TESparam,Circuitparam)
 
 %%%pintamos curvas IV y pendientes 'N' y 'S'
 %plot3(ttes,ites,rtes,'.r','markersize',15)
@@ -59,7 +59,7 @@ showStability(TESparam)
 plot3(Ttes,Ites,rtes,'.-k','markersize',15)
 %Tb=min(Ttes);%ojo, Ttes(1) no vale para barrido en bajada.
 Tb=Ttes(Ites==0);
-plotNSslopes(Tb,TESparam)
+plotNSslopes(Tb,TESparam,Circuitparam)
 %hold off
 
 % figure(5)

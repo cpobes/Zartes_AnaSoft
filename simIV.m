@@ -19,10 +19,11 @@ if nargin==1
     TESparam.Ic=Ic;TESparam.Tc=Tc;
 else
     TESparam=varargin{1};
-    Rsh=TESparam.Rsh;Rpar=TESparam.Rpar;Rn=TESparam.Rn;
+    Circuitparam=varargin{2};
+    Rsh=Circuitparam.Rsh;Rpar=Circuitparam.Rpar;Rn=TESparam.Rn;
     Ic=TESparam.Ic;Tc=TESparam.Tc;
     n=TESparam.n;K=TESparam.K;
-    Circuitparam=varargin{2};
+    
 end
 
 crs=Rsh/(Rsh+Rpar);crn=Rsh/(Rsh+Rpar+Rn);
@@ -33,7 +34,7 @@ tb=Tb/Tc;ib=Ib/Ic;ub=tb^n;
 %A=(Tc^n*K)/(Ic^2*Rn);
 
 %options = optimset( 'TolFun', 1.0e-12, 'TolX',1.0e-12,'jacobian','off','algorithm','levenberg-marquardt','maxfunevals',500);%,'plotfcn',@optimplotfirstorderopt);
-options = optimset( 'TolFun', 1.0e-15, 'TolX',1.0e-15,'jacobian','off','algorithm','levenberg-marquardt');
+options = optimset( 'TolFun', 1.0e-15, 'TolX',1.0e-15,'jacobian','off','algorithm','trust-region-reflective');%{'levenberg-marquardt',0.001});
 ites=zeros(1,length(Ib));
 ttes=zeros(1,length(Ib));
 for i=1:length(Ib)
@@ -45,7 +46,7 @@ for i=1:length(Ib)
         %TESparam.T0=Tb;TESparam.I0=cr*Ib(i);
         %cond=StabilityCheck(TESparam);
         %estab(i)=cond.stab;
-     problem=DefineSolverProblem(ib(i),tb,y0,TESparam,options);  
+     problem=DefineSolverProblem(ib(i),tb,y0,TESparam,Circuitparam,options);  
     %f = @(y) NormalizedGeneralModelSteadyState(y,ib(i),tb,A,rp,rn,n); % function of dummy variable y
     %[out,fval,flag]=fsolve(f,y0,options);
     [out,~,flag]=fsolve(problem);

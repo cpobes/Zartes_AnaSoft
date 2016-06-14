@@ -1,9 +1,9 @@
-function plotNSslopes(Tb,TES)
+function plotNSslopes(Tb,TES,Circuitparam)
 Imin=0;Imax=1e-3;
 Ib=Imin:1e-3*Imax:Imax;
 %parametros
-Rsh=TES.Rsh;
-Rpar=TES.Rpar;
+Rsh=Circuitparam.Rsh;
+Rpar=Circuitparam.Rpar;
 Rn=TES.Rn;
 n=TES.n;
 K=TES.K;

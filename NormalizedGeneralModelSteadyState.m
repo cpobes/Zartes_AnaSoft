@@ -8,9 +8,11 @@ function [F,J]=NormalizedGeneralModelSteadyState(x,ib,tb,A,rp,rn,n)
 
 %x=abs(x);
 %adimensional but ill-conditioned?
-F(1)=ib-(1+rp+rn*FtesTI(x(2),x(1)))*x(1);
+F(1)=ib-(1+rp+rn*FtesTI(x(2),x(1)))*x(1);%normalizando a Rsh
+%F(1)=ib*rsh-(rsh+rp+FtesTI(x(2),x(1)))*x(1);%Normalizando a Rn
 %F(2)=FtesTI(x(2),x(1))*x(1).^2-A*(x(2).^n-tb.^n);
-F(2)=ib*x(1)/rn-(1+rp)*x(1).^2/rn-A*x(2).^n+A*tb.^n;
+F(2)=ib*x(1)/rn-(1+rp)*x(1).^2/rn-A*x(2).^n+A*tb.^n;%normalizando a Rsh
+%F(2)=ib*rsh*x(1)-(rsh+rp)*x(1).^2-A*x(2).^n+A*tb.^n;%Normalizando a Rn
 
 if nargout>1
 [f,a,b]=FtesTI(x(2),x(1));

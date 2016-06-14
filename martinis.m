@@ -80,8 +80,9 @@ f=1/(4*Gk/(Lf)^2); %hay un factor 2 de diferencia con el Gk de Martinis.
 %RRRs=rhos0/rhos;RRRn=rhon0/rhon;
 
 %t2=1./(1./t+bool*(1/3).*(ds/(RRRs*fs)+dn/(RRRn*fn))); %+0*(dn/(RRRn*84.4e-9)) eliminamos la parte de dn en los ajustes porque esta sí es despreciable
-t2=1./(1./t+bool*(1/3).*(ds*rhos+dn*rhon)/f)';
+t2=1./(1./t+bool*(1/3).*(ds*rhos+dn*rhon)/f);
 % rho0s=130e-9(maria) -> f=6.8nm; rho0s=52.91 (martinis)-> f=16.75nm;
 %t2=1./(1./t+bool*(1/3).*(ds/(RRRs*13e-9)+dn/(RRRn*152e-9)));
-%size(Ds),size(alfa),size(t2);
+
+%size(Ds),size(alfa),size(t2)
 Tc=T0.*(Ds./(d0*1.13.*(1+1./alfa).*t2)).^alfa;

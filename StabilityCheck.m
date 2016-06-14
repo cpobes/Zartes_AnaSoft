@@ -19,8 +19,9 @@ if nargin==0
 
 else
     TESparam=varargin{1};
+    Circuitparam=varargin{2}
     C=TESparam.C;G=TESparam.G;%realmente no son constantes.
-    L=TESparam.L;Rsh=TESparam.Rsh;Rpar=TESparam.Rpar;%parametros del circuito.
+    L=Circuitparam.L;Rsh=Circuitparam.Rsh;Rpar=Circuitparam.Rpar;%parametros del circuito.
     T0=TESparam.T0;I0=TESparam.I0;%punto de operacion.
     Tc=TESparam.Tc;Ic=TESparam.Ic;Rn=TESparam.Rn;
     %[r0,alfa,beta]=FtesTI(T0/Tc,I0/Ic);
