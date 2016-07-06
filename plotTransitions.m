@@ -23,6 +23,8 @@ h=get(gca,'children');
 set(h(1),'MarkerSize',15)
 set(h(2),'MarkerSize',15)
 grid on
+set(gca,'fontsize',11)
+set(gca,'fontweight','bold')
 legend('R1','R2')
 xlabel('T(K)')
 ylabel('R(\Omega)')
@@ -39,9 +41,12 @@ if fit
     
     [p1,aux1,aux2,aux3,out]=lsqcurvefit(@fitTc,p01,T(ind),R1(ind));
     [p2,aux1,aux2,aux3,out]=lsqcurvefit(@fitTc,p02,T(ind),R2(ind));
-    plot(T(ind),fitTc(p1,T(ind)),'b');
-    plot(T(ind),fitTc(p2,T(ind)),'r');
+    %y=resample(T(ind),10,1);
+    y=min(T(ind)):1e-4:max(T(ind));
+    plot(y,fitTc(p1,y),'b');
+    plot(y,fitTc(p2,y),'r');
     legend('R1','R2','fit R1','fit R2')
     varargout{1}=p1;
     varargout{2}=p2;
 end
+hold off

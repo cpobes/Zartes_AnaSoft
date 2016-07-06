@@ -1,4 +1,4 @@
-function showIVsims(Ttes,Ites,Ib,TESparam,Circuitparam)
+function showIVsims(Ttes,Ites,Tb,Ib,TESparam,Circuitparam)
 
 Rsh=Circuitparam.Rsh;Rpar=Circuitparam.Rpar;Rn=TESparam.Rn;
 Ic=TESparam.Ic;Tc=TESparam.Tc;
@@ -58,7 +58,7 @@ showStability(TESparam,Circuitparam)
 %hold on%
 plot3(Ttes,Ites,rtes,'.-k','markersize',15)
 %Tb=min(Ttes);%ojo, Ttes(1) no vale para barrido en bajada.
-Tb=Ttes(Ites==0);
+%Tb=Ttes(Ites==0);
 plotNSslopes(Tb,TESparam,Circuitparam)
 %hold off
 

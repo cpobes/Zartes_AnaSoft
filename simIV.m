@@ -2,9 +2,9 @@ function [IVsim,xf]=simIV(Tb,varargin)
 
 %scan parameters
 %Imax=2e-3; %en mA %2e-3;
-Imax=0.5e-3;
-Imin=0;%0.5e-3;
-Ib=linspace(Imin,Imax,500);
+Imax=0.2e-3;
+Imin=0.1e-3;%0.5e-3;
+Ib=linspace(Imin,Imax,1000);
 %relatstep=-1e-2;
 %Ib=Imin:relatstep*Imax:Imax;
 %Ib=Imax:-1e-2*Imax:Imin;
@@ -64,7 +64,7 @@ Ttes=ttes*Tc;
 % TESparam.Rsh=Rsh;TESparam.Rpar=Rpar;TESparam.Rn=Rn;
 % TESparam.Ic=Ic;TESparam.Tc=Tc;
 
-showIVsims(Ttes,Ites,Ib,TESparam,Circuitparam)
+showIVsims(Ttes,Ites,Tb,Ib,TESparam,Circuitparam)
 IVsim=BuildIVsimStruct(Ttes,Ites,TESparam);
 
 

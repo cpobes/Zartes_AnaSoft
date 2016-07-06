@@ -4,7 +4,7 @@ function [data,out]=loadppms()
 %se accede a los datos como data{i}(:,:)
 
 %[file,path]=uigetfile('C:\Users\Carlos\Desktop\ATHENA\medidas\*.dat','','Multiselect','on')
-[file,path]=uigetfile('\\155.210.93.139\Usuarios\Nico\Datos\*.dat','','Multiselect','on'); %9T
+[file,path]=uigetfile('\\155.210.93.138\Usuarios\Nico\Datos\*.dat','','Multiselect','on'); %9T
 
 T=strcat(path,file);
 if(iscell(T))

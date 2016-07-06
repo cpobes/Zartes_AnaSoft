@@ -13,7 +13,7 @@ r=exp(log(exp(p*log(ttes))+exp(p*log(ites)))/p);
 %Se puede hacer n=1.
 
 %%%available models:'power', 'erf', 'recta', 'ere', 'TFM'
-model='power';%'recta';
+model='erf';%'recta';
 if strcmp(model,'1')
 %model1. %Dr=0.2;%0.01%for model 1 and model 2.
 %Rtes=Rn./(1+exp(-(sqrt((Ttes/Tc).^2+(Ites/Ic).^2).^4-1)./Dr));
