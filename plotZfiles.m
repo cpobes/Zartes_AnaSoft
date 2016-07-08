@@ -6,7 +6,9 @@ L=circuit.L;
 %Rsh=2e-3;
 %Rpar=0.12e-3;
 
-[file,path]=uigetfile('C:\Users\Carlos\Desktop\ATHENA\medidas\TES\2016\May2016\Mayo2016_pcZ(w)\Z(w)\*','','Multiselect','on');
+%[file,path]=uigetfile('C:\Users\Carlos\Desktop\ATHENA\medidas\TES\2016\May2016\Mayo2016_pcZ(w)\Z(w)\*','','Multiselect','on');
+[file,path]=uigetfile('C:\Users\Carlos\Desktop\LastTESdir\*','','Multiselect','on');
+
 %file
 T=strcat(path,file);
 %ind=1:801;%
@@ -30,7 +32,7 @@ for i=1:length(T),
     Rth=Rsh+Rpar+2*pi*L*data{i}(:,1)*1i;
     %tf{i}=conj(tf{i});
     %size(TFS),size(tf{i}),size(Rth)
-    ztes{i}=1.0*((TFS./tf{i}-1).*Rth);
+    ztes{i}=1.0*((TFS.tf./tf{i}-1).*Rth);
     figure(h(1)),plot(ztes{i}(ind),'.'),grid on,hold on,
     xlabel('Re(Z)');ylabel('Im(Z)'),title('Ztes with fits (red)');
     figure(h(2)),semilogx(data{i}(:,1),real(ztes{i}(ind)),'.',data{i}(:,1),imag(ztes{i}(ind)),'.r'),hold on
@@ -42,7 +44,7 @@ else
     Rth=Rsh+Rpar+2*pi*L*data(:,1);%*1i;
     %tf{i}=conj(tf{i});
     %size(TFS),size(tf{i}),size(Rth)
-    ztes=(TFS./tf-1).*Rth;
+    ztes=(TFS.tf./tf-1).*Rth;
     figure(h(1)),plot(ztes(ind),'.'),hold on,
     figure(h(2)),semilogx(data(:,1),real(ztes(ind)),'.',data(:,1),imag(ztes(ind)),'.r'),hold on
 end

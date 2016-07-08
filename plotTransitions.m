@@ -41,8 +41,7 @@ if fit
     
     [p1,aux1,aux2,aux3,out]=lsqcurvefit(@fitTc,p01,T(ind),R1(ind));
     [p2,aux1,aux2,aux3,out]=lsqcurvefit(@fitTc,p02,T(ind),R2(ind));
-    %y=resample(T(ind),10,1);
-    y=min(T(ind)):1e-4:max(T(ind));
+    y=min(T(ind)):1e-4:max(T(ind));%remuestreamos para el fit.
     plot(y,fitTc(p1,y),'b');
     plot(y,fitTc(p2,y),'r');
     legend('R1','R2','fit R1','fit R2')

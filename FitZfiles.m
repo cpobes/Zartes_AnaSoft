@@ -1,17 +1,24 @@
 function [param,resN]=FitZfiles(fitinputs,TFSstr,IVmeasure,TES,Circuit,varargin)
-
+%Función para ajustar automáticamente los datos de impedancia compleja.
+%fitinputs contiene los valores de Ib a los que se ha tomado cada fichero,
+%TFSstr es la TF en estado superconductor (la estructura leída con
+%importTF) IVmeasure es la IV cogida a esa temperatura con formato
+%estructura IV.(ib,vout,Tbath)
 
 L=Circuit.L;
 Rf=Circuit.Rf;
 Itemp=IVmeasure.ib;
 Vtemp=IVmeasure.vout;
 
-Zinf=fitinputs.zinfs;
-Z0=fitinputs.z0s;
 Ibs=fitinputs.ibs;
+%Zinf=fitinputs.zinfs;
+%Z0=fitinputs.z0s;
+
+
 
 fS=TFSstr.f;
-TFS=TFSstr.tf;
+%TFS=TFSstr.tf;
+TFS=TFSstr;
 
 if nargin>5,%%
     ind=varargin{1};
@@ -27,6 +34,8 @@ h(2)=figure;
 end
 
 zt=plotZfiles(TFS,Circuit,ind,h(1),h(2))
+for i=1:length(fitinputs.ibs), Zinf(i)=real(zt{i}(end));end%%funciona bien como estimación de los Z0.
+for i=1:length(fitinputs.ibs), Z0(i)=real(zt{i}(1));end
 tau0=1e-4;
 
 for i=1:length(zt)
