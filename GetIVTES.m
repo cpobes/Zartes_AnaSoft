@@ -25,10 +25,10 @@ for i=1:length(IVmeasure)
     end
 
     ites=IVmeasure(i).vout*invMin/(invMf*Rf);
-    Vs=(IVmeasure(i).ib-ites)*Rsh;%(ibias*1e-6-ites)*Rsh;if Ib in uA.
+    Vs=(IVmeasure(i).ibias-ites)*Rsh;%(ibias*1e-6-ites)*Rsh;if Ib in uA.
     vtes=Vs-ites*Rpar;
     ptes=vtes.*ites;
-    IVstruct(i).ib=IVmeasure(i).ib;
+    IVstruct(i).ib=IVmeasure(i).ibias;
     IVstruct(i).vout=IVmeasure(i).vout;
     IVstruct(i).Rtes=vtes./ites;
     IVstruct(i).rtes=IVstruct(i).Rtes/Rn;

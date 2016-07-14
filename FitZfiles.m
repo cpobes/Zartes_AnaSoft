@@ -1,4 +1,4 @@
-function [param,resN]=FitZfiles(fitinputs,TFSstr,IVmeasure,TES,Circuit,varargin)
+function [param,resN]=FitZfiles(Ibs,TFSstr,IVmeasure,TES,Circuit,varargin)
 %Función para ajustar automáticamente los datos de impedancia compleja.
 %fitinputs contiene los valores de Ib a los que se ha tomado cada fichero,
 %TFSstr es la TF en estado superconductor (la estructura leída con
@@ -7,10 +7,10 @@ function [param,resN]=FitZfiles(fitinputs,TFSstr,IVmeasure,TES,Circuit,varargin)
 
 L=Circuit.L;
 Rf=Circuit.Rf;
-Itemp=IVmeasure.ib;
+Itemp=IVmeasure.ibias;
 Vtemp=IVmeasure.vout;
 
-Ibs=fitinputs.ibs;
+%Ibs=fitinputs.ibs;
 %Zinf=fitinputs.zinfs;
 %Z0=fitinputs.z0s;
 
@@ -34,8 +34,8 @@ h(2)=figure;
 end
 
 zt=plotZfiles(TFS,Circuit,ind,h(1),h(2))
-for i=1:length(fitinputs.ibs), Zinf(i)=real(zt{i}(end));end%%funciona bien como estimación de los Z0.
-for i=1:length(fitinputs.ibs), Z0(i)=real(zt{i}(1));end
+for i=1:length(Ibs), Zinf(i)=real(zt{i}(end));end%%funciona bien como estimación de los Z0.
+for i=1:length(Ibs), Z0(i)=real(zt{i}(1));end
 tau0=1e-4;
 
 for i=1:length(zt)
