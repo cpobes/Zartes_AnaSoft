@@ -31,6 +31,14 @@ for i=1:length(h)
     subplot(2,2,4),plot(rtes,ptes,'.-'),hold on;
 end  
 subplot(2,2,1),title('Vout vs Ibias'),xlabel('Ibias'),ylabel('Vout'),grid on
+FormatMultiplePlot(get(gca,'children'));
+set(gca,'fontsize',12)
 subplot(2,2,2),title('Ites vs Vtes'),xlabel('Vtes'),ylabel('Ites'),grid on
+FormatMultiplePlot(get(gca,'children'));
+set(gca,'fontsize',12)
 subplot(2,2,3),title('Ptes vs Vtes'),xlabel('Vtes'),ylabel('Ptes'),grid on
+FormatMultiplePlot(get(gca,'children'));
+set(gca,'fontsize',12)
 subplot(2,2,4),title('Ptes vs r%'),xlabel('r%'),ylabel('Ptes'),grid on
+FormatMultiplePlot(get(gca,'children'));
+set(gca,'fontsize',12)

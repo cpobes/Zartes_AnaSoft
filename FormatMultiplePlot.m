@@ -4,7 +4,7 @@ function FormatMultiplePlot(handle,options)
 
 %%%list of propertiy names:
 names={'Color' 'LineStyle' 'LineWidth' 'Marker' 'MarkerSize' 'MarkerEdgeColor' 'MarkerFaceColor'};
-lineColors = {[0,0,1];[1,0,0];[0,0.5,0];[0,0,0];[1,1,0];[1,0,1];[0,1,1];[0.5 0.5 0.5]};
+lineColors = {[0,0,1];[1,0,0];[0,0.5,0];[0,0,0];[1,1,0];[1,0,1];[0,1,1];[0.5 0.5 0.5]};%b,r,dark green, k, y, m, c, grey
 
 if nargin==1
     %%%build here your style options

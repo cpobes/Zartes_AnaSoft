@@ -6,7 +6,7 @@ function opt=BuildPlotOptionsScript()
 %names={'Color' 'LineStyle' 'LineWidth' 'Marker' 'MarkerSize' 'MarkerEdgeColor' 'MarkerFaceColor'};
 lineColors = {[0,0,1];[1,0,0];[0,0.5,0];[0,0,0];[1,0,1];[0,1,1];[0.5 0.5 0.5];[1,1,0]};
 
-style='3param';%'IVsZTES13';%'8transitionswithfit';
+style='IVsZTES20';%'3param';%'IVsZTES13';%'8transitionswithfit';
 if strcmp(style,'8transitionswithfit')
     
     lineWidthArray([1:16],1)={2};
@@ -55,6 +55,31 @@ elseif strcmp(style,'IVsZTES13')
     opt.names={'Color' 'LineStyle' 'LineWidth'  'Marker' 'MarkerSize' 'displayname'};
     opt.values=[ lineColorArray lineStyleArray lineWidthArray MarkerArray MarkerSizeArray displaynameArray];
 
+    elseif strcmp(style,'IVsZTES20')
+    
+    lineStyleArray([1:4],1)={'-'};
+    lineStyleArray([5:8],1)={':'};
+    lineStyleArray([9:12],1)={'--'};
+    lineStyleArray([13:16],1)={'-.'};
+    lineColorArray([1:4],1)=lineColors(1:4);
+    lineColorArray([5:8],1)=lineColors(1:4);
+    lineColorArray([9:12],1)=lineColors(1:4);
+    lineColorArray([13:16],1)=lineColors(1:4);
+    lineWidthArray([1:16],1)={1};
+    MarkerArray([1:4],1)={'.';'*';'^';'v'};
+    MarkerArray([5:8],1)={'.';'*';'^';'v'};
+    MarkerArray([9:12],1)={'.';'*';'^';'v'};
+    MarkerArray([13:16],1)={'.';'*';'^';'v'};
+    
+    MarkerSizeArray([1:16],1)={4};
+    %MarkerSizeArray([1 6 11],1)={8};
+    
+    displaynameArray={'32mK' '40mK' '45mK' '50mK' '55mK' '60mK' '65mK' '70mK' '75mK' '80mK' '85mK' '88mK' '89mK' '90mK' '92mK' '95mK'}';
+    fontsize([1:16],1)={11};
+    
+    opt.names={'Color' 'LineStyle' 'LineWidth'  'Marker' 'MarkerSize' 'displayname'};
+    opt.values=[ lineColorArray lineStyleArray lineWidthArray MarkerArray MarkerSizeArray displaynameArray];
+    
 elseif strcmp(style,'3param')
     
     lineStyleArray([1:3],1)={'--'};
