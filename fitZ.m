@@ -33,15 +33,27 @@ function fz=fitZ(p,f)
 %%%p=[Zinf Z0 tau];
 w=2*pi*f;
 D=(1+(w.^2)*(p(3).^2));
-fz=p(1)-(p(2)+p(1))./(-1+2*pi*f*p(3)*1i);
+%fz=p(1)-(p(2)+p(1))./(-1+2*pi*f*p(3)*1i);
 %rfz=real(fz);imz=imag(fz);
 
 
 rfz=p(1)-(p(1)-p(2))./D;
-%%rfz=p(1)-(p(1)-p(2))./D+(p(4)-p(5))*w*p(3)./D;
+%rfz=p(1)-(p(1)-p(2))./D+(p(4)-p(5))*w*p(3)./D;
 imz=-(p(1)-p(2))*w*p(3)./D;
-%%imz=p(4)-(p(1)-p(2))*w*p(3)./D-(p(4)-p(5))./D;
+%imz=p(4)-(p(1)-p(2))*w*p(3)./D-(p(4)-p(5))./D;
+fz=rfz+1i*imz;
+ifz=1./fz;
+ifz=[real(ifz) imag(ifz)];
 fz=[rfz imz];%%%uncomment for real parameters.
+
+%%%p=[Zinf 1/Z0 1/taueff]. Intento de ajustar a 1/Ztes.
+% ifz=p(2)*(-p(3)+1i*w)./(-p(3)+1i*w*p(1)*p(2));
+% %rifz=real(ifz);
+% %imifz=imag(ifz);
+% D=p(3).^2+w.^2.*p(1).^2.*p(2).^2;
+% rifz=p(2)*(p(3).^2+w.^2.*p(1).*p(2))./D;
+% imifz=p(2).*w.*p(3)*(p(1).*p(2)-1)./D;
+% ifz=[rifz -imifz];%?
 
 %modelo 2 bloques Caso A cuadernos maria.ec(70)section 4.4.1.
 %incluyo dos parámetros mas, el cociente de capacidades y un tau_A
