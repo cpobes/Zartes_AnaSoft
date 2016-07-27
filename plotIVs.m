@@ -7,7 +7,7 @@ IVstruct=GetIVTES(Circuit,IVmeasure);
 % plot(vtes,ites,'.--'),grid on,hold on
 % xlabel('Vtes(V)');ylabel('Ites(A)');
 
-ibias=IVmeasure.ib;
+ibias=IVmeasure.ibias;
 vout=IVmeasure.vout;%valor corregido de Vout.
 
 %curva Vout-Ibias

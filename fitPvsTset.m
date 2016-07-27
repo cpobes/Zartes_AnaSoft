@@ -1,6 +1,8 @@
 function Gaux=fitPvsTset(IVTESset,perc)
+%funcion para ajustar automaticamente curvas P-Tbath a un valor o valores
+%de porcentaje de Rn. Ojo al uso de cells o arrays en IVset.
 
-for i=1:length(IVTESset), Tbath(i)=IVTESset{i}.Tbath;end
+for i=1:length(IVTESset), Tbath(i)=IVTESset(i).Tbath;end
 
 for jj=1:length(perc)
     Paux=[];
@@ -8,7 +10,7 @@ for jj=1:length(perc)
         %txt=strcat('P',num2str(100*perc(jj)));
         %exec=strcat(txt,'(i)=','ppval(spline(IVTESset{i}.rtes,IVTESset{i}.ptes),jj)')
         %evalin('caller',exec);
-        Paux(i)=ppval(spline(IVTESset{i}.rtes,IVTESset{i}.ptes),perc(jj));
+        Paux(i)=ppval(spline(IVTESset(i).rtes,IVTESset(i).ptes),perc(jj));
     end
     %fitaux=fit(Tbath',Paux'*1e12,'a*x^b+c','startpoint',[0 3 0]);
     plot(Tbath,Paux*1e12,'.'),hold on

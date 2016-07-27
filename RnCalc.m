@@ -3,7 +3,7 @@ function Rn=RnCalc(mN,mS,Rf)
 %superconductor.
 %OJO, la Rf del fichero S puede ser distinta de la del fichero N.
 
-Rpar=RparCalc(mS,1e3)
+Rpar=RparCalc(mS,Rf)
 Rsh=2e-3;
 invMs=24.1;
 invMf=66;
