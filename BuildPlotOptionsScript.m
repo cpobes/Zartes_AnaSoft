@@ -55,7 +55,7 @@ elseif strcmp(style,'IVsZTES13')
     opt.names={'Color' 'LineStyle' 'LineWidth'  'Marker' 'MarkerSize' 'displayname'};
     opt.values=[ lineColorArray lineStyleArray lineWidthArray MarkerArray MarkerSizeArray displaynameArray];
 
-    elseif strcmp(style,'IVsZTES20')
+    elseif strcmp(style,'IVsZTES20')%sirve tb para ZTES18 cambiando Tbaths
     
     lineStyleArray([1:4],1)={'-'};
     lineStyleArray([5:8],1)={':'};
@@ -74,7 +74,8 @@ elseif strcmp(style,'IVsZTES13')
     MarkerSizeArray([1:16],1)={4};
     %MarkerSizeArray([1 6 11],1)={8};
     
-    displaynameArray={'32mK' '40mK' '45mK' '50mK' '55mK' '60mK' '65mK' '70mK' '75mK' '80mK' '85mK' '88mK' '89mK' '90mK' '92mK' '95mK'}';
+    %displaynameArray={'32mK' '40mK' '45mK' '50mK' '55mK' '60mK' '65mK' '70mK' '75mK' '80mK' '85mK' '88mK' '89mK' '90mK' '92mK' '95mK'}';
+    displaynameArray={'40mK' '45mK' '50mK' '55mK' '60mK' '65mK' '70mK' '75mK' '80mK' '85mK' '87mK' '89mK' '90mK' '91mK' '92mK' '95mK'}';
     fontsize([1:16],1)={11};
     
     opt.names={'Color' 'LineStyle' 'LineWidth'  'Marker' 'MarkerSize' 'displayname'};
