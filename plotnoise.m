@@ -12,7 +12,8 @@ end
 f=logspace(0,6);
 n=length(models);
 for i=1:n
-subplot(1,n,i)
+%subplot(1,n,i) %util para comparar Irwin y wouter, pero estorba en
+%plotnoiseFiles.
 if nargin<=1
     noise=noisesim(models{i});
 else
