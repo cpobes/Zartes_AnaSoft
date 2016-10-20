@@ -1,5 +1,5 @@
 function OP=setTESOPfromIb(Ib,IV,p)
-%set the TES operating point from Ibiaas and IV curves and fitted
+%set the TES operating point from Ibias and IV curves and fitted
 %parameters p.
 
 OP.r0=ppval(spline(IV.ibias,IV.rtes),Ib);

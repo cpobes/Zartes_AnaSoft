@@ -30,21 +30,28 @@ function fz=fitZ(p,f)
 %alternative definition ztes=Zinf-(Z0-Zinf)/(-1+w*tau*i)
 %pasamos directamente Zinf=p(1), Z0=p(2), tau=p(3).
 %manejamos magnitudes complejas directamente.
-%%%p=[Zinf Z0 tau];
+
 w=2*pi*f;
 D=(1+(w.^2)*(p(3).^2));
 %fz=p(1)-(p(2)+p(1))./(-1+2*pi*f*p(3)*1i);
 %rfz=real(fz);imz=imag(fz);
 
-
-rfz=p(1)-(p(1)-p(2))./D;
-%rfz=p(1)-(p(1)-p(2))./D+(p(4)-p(5))*w*p(3)./D;
-imz=-(p(1)-p(2))*w*p(3)./D;
-%imz=p(4)-(p(1)-p(2))*w*p(3)./D-(p(4)-p(5))./D;
-fz=rfz+1i*imz;
-ifz=1./fz;
-ifz=[real(ifz) imag(ifz)];
+modelo='1b';
+if strcmp(modelo,'1b')
+    %%%p=[Zinf Z0 tau];
+    rfz=p(1)-(p(1)-p(2))./D;%%%modelo de 1 bloque.
+    imz=-(p(1)-p(2))*w*p(3)./D;%%% modelo de 1 bloque.
+elseif strcmp(modelo,'2b')
+    %p=[Zinf Z0 tau_eff c tau_A]; c=CA/C0, tauA=CA/Gtes.
+    rfz=p(1)-(p(1)-p(2))./D+(p(4)-p(5))*w*p(3)./D;%%%modelo de 2bloques.
+    imz=p(4)-(p(1)-p(2))*w*p(3)./D-(p(4)-p(5))./D;%%%modelos de 2 bloques.
+end
+%fz=rfz+1i*imz;%%%uncomment for complex parameters.
 fz=[rfz imz];%%%uncomment for real parameters.
+
+%%%para ajustar 1/fZ.try1.
+%ifz=1./fz;
+%ifz=[real(ifz) imag(ifz)];
 
 %%%p=[Zinf 1/Z0 1/taueff]. Intento de ajustar a 1/Ztes.
 % ifz=p(2)*(-p(3)+1i*w)./(-p(3)+1i*w*p(1)*p(2));
@@ -63,4 +70,4 @@ fz=[rfz imz];%%%uncomment for real parameters.
 %
 % fz=p(1)+(p(1)-p(2))./(-1+2*pi*f*p(3)*1i.*(1-p(4)*(2*pi*f*p(5)*1i)./(1+2*pi*f*p(5)*1i)));
 % rfz=real(fz);imz=imag(fz);
- %fz=[rfz imz];
+% fz=[rfz imz];
