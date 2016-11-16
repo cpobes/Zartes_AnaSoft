@@ -25,6 +25,8 @@ h(1)=figure;
 h(2)=figure;
 end
 
+%if ~iscell(T), T{1}=T;end
+
 if (iscell(T))
 for i=1:length(T),
     data{i}=importdata(T{i});

@@ -38,6 +38,7 @@ R0/Rn
 %for simple model p(1)=Zinf, p(2)=Z0, p(3)=taueff
 %rp=real(p);
 rp=p;
+rp(3)=abs(rp(3));
 param.bi=(rp(1)/R0)-1;
 param.L0=(rp(2)-rp(1))/(rp(2)+R0);
 param.tau0=rp(3)*(param.L0-1);
