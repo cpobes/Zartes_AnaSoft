@@ -39,24 +39,26 @@ if(length(p)==3)
         %derived parameters
         %for simple model p(1)=Zinf, p(2)=Z0, p(3)=taueff
         %rp=real(p);
+        %El orden importa a la hora de exportar los datos.
+        param.rp=R0/Rn;
+        param.ai=param.L0*G0*T0/P0;
         param.bi=(rp(1)/R0)-1;
         param.L0=(rp(2)-rp(1))/(rp(2)+R0);
         param.tau0=rp(3)*(param.L0-1);
-        param.C=param.tau0*G0;
-        param.ai=param.L0*G0*T0/P0;
-        param.rp=R0/Rn;
+        param.taueff=rp(3);
+        param.C=param.tau0*G0;        
         param.Zinf=rp(1);
         param.Z0=rp(2);
-        param.taueff=rp(3);
+        
     elseif(length(p)==5)
         %derived parameters for 2 block model case A
+        param.rp=R0/Rn;
+        param.ai=param.L0*G0*T0/P0;
         param.bi=(rp(1)/R0)-1;
         param.L0=(rp(2)-rp(1))/(rp(2)+R0);
-        param.taueff=rp(3);
         param.tau0=rp(3)*(param.L0-1);
+        param.taueff=rp(3);
         param.C=param.tau0*G0;
-        param.ai=param.L0*G0*T0/P0;
-        param.rp=R0/Rn;
         param.Zinf=rp(1);
         param.Z0=rp(2);
         param.CA=param.C*rp(4)/(1-rp(4));

@@ -24,7 +24,9 @@ for i=1:length(IVmeasure)
         Rn=TES.Rn; %Si no cargamos la estructura TES, la Rn podemos pasarla a través de la estructura Circuit. Pasar TES tiene sentido para usar la 'K' y 'n' para deducir la Ttes.
     end
 
-    ites=IVmeasure(i).vout*invMin/(invMf*Rf);
+    F=invMin/(invMf*Rf);%36.51e-6;
+    %F=36.52e-6;
+    ites=IVmeasure(i).vout*F;
     Vs=(IVmeasure(i).ibias-ites)*Rsh;%(ibias*1e-6-ites)*Rsh;if Ib in uA.
     vtes=Vs-ites*Rpar;
     ptes=vtes.*ites;

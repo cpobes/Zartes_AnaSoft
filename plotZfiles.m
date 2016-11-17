@@ -27,6 +27,7 @@ end
 
 if (iscell(T))
 for i=1:length(T),
+    T{i}
     data{i}=importdata(T{i});
     tf{i}=data{i}(:,2)+1i*data{i}(:,3);%%%!!!ojo al menos.
     Rth=Rsh+Rpar+2*pi*L*data{i}(:,1)*1i;

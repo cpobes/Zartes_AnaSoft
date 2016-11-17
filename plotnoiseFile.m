@@ -1,11 +1,18 @@
-function [thres,expres]=plotnoiseFile(IVstr,p,circuit,ZTES)
+function [thres,expres]=plotnoiseFile(IVstr,p,circuit,ZTES,varargin)
 %pinta ruido y compara con Irwin a partir de fichero
 
+if nargin>4
+    wdir=varargin{1};
+    wfiles=varargin{2};
+    [noise,file]=loadnoise(0,wdir,wfiles);
+else
 [noise,file]=loadnoise();
+end
 
 if iscell(file)
     N=length(file)
     for i=1:N        
+        i
         Ib=sscanf(file{i},'HP_noise_%duA*')*1e-6; %%%HP_noise para ZTES18.!!!
         OP=setTESOPfromIb(Ib,IVstr,p);
         ncols=max(ceil(N/3),1);
