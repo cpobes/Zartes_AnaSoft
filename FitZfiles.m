@@ -59,7 +59,9 @@ for i=1:length(zt)
     param(i)=GetModelParameters(p,IVmeasure,Ibs(i),TES,Circuit);
     resN(i)=aux1;
     %plot(fitZ(p,fS),'r')
+    p(3)=abs(p(3));%%%
     fZ=fitZ(p,fS);figure(h(1)),plot(1e3*fZ(:,1),1e3*fZ(:,2),'r','linewidth',2);hold on
+    %fZ=fitZ(p,fS);figure(h(1)),plot(fZ(:,1),fZ(:,2),'r');hold on
     figure(h(2)),semilogx(fS,fZ(:,1),'k',fS,fZ(:,2),'k'),hold on
 end
 figure

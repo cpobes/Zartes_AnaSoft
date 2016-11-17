@@ -35,6 +35,7 @@ R0=V0/I0;
 R0/Rn
 
 rp=p;
+rp(3)=abs(rp(3));
 if(length(p)==3)
         %derived parameters
         %for simple model p(1)=Zinf, p(2)=Z0, p(3)=taueff
@@ -66,3 +67,5 @@ if(length(p)==3)
         param.tauA=rp(5);
         param.ca0=p(4);
 end
+
+

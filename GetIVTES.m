@@ -6,7 +6,7 @@ function IVstruct=GetIVTES(Circuit,IVmeasure,varargin)
 
 
 for i=1:length(IVmeasure)
-    Tbath=IVmeasure(i).Tbath;
+    Tbath=IVmeasure(i).Tbath
 
     %!
     %IVmeasure(i).voutc=IVmeasure.vout;
