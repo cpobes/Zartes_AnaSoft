@@ -1,4 +1,4 @@
-function [data,file]=loadnoise(varargin);
+function [data,file]=loadnoise(varargin)
 %carga de golpe ficheros tomados en el HP3265a
 %se accede a los datos como data{i}(:,:)
 
@@ -13,7 +13,8 @@ if nargin>1
     file=varargin{3};
     %iscell(file)
 else
-    [file,path]=uigetfile('C:\Users\Carlos\Desktop\ATHENA\medidas\TES\2016\*','','Multiselect','on');
+    [file,path]=uigetfile('HP_*','*','Multiselect','on');
+    %%%C:\Users\Carlos\Desktop\ATHENA\medidas\TES\2016\*
     %iscell(file)
 end
 
@@ -25,7 +26,7 @@ if ~iscell(file)
     file=xfile;
 end
 
-T=strcat(path,file);
+T=strcat(path,'\',file)%%path='xxxmK'
 
 for i=1:length(T),
     if iscell(T)
