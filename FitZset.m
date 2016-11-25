@@ -25,16 +25,18 @@ pause(2)
 for i=1:length(dirs)
     %%%buscamos los ficheros a analizar en cada directorio.
     d=pwd;
+    dirs{i},pause(1)
     files=ls(strcat(d,'\',dirs{i}));
     [ii,jj]=size(files);
-    filesc=mat2cell(files,ones(1,ii),jj)
-    filesZ=regexp(filesc,'TF_\d+uA','match');
-    filesZ=filesZ(~cellfun('isempty',filesZ));
+    filesc=mat2cell(files,ones(1,ii),jj);
+    filesZ=regexp(filesc,'TF_\d+.?\d+uA','match');
+    filesZ=filesZ(~cellfun('isempty',filesZ))
     filesNoise=regexp(filesc,'HP_noise_\d+uA','match');
     filesNoise=filesNoise(~cellfun('isempty',filesNoise));
+    %length(filesNoise)
     for ii=1:length(filesZ) 
         filesZ{ii}=char(filesZ{ii});
-        filesNoise{ii}=char(filesNoise{ii});
+        if ~isempty(filesNoise)filesNoise{ii}=char(filesNoise{ii});end
     end
     %filesc
     
@@ -46,8 +48,8 @@ for i=1:length(dirs)
     %%%hacemos loop en cada fichero a analizar.
     for jj=1:length(filesZ)
         thefile=strcat(d,'\',dirs{i},'\',filesZ{jj},'.txt');
-        thenoisefile=strcat(d,'\',dirs{i},'\',filesNoise{jj},'.txt');
-        Ib=sscanf(char(regexp(thefile,'\d+uA','match')),'%duA')*1e-6;
+        if ~isempty(filesNoise) thenoisefile=strcat(d,'\',dirs{i},'\',filesNoise{jj},'.txt');end
+        Ib=sscanf(char(regexp(thefile,'\d+.?\d+uA','match')),'%fuA')*1e-6
         
         %%%importamos la TF
             data=importdata(thefile);
@@ -78,6 +80,7 @@ for i=1:length(dirs)
             P(i).residuo(jj)=resN;
             
          %%%Analizamos el ruido
+         if ~isempty(filesNoise)
             [noisedata,file]=loadnoise(0,dirs{i},strcat(filesNoise{jj},'.txt'));
             OP=setTESOPfromIb(Ib,IV,param);
             noiseIrwin=noisesim('irwin',TES,OP,circuit);
@@ -89,6 +92,7 @@ for i=1:length(dirs)
             RES=2.35/sqrt(trapz(noisedata{1}(:,1),1./NEP.^2))/2/1.609e-19;
             P(i).ExRes(jj)=RES;
             P(i).ThRes(jj)=noiseIrwin.Res;
+         end
             
     end
     
