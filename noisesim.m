@@ -63,6 +63,7 @@ else
     I0=OP.I0;
     V0=OP.V0;
     L0=P0*alfa/(G*T0);
+    n=TES.n;
 end
 
 tau=C/G;
@@ -84,17 +85,29 @@ elseif strcmp(model,'irwin')
 
 sI=-(1/(I0*R0))*(L/(tau_el*R0*L0)+(1-RL/R0)-L*tau*(2*pi*f).^2/(L0*R0)+1i*(2*pi*f)*L*tau*(1/tauI+1/tau_el)/(R0*L0)).^-1;%funcion de transferencia.
 t=Ts/T0;
-n=3.5;
+%n=3.1;
 F=t^(n+1)*(t^(n+2)+1)/2;%F de boyle y rogers. n= exponente de la ley de P(T). El primer factor viene de la pag22 del cap de Irwin.
-%F=t^(n+1)*(n+1)*(t^(2*n+3)-1)/((2*n+3)*(t^(n+1)-1));%F de Mather.
+%F=t^(n+1)*(n+1)*(t^(2*n+3)-1)/((2*n+3)*(t^(n+1)-1));%F de Mather. La
+%diferencia entre las dos fórmulas es menor del 1%.
 stfn=4*Kb*T0^2*G*abs(sI).^2*F;%Thermal Fluctuation Noise
 ssh=4*Kb*Ts*I0^2*RL*(L0-1)^2*(1+4*pi^2*f.^2*tau^2/(1-L0)^2).*abs(sI).^2/L0^2; %Load resistor Noise
 stes=4*Kb*T0*I0^2*R0*(1+2*bI)*(1+4*pi^2*f.^2*tau^2).*abs(sI).^2/L0^2;
+smax=4*Kb*T0^2*G.*abs(sI).^2;
 
+
+NEP=sqrt(stfn+ssh+stes)./abs(sI);
+Res=2.35/sqrt(trapz(f,1./NEP.^2))/2/1.609e-19;%resolución en eV. Tesis Wouter (2.37).
+M=1.;
+%stes=stes*M^2;
 i_ph=sqrt(stfn);
 i_jo=sqrt(stes);
 i_sh=sqrt(ssh);
-noise.ph=i_ph;noise.jo=i_jo;noise.sh=i_sh;noise.sum=sqrt(stfn+stes+ssh);%noise.sum=i_ph+i_jo+i_sh;
+%G*5e-8
+%(n*TES.K*Ts.^n)*5e-6
+i_temp=(n*TES.K*Ts.^n)*0e-6*abs(sI);%%%ruido en Tbath.(5e-4=200uK, 5e-5=20uK, 5e-6=2uK)
+
+noise.ph=i_ph;noise.jo=i_jo;noise.sh=i_sh;noise.sum=M*sqrt(stfn+stes+ssh+i_temp.^2);%noise.sum=i_ph+i_jo+i_sh;
+noise.sI=abs(sI);noise.NEP=NEP;noise.max=sqrt(smax);noise.Res=Res;noise.tbath=i_temp;
 else
     error('no valid model')
 end

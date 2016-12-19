@@ -19,7 +19,7 @@ if nargin<=1
 else
     noise=noisesim(models{i},TES,OP,circuit);
 end
-noise.squid=5e-12*ones(1,length(f));
+noise.squid=3e-12*ones(1,length(f));
 % loglog(f,noise.jo,f,noise.ph,f,noise.sh,f,noise.squid,f,noise.sum+noise.squid)
 % grid on
 % title(models{i})
@@ -29,16 +29,23 @@ noise.squid=5e-12*ones(1,length(f));
 % legend('jhonson','phonon','shunt','squid','total')
 totnoise=noise.sum+noise.squid;
 %totnoise=noise.sum;
+%loglog(f,noise.NEP)
+
 loglog(f,totnoise)
+axis([1 1e5 1e-11 1e-9])
+%loglog(f,totnoise,f,noise.jo,f,noise.ph,f,noise.sh)%%uncomment para mostrar componentes
+%legend('exp','total','jhonson','phonon','shunt')%%uncomment para mostrar componentes
+
 h=get(gca,'children');
-set(h(1),'linewidth',3)
-        % subplot(1,2,2)
-        % noise=noisesim('irwin');
-        % loglog(f,noise.jo,f,noise.ph,f,noise.sh,f,noise.sum)
-        % grid on
-        % title('irwin')
-        % axis([1 1e5 1e-12 1e-10])
-        % h=get(gca,'children')
-        % set(h(1),'linewidth',3)
-        % legend('jhonson','phonon','shunt','total')
+set(h(1),'linewidth',3);
+%loglog(f,noise.max,'k');
+%         subplot(1,2,2)
+%         noise=noisesim('irwin');
+%         loglog(f,noise.jo,f,noise.ph,f,noise.sh,f,noise.sum)
+%         grid on
+%         title('irwin')
+%         axis([1 1e5 1e-12 1e-10])
+%         h=get(gca,'children')
+%         set(h(1),'linewidth',3)
+%         legend('jhonson','phonon','shunt','total')
 end

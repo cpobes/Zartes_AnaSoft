@@ -4,7 +4,7 @@ function IVset=importIVs(varargin)
 [file,path]=uigetfile('C:\Users\Carlos\Desktop\LastTESdir\*','','Multiselect','on');
 T=strcat(path,file);
 
-
+file
 skip=7;%header=6, +1 del primer pto. Ojo, si skip=0, se devuelve data y no data.data.
 if (iscell(T))
 for i=1:length(T),
@@ -15,7 +15,7 @@ for i=1:length(T),
     if nargin>0
         IVset(i).Tbath=varargin{1}(i);
     else
-        IVset(i).Tbath=sscanf(file{i},'%dmK*')*1e-3;
+        IVset(i).Tbath=sscanf(file{i},'IV%dmK*')*1e-3;
     end
 end
 else
@@ -26,6 +26,6 @@ else
     if nargin>0
         IVset.Tbath=varargin{1};
     else
-        IVset.Tbath=sscanf(file,'%dmK*')*1e-3;
+        IVset.Tbath=sscanf(file,'IV%dmK*')*1e-3;
     end
 end
