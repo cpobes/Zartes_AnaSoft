@@ -21,7 +21,7 @@ elseif nargin==5
 end
 
 dirs
-pause(2)
+pause(1)
 for i=1:length(dirs)
     %%%buscamos los ficheros a analizar en cada directorio.
     d=pwd;
@@ -29,9 +29,9 @@ for i=1:length(dirs)
     files=ls(strcat(d,'\',dirs{i}));
     [ii,jj]=size(files);
     filesc=mat2cell(files,ones(1,ii),jj);
-    filesZ=regexp(filesc,'TF_\d+.?\d+uA','match');
+    filesZ=regexp(filesc,'^TF_\d+.?\d+uA','match');
     filesZ=filesZ(~cellfun('isempty',filesZ))
-    filesNoise=regexp(filesc,'HP_noise_\d+uA','match');
+    filesNoise=regexp(filesc,'^HP_noise_\d+.?\d+uA','match');
     filesNoise=filesNoise(~cellfun('isempty',filesNoise));
     %length(filesNoise)
     for ii=1:length(filesZ) 
@@ -42,7 +42,8 @@ for i=1:length(dirs)
     
     %%%buscamos la IV correspondiente a la Tmc dada
     Tbath=sscanf(dirs{i},'%dmK');
-    Tind=[IVset.Tbath]*1e3==Tbath;
+    %Tind=[IVset.Tbath]*1e3==Tbath;
+    [~,Tind]=min(abs([IVset.Tbath]*1e3-Tbath));%%%En general Tbath de la IVsest tiene que ser exactamente la misma que la del directorio, pero en algun run he puesto el valor 'real'.(ZTES20)
     IV=IVset(Tind);
     
     %%%hacemos loop en cada fichero a analizar.
