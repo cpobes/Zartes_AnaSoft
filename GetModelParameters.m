@@ -32,7 +32,7 @@ V0=IVstruct.vtes;
 P0=V0.*I0;
 %G=716e-12;
 R0=V0/I0;
-R0/Rn
+%R0/Rn
 
 %derived parameters
 %for simple model p(1)=Zinf, p(2)=Z0, p(3)=taueff

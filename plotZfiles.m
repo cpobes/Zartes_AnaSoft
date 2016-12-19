@@ -29,12 +29,13 @@ end
 
 if (iscell(T))
 for i=1:length(T),
-    data{i}=importdata(T{i});
+    data{i}=importdata(T{i});%size(data{i})
     tf{i}=data{i}(:,2)+1i*data{i}(:,3);%%%!!!ojo al menos.
     Rth=Rsh+Rpar+2*pi*L*data{i}(:,1)*1i;
     %tf{i}=conj(tf{i});
     %size(TFS),size(tf{i}),size(Rth)
     ztes{i}=1.0*((TFS.tf./tf{i}-1).*Rth);
+    %T{i}
     figure(h(1)),plot(ztes{i}(ind),'.'),grid on,hold on,
     xlabel('Re(Z)');ylabel('Im(Z)'),title('Ztes with fits (red)');
     figure(h(2)),semilogx(data{i}(:,1),real(ztes{i}(ind)),'.',data{i}(:,1),imag(ztes{i}(ind)),'.r'),hold on

@@ -43,14 +43,16 @@ feff0=1e2;
 for i=1:length(zt)
     p0=[Zinf(i) Z0(i) tau0];
     pinv0=[Zinf(i) 1/Y0(i) tau0];
+    %size(zt{i})
     %[p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,p0,fS,[real(zt{i}) imag(zt{i})]);%%%uncomment for real parameters.
     %[p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,pinv0,fS,[real(1./zt{i}) imag(1./zt{i})]);%%%uncomment for inverse Ztes fit.
-    [p,aux1,aux2,aux3,out]=lsqcurvefit(@fitReZ,p0,fS,[real(zt{i})]);%%%uncomment for real part only.
+    [p,aux1,aux2,aux3,out]=lsqcurvefit(@fitReZ,p0,fS,[real(zt{i})],[0 -Inf 0],[1 Inf 1]);%%%uncomment for real part only.
     %[p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,p0,fS,zt{i});%%%uncommetn for complex parameters
     
     %p=[p(1) 1/p(2) 1/p(3)];%solo para 1/Ztesvfits.
     param(i)=GetModelParameters(p,IVmeasure,Ibs(i),TES,Circuit);
     resN(i)=aux1;
+    Ibs(i)
     %plot(fitZ(p,fS),'r')
     p(3)=abs(p(3));%%%
     fZ=fitZ(p,fS);figure(h(1)),plot(fZ(:,1),fZ(:,2),'r');hold on
