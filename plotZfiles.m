@@ -35,17 +35,17 @@ for i=1:length(T),
     %tf{i}=conj(tf{i});
     %size(TFS),size(tf{i}),size(Rth)
     ztes{i}=1.0*((TFS.tf./tf{i}-1).*Rth);
-<<<<<<< HEAD
+
     %T{i}
-    figure(h(1)),plot(ztes{i}(ind),'.'),grid on,hold on,
-    xlabel('Re(Z)');ylabel('Im(Z)'),title('Ztes with fits (red)');
-    figure(h(2)),semilogx(data{i}(:,1),real(ztes{i}(ind)),'.',data{i}(:,1),imag(ztes{i}(ind)),'.r'),hold on
-=======
+%     figure(h(1)),plot(ztes{i}(ind),'.'),grid on,hold on,
+%     xlabel('Re(Z)');ylabel('Im(Z)'),title('Ztes with fits (red)');
+%     figure(h(2)),semilogx(data{i}(:,1),real(ztes{i}(ind)),'.',data{i}(:,1),imag(ztes{i}(ind)),'.r'),hold on
+    
     figure(h(1)),plot(1e3*ztes{i}(ind),'o','markerfacecolor','b','markersize',6),grid on,hold on;%%%
     set(gca,'fontsize',12,'fontweight','bold');
     xlabel('Re(mZ)','fontsize',12,'fontweight','bold');ylabel('Im(mZ)','fontsize',12,'fontweight','bold');%title('Ztes with fits (red)');
     figure(h(2)),semilogx(data{i}(ind,1),real(ztes{i}(ind)),'.',data{i}(ind,1),imag(ztes{i}(ind)),'.r'),hold on
->>>>>>> origin/master
+
     xlabel('Freq(Hz)(Z)');title('Real (blue) and Imaginary (red) parts of Ztes with fits (black)');
 end
 else

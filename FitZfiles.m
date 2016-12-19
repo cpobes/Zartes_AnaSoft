@@ -46,22 +46,15 @@ tau0=1e-4;
 feff0=1e2;
 
 for i=1:length(zt)
-<<<<<<< HEAD
+
     p0=[Zinf(i) Z0(i) tau0];
-    pinv0=[Zinf(i) 1/Y0(i) tau0];
+    %p0=[Zinf(i) Z0(i) tau0 1e-3 1e-6];%%%p0 for 2 block model.
+    %pinv0=[Zinf(i) 1/Y0(i) tau0];%%%p0 for 1/Z fits.
     %size(zt{i})
     %[p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,p0,fS,[real(zt{i}) imag(zt{i})]);%%%uncomment for real parameters.
     %[p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,pinv0,fS,[real(1./zt{i}) imag(1./zt{i})]);%%%uncomment for inverse Ztes fit.
     [p,aux1,aux2,aux3,out]=lsqcurvefit(@fitReZ,p0,fS,[real(zt{i})],[0 -Inf 0],[1 Inf 1]);%%%uncomment for real part only.
-=======
-    p0=[Zinf(i) Z0(i) tau0];%%%p0 for simple 1 bloque model.
-    %p0=[Zinf(i) Z0(i) tau0 1e-3 1e-6];%%%p0 for 2 block model.
-    %pinv0=[Zinf(i) 1/Y0(i) tau0];%%%p0 for 1/Z fits.
-    
-    [p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,p0,fS,[real(zt{i}) imag(zt{i})]);%%%uncomment for real parameters.
-    %[p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,pinv0,fS,[real(1./zt{i}) imag(1./zt{i})]);%%%uncomment for inverse Ztes fit.
-    %[p,aux1,aux2,aux3,out]=lsqcurvefit(@fitReZ,p0,fS,[real(zt{i})]);%%%uncomment for 1 block real part only.
->>>>>>> origin/master
+
     %[p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,p0,fS,zt{i});%%%uncommetn for complex parameters
     Ibs(i)
     %p=[p(1) 1/p(2) 1/p(3)];%solo para 1/Ztesvfits.
