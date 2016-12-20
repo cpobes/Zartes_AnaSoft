@@ -122,7 +122,7 @@ for i=1:length(dirs)
     aux=[P(i).p(kk).Zinf];for jj=1:length(Y),P(i).p(jj).Zinf=aux(jj);end
     aux=[P(i).p(kk).Z0];for jj=1:length(Y),P(i).p(jj).Z0=aux(jj);end
     aux=[P(i).p(kk).taueff];for jj=1:length(Y),P(i).p(jj).taueff=aux(jj);end
-    aux=[P(i).res];for jj=1:length(Y),P(i).res=aux(jj);end
+    aux=[P(i).residuo];for jj=1:length(Y),P(i).residuo=aux(jj);end
         
     P(i).Tbath=Tbath;
 end
