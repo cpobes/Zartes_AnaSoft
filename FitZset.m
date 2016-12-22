@@ -29,9 +29,9 @@ for i=1:length(dirs)
     files=ls(strcat(d,'\',dirs{i}));
     [ii,jj]=size(files);
     filesc=mat2cell(files,ones(1,ii),jj);
-    filesZ=regexp(filesc,'^TF_\d+.?\d+uA','match');
+    filesZ=regexp(filesc,'^TF_-?\d+.?\d+uA','match');
     filesZ=filesZ(~cellfun('isempty',filesZ))
-    filesNoise=regexp(filesc,'^HP_noise_\d+.?\d+uA','match');
+    filesNoise=regexp(filesc,'^HP_noise_-?\d+.?\d+uA','match');
     filesNoise=filesNoise(~cellfun('isempty',filesNoise));
     %length(filesNoise)
     for ii=1:length(filesZ) 
@@ -51,7 +51,7 @@ for i=1:length(dirs)
     for jj=1:length(filesZ)
         thefile=strcat(d,'\',dirs{i},'\',filesZ{jj},'.txt');
         if ~isempty(filesNoise) thenoisefile=strcat(d,'\',dirs{i},'\',filesNoise{jj},'.txt');end
-        Ib=sscanf(char(regexp(thefile,'\d+.?\d+uA','match')),'%fuA')*1e-6
+        Ib=sscanf(char(regexp(thefile,'-?\d+.?\d+uA','match')),'%fuA')*1e-6
         
         %%%importamos la TF
             data=importdata(thefile);%size(data)
