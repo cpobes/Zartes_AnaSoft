@@ -1,4 +1,4 @@
-function zs=plotZfiles(TFS,circuit,varargin)
+function [zs,file]=plotZfiles(TFS,circuit,varargin)
 %plot Ztes at different OP from files a partir de TFS y L.
 Rsh=circuit.Rsh;
 Rpar=circuit.Rpar;
@@ -7,7 +7,7 @@ L=circuit.L;
 %Rpar=0.12e-3;
 
 %[file,path]=uigetfile('C:\Users\Carlos\Desktop\ATHENA\medidas\TES\2016\May2016\Mayo2016_pcZ(w)\Z(w)\*','','Multiselect','on');
-[file,path]=uigetfile('C:\Users\Carlos\Desktop\LastTESdir\*','','Multiselect','on');
+[file,path]=uigetfile('C:\Users\Carlos\Desktop\LastTESdir\*','TF*','Multiselect','on');
 
 %file
 T=strcat(path,file);

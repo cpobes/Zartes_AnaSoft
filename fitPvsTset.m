@@ -24,6 +24,9 @@ for jj=1:length(perc)
     fitaux.c=fit(3);
     Gaux(jj)=GetGfromFit(fitaux);
 end
+xlabel('T_{bath}(K)','fontsize',11,'fontweight','bold')
+ylabel('P_{tes}(pW)','fontsize',11,'fontweight','bold')
+title('P vs T fits','fontsize',11,'fontweight','bold')
 
 
 

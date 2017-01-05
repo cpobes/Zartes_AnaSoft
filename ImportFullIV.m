@@ -23,6 +23,7 @@ for i=1:length(T)
     %cargamos datos.Ojo al formato.
     data=importdata(T{i},'\t');%%%si hay header hace falta skip.
     if isstruct(data) data=data.data;end
+    
     %corregir el vout.
     %auxS=corregir4ramas(data);%%para importar ficheros con 4 ramas (sin header)
     auxS=corregir1rama(data);%% para importar ficheros con 1 rama.
