@@ -1,4 +1,4 @@
-function [data,file]=loadnoise(varargin)
+function [data,file,path]=loadnoise(varargin)
 %carga de golpe ficheros tomados en el HP3265a
 %se accede a los datos como data{i}(:,:)
 

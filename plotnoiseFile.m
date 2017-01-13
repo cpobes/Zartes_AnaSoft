@@ -1,26 +1,59 @@
-function [thres,expres]=plotnoiseFile(IVstr,p,circuit,ZTES,varargin)
+function [thres,expres]=plotnoiseFile(IVset,P,circuit,ZTES,varargin)
 %pinta ruido y compara con Irwin a partir de fichero
 %V170112. IVstr es la estructura a la temperatura de interés, y p es la
 %estructura de parámetros también a esa temepratura.
 
-wdir=strcat(num2str(IVstr.Tbath*1e3),'mK');
-if nargin>4
-    %wdir=varargin{1};
-    wfiles=varargin{1};
-    [noise,file]=loadnoise(0,wdir,wfiles);
-else
-    %%%listar ficheros
-        d=pwd;
-    files=ls(strcat(d,'\',wdir))
-    [ii,jj]=size(files);
-    filesc=mat2cell(files,ones(1,ii),jj);
-    filesNoise=regexp(filesc,'^HP_noise_-?\d+.?\d+uA.txt','match');%%%En fitZset no hace falta .txt pq?
-    filesNoise=filesNoise(~cellfun('isempty',filesNoise));
-    for ii=1:length(filesNoise) 
-        if ~isempty(filesNoise)filesNoise{ii}=char(filesNoise{ii});end
-    end
-[noise,file]=loadnoise(0,wdir,filesNoise);
+%v170113. Paso ya el IVset completo y P completo.
+
+% wdir=strcat(num2str(IVstr.Tbath*1e3),'mK');
+% if nargin>4
+%     %wdir=varargin{1};
+%     wfiles=varargin{1};
+%     [noise,file]=loadnoise(0,wdir,wfiles);
+% else
+%     %%%listar ficheros
+%     d=pwd;
+%     strcat(d,'\',wdir)
+%     D=dir(strcat(d,'\',wdir,'\HP*'));
+%     [~,s2]=sort([D(:).datenum]',1,'descend');
+%     filesNoise={D(s2).name}%%%ficheros en orden de %Rn!!!
+% 
+%     [noise,file]=loadnoise(0,wdir,filesNoise);
+% end
+
+if nargin==4
+    [noise,file,path]=loadnoise();
+    %%%buscamos la IV y P correspondientes a la Tbath dada
+    path
+    Tbath=sscanf(char(regexp(path,'\d*mK','match')),'%dmK');
+    [~,Tind]=min(abs([IVset.Tbath]*1e3-Tbath));%%%En general Tbath de la IVsest tiene que ser exactamente la misma que la del directorio, pero en algun run he puesto el valor 'real'.(ZTES20)
+    IVstr=IVset(Tind);
+    [~,Tind]=min(abs([P.Tbath]*1e3-Tbath));
+    p=P(Tind).p;
 end
+if nargin==5
+    wdir=varargin{1};
+    d=pwd;
+    D=dir(strcat(d,'\',wdir,'\HP*'));
+    [~,s2]=sort([D(:).datenum]',1,'descend');
+    filesNoise={D(s2).name}%%%ficheros en orden de %Rn!!!
+    [noise,file]=loadnoise(0,wdir,filesNoise);
+    Tbath=sscanf(wdir,'%dmK');
+    [~,Tind]=min(abs([IVset.Tbath]*1e3-Tbath));%%%En general Tbath de la IVsest tiene que ser exactamente la misma que la del directorio, pero en algun run he puesto el valor 'real'.(ZTES20)
+    IVstr=IVset(Tind);
+    [~,Tind]=min(abs([P.Tbath]*1e3-Tbath));
+    p=P(Tind).p;
+end
+if nargin==6     
+    wdir=varargin{1};
+    wfiles=varargin{2};
+   [noise,file]=loadnoise(0,wdir,wfiles);
+      Tbath=sscanf(wdir,'%dmK');
+    [~,Tind]=min(abs([IVset.Tbath]*1e3-Tbath));%%%En general Tbath de la IVsest tiene que ser exactamente la misma que la del directorio, pero en algun run he puesto el valor 'real'.(ZTES20)
+    IVstr=IVset(Tind);
+    [~,Tind]=min(abs([P.Tbath]*1e3-Tbath));
+    p=P(Tind).p;
+end 
 
 if iscell(file)
     N=length(file)
@@ -43,6 +76,8 @@ if iscell(file)
          f=logspace(0,6,1000);
          %figure(17)
          %loglog(f,auxnoise.sI),hold on
+         
+         if(0)
          sIaux=ppval(spline(f,auxnoise.sI),noise{i}(:,1));
          NEP=(V2I(noise{i}(:,2),circuit.Rf)-3e-12)./sIaux;
 %         loglog(noise{i}(:,1),NEP,'r'),hold on,grid on,%%%for noise in Power
@@ -53,9 +88,11 @@ if iscell(file)
         expres(2,i)=RES;
         thres(1,i)=OP.R0/ZTES.Rn;
         thres(2,i)=auxnoise.Res;
+         end
         set(gca,'xlim',[100 1e5]);
         %set(gca,'ylim',[1e-11 1e-9]);
         %set(gca,'ylim',[1e-18 1e-16]);
+         
     end
 else
     Ib=sscanf(file,'HP_noise_%duA*')*1e-6;

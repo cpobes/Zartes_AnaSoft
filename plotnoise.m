@@ -32,7 +32,7 @@ totnoise=noise.sum+noise.squid;
 %loglog(f,noise.NEP)
 
 loglog(f,totnoise)
-axis([1 1e5 1e-11 1e-7])
+axis([10 1e5 1e-11 1e-9])
 %loglog(f,totnoise,f,noise.jo,f,noise.ph,f,noise.sh)%%uncomment para mostrar componentes
 %legend('exp','total','jhonson','phonon','shunt')%%uncomment para mostrar componentes
 

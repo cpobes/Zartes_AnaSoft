@@ -15,6 +15,10 @@ if nargin==4
     dirs=regexp(fc,'^\d+mK','match');
     dirs=dirs(~cellfun('isempty',dirs));
     for i=1:length(dirs) dirs{i}=char(dirs{i});end
+    
+    for i=1:length(dirs),aux(i)=sscanf(dirs{i},'%d');end
+    aux=sort(aux);
+    for i=1:length(aux) dirs{i}=strcat(num2str(aux(i)),'mK');end
 elseif nargin==5
     t=varargin{1};
     for i=1:length(t) dirs{i}=strcat(num2str(t(i)),'mK');end
@@ -25,20 +29,29 @@ pause(1)
 for i=1:length(dirs)
     %%%buscamos los ficheros a analizar en cada directorio.
     d=pwd;
-    dirs{i},pause(1)
-    files=ls(strcat(d,'\',dirs{i}));
-    [ii,jj]=size(files);
-    filesc=mat2cell(files,ones(1,ii),jj);
-    filesZ=regexp(filesc,'^TF_-?\d+.?\d+uA','match');
-    filesZ=filesZ(~cellfun('isempty',filesZ))
-    filesNoise=regexp(filesc,'^HP_noise_-?\d+.?\d+uA','match');
-    filesNoise=filesNoise(~cellfun('isempty',filesNoise));
-    %length(filesNoise)
-    for ii=1:length(filesZ) 
-        filesZ{ii}=char(filesZ{ii});
-        if ~isempty(filesNoise)filesNoise{ii}=char(filesNoise{ii});end
-    end
-    %filesc
+    %dirs{i},pause(1)
+%    files=ls(strcat(d,'\',dirs{i}));
+    
+%%%devolvemos los ficheros en orden!
+    D=dir(strcat(d,'\',dirs{i},'\TF*'));
+    [~,s2]=sort([D(:).datenum]',1,'descend');
+    filesZ={D(s2).name}%%%ficheros en orden de %Rn!!!
+    D=dir(strcat(d,'\',dirs{i},'\HP*'));
+    [~,s2]=sort([D(:).datenum]',1,'descend');
+    filesNoise={D(s2).name}%%%ficheros en orden de %Rn!!!
+    
+%     [ii,jj]=size(files);
+%     filesc=mat2cell(files,ones(1,ii),jj);
+%     filesZ=regexp(filesc,'^TF_-?\d+.?\d+uA','match');
+%     filesZ=filesZ(~cellfun('isempty',filesZ))
+%     filesNoise=regexp(filesc,'^HP_noise_-?\d+.?\d+uA','match');
+%     filesNoise=filesNoise(~cellfun('isempty',filesNoise));
+%     %length(filesNoise)
+%     for ii=1:length(filesZ) 
+%         filesZ{ii}=char(filesZ{ii});
+%         if ~isempty(filesNoise)filesNoise{ii}=char(filesNoise{ii});end
+%     end
+%     %filesc
     
     %%%buscamos la IV correspondiente a la Tmc dada
     Tbath=sscanf(dirs{i},'%dmK');
@@ -49,8 +62,8 @@ for i=1:length(dirs)
     %%%hacemos loop en cada fichero a analizar.
 
     for jj=1:length(filesZ)
-        thefile=strcat(d,'\',dirs{i},'\',filesZ{jj},'.txt');
-        if ~isempty(filesNoise) thenoisefile=strcat(d,'\',dirs{i},'\',filesNoise{jj},'.txt');end
+        thefile=strcat(d,'\',dirs{i},'\',filesZ{jj});%%%quito '.txt' respecto a version anterior. 
+        if ~isempty(filesNoise) thenoisefile=strcat(d,'\',dirs{i},'\',filesNoise{jj});end%%%quito'.txt'
         Ib=sscanf(char(regexp(thefile,'-?\d+.?\d+uA','match')),'%fuA')*1e-6
         
         %%%importamos la TF
@@ -84,7 +97,7 @@ for i=1:length(dirs)
             
          %%%Analizamos el ruido
          if ~isempty(filesNoise)
-            [noisedata,file]=loadnoise(0,dirs{i},strcat(filesNoise{jj},'.txt'));
+            [noisedata,file]=loadnoise(0,dirs{i},filesNoise{jj});%%%quito '.txt'
             OP=setTESOPfromIb(Ib,IV,param);
             noiseIrwin=noisesim('irwin',TES,OP,circuit);
             noiseIrwin.squid=3e-12;
@@ -95,35 +108,33 @@ for i=1:length(dirs)
             RES=2.35/sqrt(trapz(noisedata{1}(:,1),1./NEP.^2))/2/1.609e-19;
             P(i).ExRes(jj)=RES;
             P(i).ThRes(jj)=noiseIrwin.Res;
-         end
-            
+         end         
     end
+        P(i).Tbath=Tbath*1e-3;%%%se lee en mK.
     
-    %%%Ordenamos los parametros de menor a mayor por si el ls los da
-    %%%desordenados. Brute force.mejorar.
-    [Y,kk]=sort([P(i).p(:).rp]);
-    for jj=1:length(Y), P(i).p(jj).rp=Y(jj);end
-
-%     for jj=1:length(Y),P(i).p(jj).bi=[P(i).p(kk(jj)).bi];end
-%     for jj=1:length(Y),P(i).p(jj).L0=[P(i).p(kk(jj)).L0];end
-%     for jj=1:length(Y),P(i).p(jj).tau0=[P(i).p(kk(jj)).tau0];end
-%     for jj=1:length(Y),P(i).p(jj).C=[P(i).p(kk(jj)).C];end
-%     for jj=1:length(Y),P(i).p(jj).ai=[P(i).p(kk(jj)).ai];end
-%     for jj=1:length(Y),P(i).p(jj).Zinf=[P(i).p(kk(jj)).Zinf];end
-%     for jj=1:length(Y),P(i).p(jj).Z0=[P(i).p(kk(jj)).Z0];end
-%     for jj=1:length(Y),P(i).p(jj).taueff=[P(i).p(kk(jj)).taueff];end
-%     for jj=1:length(Y),P(i).residuo(jj)=[P(i).residuo(kk(jj))];end
-    
-    aux=[P(i).p(kk).bi];for jj=1:length(Y),P(i).p(jj).bi=aux(jj);end
-    aux=[P(i).p(kk).L0];for jj=1:length(Y),P(i).p(jj).L0=aux(jj);end
-    aux=[P(i).p(kk).tau0];for jj=1:length(Y),P(i).p(jj).tau0=aux(jj);end
-    aux=[P(i).p(kk).C];for jj=1:length(Y),P(i).p(jj).C=aux(jj);end
-    aux=[P(i).p(kk).ai];for jj=1:length(Y),P(i).p(jj).ai=aux(jj);end
-    aux=[P(i).p(kk).Zinf];for jj=1:length(Y),P(i).p(jj).Zinf=aux(jj);end
-    aux=[P(i).p(kk).Z0];for jj=1:length(Y),P(i).p(jj).Z0=aux(jj);end
-    aux=[P(i).p(kk).taueff];for jj=1:length(Y),P(i).p(jj).taueff=aux(jj);end
-    aux=[P(i).residuo];for jj=1:length(Y),P(i).residuo=aux(jj);end
-        
-    P(i).Tbath=Tbath;
+%     %%%Ordenamos los parametros de menor a mayor por si el ls los da
+%     %%%desordenados. Brute force.mejorar.
+%     [Y,kk]=sort([P(i).p(:).rp]);
+%     for jj=1:length(Y), P(i).p(jj).rp=Y(jj);end
+% 
+% %     for jj=1:length(Y),P(i).p(jj).bi=[P(i).p(kk(jj)).bi];end
+% %     for jj=1:length(Y),P(i).p(jj).L0=[P(i).p(kk(jj)).L0];end
+% %     for jj=1:length(Y),P(i).p(jj).tau0=[P(i).p(kk(jj)).tau0];end
+% %     for jj=1:length(Y),P(i).p(jj).C=[P(i).p(kk(jj)).C];end
+% %     for jj=1:length(Y),P(i).p(jj).ai=[P(i).p(kk(jj)).ai];end
+% %     for jj=1:length(Y),P(i).p(jj).Zinf=[P(i).p(kk(jj)).Zinf];end
+% %     for jj=1:length(Y),P(i).p(jj).Z0=[P(i).p(kk(jj)).Z0];end
+% %     for jj=1:length(Y),P(i).p(jj).taueff=[P(i).p(kk(jj)).taueff];end
+% %     for jj=1:length(Y),P(i).residuo(jj)=[P(i).residuo(kk(jj))];end
+%     
+%     aux=[P(i).p(kk).bi];for jj=1:length(Y),P(i).p(jj).bi=aux(jj);end
+%     aux=[P(i).p(kk).L0];for jj=1:length(Y),P(i).p(jj).L0=aux(jj);end
+%     aux=[P(i).p(kk).tau0];for jj=1:length(Y),P(i).p(jj).tau0=aux(jj);end
+%     aux=[P(i).p(kk).C];for jj=1:length(Y),P(i).p(jj).C=aux(jj);end
+%     aux=[P(i).p(kk).ai];for jj=1:length(Y),P(i).p(jj).ai=aux(jj);end
+%     aux=[P(i).p(kk).Zinf];for jj=1:length(Y),P(i).p(jj).Zinf=aux(jj);end
+%     aux=[P(i).p(kk).Z0];for jj=1:length(Y),P(i).p(jj).Z0=aux(jj);end
+%     aux=[P(i).p(kk).taueff];for jj=1:length(Y),P(i).p(jj).taueff=aux(jj);end
+%     aux=[P(i).residuo];for jj=1:length(Y),P(i).residuo=aux(jj);end
 end
     
