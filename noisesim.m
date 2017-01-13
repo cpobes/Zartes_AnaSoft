@@ -72,7 +72,7 @@ tauI=tau/(1-L0);
 tau_el=L/(RL+R0*(1+bI));
 
 %f=1:1e6;
-f=logspace(0,6);
+f=logspace(0,6,1000);
 if strcmp(model,'wouter')
 %%%ecuaciones 2.25-2.27 Tesis de Wouter.
 i_ph=sqrt(4*gamma*Kb*T0^2*G)*alfa*I0*R0./(G*T0*(R0+Rs)*(1+beta*L0)*sqrt(1+4*pi^2*taueff^2.*f.^2));
@@ -84,6 +84,7 @@ elseif strcmp(model,'irwin')
 %%% ecuaciones capitulo Irwin
 
 sI=-(1/(I0*R0))*(L/(tau_el*R0*L0)+(1-RL/R0)-L*tau*(2*pi*f).^2/(L0*R0)+1i*(2*pi*f)*L*tau*(1/tauI+1/tau_el)/(R0*L0)).^-1;%funcion de transferencia.
+
 t=Ts/T0;
 %n=3.1;
 F=t^(n+1)*(t^(n+2)+1)/2;%F de boyle y rogers. n= exponente de la ley de P(T). El primer factor viene de la pag22 del cap de Irwin.

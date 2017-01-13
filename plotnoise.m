@@ -9,7 +9,7 @@ else
         circuit=varargin{4};
     end
 end
-f=logspace(0,6);
+f=logspace(0,6,1000);
 n=length(models);
 for i=1:n
 %subplot(1,n,i) %util para comparar Irwin y wouter, pero estorba en
@@ -32,7 +32,7 @@ totnoise=noise.sum+noise.squid;
 %loglog(f,noise.NEP)
 
 loglog(f,totnoise)
-axis([1 1e5 1e-11 1e-9])
+axis([1 1e5 1e-11 1e-7])
 %loglog(f,totnoise,f,noise.jo,f,noise.ph,f,noise.sh)%%uncomment para mostrar componentes
 %legend('exp','total','jhonson','phonon','shunt')%%uncomment para mostrar componentes
 

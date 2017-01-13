@@ -25,7 +25,7 @@ IVstruct=GetIVTES(Circuit,IVaux);%%%
 
 I0=IVstruct.ites;
 V0=IVstruct.vtes;
-%Rn=25.0e-3;
+
 %R0=0.46*Rn;%0.0147;
 %T0=145e-3;
 %V0=0.507e-6;I0=43.78e-6;

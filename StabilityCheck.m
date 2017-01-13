@@ -18,8 +18,8 @@ if nargin==0
     beta=0.96;
 
 else
-    TESparam=varargin{1};
-    Circuitparam=varargin{2}
+    TESparam=varargin{1}
+    Circuitparam=varargin{2};
     C=TESparam.C;G=TESparam.G;%realmente no son constantes.
     L=Circuitparam.L;Rsh=Circuitparam.Rsh;Rpar=Circuitparam.Rpar;%parametros del circuito.
     T0=TESparam.T0;I0=TESparam.I0;%punto de operacion.

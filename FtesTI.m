@@ -13,7 +13,7 @@ r=exp(log(exp(p*log(ttes))+exp(p*log(ites)))/p);
 %Se puede hacer n=1.
 
 %%%available models:'power', 'erf', 'recta', 'ere', 'TFM'
-model='erf';%'recta';
+model='recta';%'erf';%'recta';
 if strcmp(model,'1')
 %model1. %Dr=0.2;%0.01%for model 1 and model 2.
 %Rtes=Rn./(1+exp(-(sqrt((Ttes/Tc).^2+(Ites/Ic).^2).^4-1)./Dr));
@@ -34,7 +34,7 @@ elseif strcmp(model,'power')
 %%%%%model3.R(T)=(T/Tc)^alfa.
 %profiler notes. las operaciones '.^' son costosas. Reescribo para
 %minimizarlas.
-alfa=80;
+alfa=100;
 %r=(ttes.^p+ites.^p).^(1/p);
 %r=(ttes.^p+(1-ttes).^p).^(1/p);
 %r=exp(log(exp(p*log(ttes))+exp(p*log(ites)))/p);%%%distancia_p
@@ -53,7 +53,7 @@ varargout{2}=alfa-varargout{1};
 
 elseif strcmp(model,'erf')
 %%%%Model 4. f='erf'
-delta=0.01;
+delta=0.005;
 ftes=(erf((r-1)/delta)+1)/2;
 alfar=(1/(delta))*r.*normpdf(r,1,delta/sqrt(2))./ftes;
 varargout{1}=alfar.*(ttes./r).^p;
@@ -61,7 +61,7 @@ varargout{2}=alfar-varargout{1};
 
 elseif strcmp(model,'recta')
     %%%modelo lineal en toda la transición.
-    delta=0.007;
+    delta=0.02;
     ftes=(r-1)/delta+0.5;%%%R(Tc)=Rn/2.
     ftes(ftes<0)=0;
     ftes(ftes>1)=1;

@@ -1,7 +1,7 @@
 function showStability(TES,Circuitparam)
 %mostrar superficie de estabilidad para un TES.
-step=1e-3;
-trange=0:step:1.5;irange=0:step:0.5;%%%1.5
+step=1e-4;
+trange=0.95:step:1.02;irange=0:step:0.02;%%%1.5
 [X,Y]=meshgrid(trange,irange);
 TES=SetOP(X*TES.Tc,Y*TES.Ic,TES);%llama a FtesTI.
 stab=StabilityCheck(TES,Circuitparam);%

@@ -50,7 +50,8 @@ elseif strcmp(style,'IVsZTES13')
     MarkerSizeArray([1 6 11],1)={8};
     
     displaynameArray={'40mK' '50mK' '60mK' '70mK' '80mK' '90mK' '95mK' '102mK' '104mK' '106mK' '110mK' '111mK' '112mK' '113mK' '114mK'}';%%%ZTES13
-    displaynameArray={'30mK' '40mK' '50mK' '60mK' '70mK' '80mK' '90mK' '95mK' '100mK' '105mK' '107mK' '108mK' '109mK' '110mK' '120mK'}';%%%ZTES13
+    displaynameArray={'30mK' '40mK' '50mK' '60mK' '70mK' '80mK' '90mK' '95mK' '100mK' '105mK' '107mK' '108mK' '109mK' '110mK' '120mK'}';%%%ZTES26
+  
     fontsize([1:15],1)={11};
     
     opt.names={'Color' 'LineStyle' 'LineWidth'  'Marker' 'MarkerSize' 'displayname'};

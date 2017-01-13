@@ -89,7 +89,7 @@ for i=1:length(dirs)
             noiseIrwin=noisesim('irwin',TES,OP,circuit);
             noiseIrwin.squid=3e-12;
             %size(noisedata),size(noiseIrwin.sum)
-            f=logspace(0,6);
+            f=logspace(0,6,1000);
             sIaux=ppval(spline(f,noiseIrwin.sI),noisedata{1}(:,1));
             NEP=(V2I(noisedata{1}(:,2),circuit.Rf)-noiseIrwin.squid)./sIaux;
             RES=2.35/sqrt(trapz(noisedata{1}(:,1),1./NEP.^2))/2/1.609e-19;

@@ -27,7 +27,7 @@ if ~iscell(file)
 end
 
 T=strcat(path,'\',file)%%path='xxxmK'
-
+T{1}
 for i=1:length(T),
     if iscell(T)
         data{i}=importdata(T{i});% ,'\t',skip
