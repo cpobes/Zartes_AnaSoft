@@ -10,7 +10,7 @@ for jj=1:length(perc)
         %txt=strcat('P',num2str(100*perc(jj)));
         %exec=strcat(txt,'(i)=','ppval(spline(IVTESset{i}.rtes,IVTESset{i}.ptes),jj)')
         %evalin('caller',exec);
-        ind=find(IVTESset(i).rtes>0.15&IVTESset(i).rtes<0.95);%%%algunas IVs fallan.
+        ind=find(IVTESset(i).rtes>0.15&IVTESset(i).rtes<0.95)%%%algunas IVs fallan.
         Paux(i)=ppval(spline(IVTESset(i).rtes(ind),IVTESset(i).ptes(ind)),perc(jj));
     end
     %fitaux=fit(Tbath',Paux'*1e12,'a*x^b+c','startpoint',[0 3 0]);
@@ -24,6 +24,7 @@ for jj=1:length(perc)
     fitaux.c=fit(3);
     Gaux(jj)=GetGfromFit(fitaux);
 end
+for jj=1:length(perc) Gaux(jj).rp=perc(jj);end
 xlabel('T_{bath}(K)','fontsize',11,'fontweight','bold')
 ylabel('P_{tes}(pW)','fontsize',11,'fontweight','bold')
 title('P vs T fits','fontsize',11,'fontweight','bold')

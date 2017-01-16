@@ -62,7 +62,8 @@ if iscell(file)
         Ib=sscanf(file{i},'HP_noise_%duA*')*1e-6 %%%HP_noise para ZTES18.!!!
         OP=setTESOPfromIb(Ib,IVstr,p);
         %%OP.Tbath=1.5*OP.Tbath;%%%effect of Tbath error.Despreciable.
-        ncols=max(ceil(N/3),1);
+        nrows=4;
+        ncols=max(ceil(N/nrows),1);
         subplot(ceil(N/ncols),ncols,i)
         hold off;%figure
         loglog(noise{i}(:,1),V2I(noise{i}(:,2),circuit.Rf),'.-r'),hold on,grid on,%%%for noise in Current

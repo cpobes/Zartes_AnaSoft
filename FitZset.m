@@ -108,33 +108,15 @@ for i=1:length(dirs)
             RES=2.35/sqrt(trapz(noisedata{1}(:,1),1./NEP.^2))/2/1.609e-19;
             P(i).ExRes(jj)=RES;
             P(i).ThRes(jj)=noiseIrwin.Res;
+            %P(i).p(jj).ExRes=RES;
+            %P(i).p(jj).ThRes=noiseIrwin.Res;
          end         
     end
-        P(i).Tbath=Tbath*1e-3;%%%se lee en mK.
-    
-%     %%%Ordenamos los parametros de menor a mayor por si el ls los da
-%     %%%desordenados. Brute force.mejorar.
-%     [Y,kk]=sort([P(i).p(:).rp]);
-%     for jj=1:length(Y), P(i).p(jj).rp=Y(jj);end
-% 
-% %     for jj=1:length(Y),P(i).p(jj).bi=[P(i).p(kk(jj)).bi];end
-% %     for jj=1:length(Y),P(i).p(jj).L0=[P(i).p(kk(jj)).L0];end
-% %     for jj=1:length(Y),P(i).p(jj).tau0=[P(i).p(kk(jj)).tau0];end
-% %     for jj=1:length(Y),P(i).p(jj).C=[P(i).p(kk(jj)).C];end
-% %     for jj=1:length(Y),P(i).p(jj).ai=[P(i).p(kk(jj)).ai];end
-% %     for jj=1:length(Y),P(i).p(jj).Zinf=[P(i).p(kk(jj)).Zinf];end
-% %     for jj=1:length(Y),P(i).p(jj).Z0=[P(i).p(kk(jj)).Z0];end
-% %     for jj=1:length(Y),P(i).p(jj).taueff=[P(i).p(kk(jj)).taueff];end
-% %     for jj=1:length(Y),P(i).residuo(jj)=[P(i).residuo(kk(jj))];end
-%     
-%     aux=[P(i).p(kk).bi];for jj=1:length(Y),P(i).p(jj).bi=aux(jj);end
-%     aux=[P(i).p(kk).L0];for jj=1:length(Y),P(i).p(jj).L0=aux(jj);end
-%     aux=[P(i).p(kk).tau0];for jj=1:length(Y),P(i).p(jj).tau0=aux(jj);end
-%     aux=[P(i).p(kk).C];for jj=1:length(Y),P(i).p(jj).C=aux(jj);end
-%     aux=[P(i).p(kk).ai];for jj=1:length(Y),P(i).p(jj).ai=aux(jj);end
-%     aux=[P(i).p(kk).Zinf];for jj=1:length(Y),P(i).p(jj).Zinf=aux(jj);end
-%     aux=[P(i).p(kk).Z0];for jj=1:length(Y),P(i).p(jj).Z0=aux(jj);end
-%     aux=[P(i).p(kk).taueff];for jj=1:length(Y),P(i).p(jj).taueff=aux(jj);end
-%     aux=[P(i).residuo];for jj=1:length(Y),P(i).residuo=aux(jj);end
+        %%%Pasamos ExRes y ThRes dentro de P.p
+        if ~isempty(filesNoise)
+        for jj=1:length(filesZ) P(i).p(jj).ExRes=P(i).ExRes(jj);P(i).p(jj).ThRes=P(i).ThRes(jj);end
+        end
+        P(i).Tbath=Tbath*1e-3;%%%se lee en mK
 end
+if ~isempty(filesNoise) P=rmfield(P,{'ExRes','ThRes'});end
     
