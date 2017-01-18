@@ -94,6 +94,7 @@ stfn=4*Kb*T0^2*G*abs(sI).^2*F;%Thermal Fluctuation Noise
 ssh=4*Kb*Ts*I0^2*RL*(L0-1)^2*(1+4*pi^2*f.^2*tau^2/(1-L0)^2).*abs(sI).^2/L0^2; %Load resistor Noise
 stes=4*Kb*T0*I0^2*R0*(1+2*bI)*(1+4*pi^2*f.^2*tau^2).*abs(sI).^2/L0^2;
 smax=4*Kb*T0^2*G.*abs(sI).^2;
+sfaser=0;%21/(2*pi^2)*((6.626e-34)^2/(1.602e-19)^2)*(10e-9)*P0/R0^2/(2.25e-8)/(1.38e-23*T0);%%%eq22 faser
 
 
 NEP=sqrt(stfn+ssh+stes)./abs(sI);
@@ -107,7 +108,7 @@ i_sh=sqrt(ssh);
 %(n*TES.K*Ts.^n)*5e-6
 i_temp=(n*TES.K*Ts.^n)*0e-6*abs(sI);%%%ruido en Tbath.(5e-4=200uK, 5e-5=20uK, 5e-6=2uK)
 
-noise.ph=i_ph;noise.jo=i_jo;noise.sh=i_sh;noise.sum=M*sqrt(stfn+stes+ssh+i_temp.^2);%noise.sum=i_ph+i_jo+i_sh;
+noise.ph=i_ph;noise.jo=i_jo;noise.sh=i_sh;noise.sum=M*sqrt(stfn+stes+ssh+i_temp.^2+sfaser);%noise.sum=i_ph+i_jo+i_sh;
 noise.sI=abs(sI);noise.NEP=NEP;noise.max=sqrt(smax);noise.Res=Res;noise.tbath=i_temp;
 else
     error('no valid model')

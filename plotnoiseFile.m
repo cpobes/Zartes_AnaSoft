@@ -54,7 +54,8 @@ if nargin==6
     [~,Tind]=min(abs([P.Tbath]*1e3-Tbath));
     p=P(Tind).p;
 end 
-
+% [IVstr.Tbath]
+% [P(Tind).Tbath]
 if iscell(file)
     N=length(file)
     for i=1:N        

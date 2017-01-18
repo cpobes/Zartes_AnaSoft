@@ -3,7 +3,7 @@ function [param,resN]=FitZfiles(IVmeasure,Circuit,TES,TFS,varargin)
 %fitinputs contiene los valores de Ib a los que se ha tomado cada fichero,
 %TFSstr es la TF en estado superconductor (la estructura leída con
 %importTF) IVmeasure es la IV cogida a esa temperatura con formato
-%estructura IV.(ib,vout,Tbath)
+%estructura IV.(ibia,vout,Tbath)
 
 L=Circuit.L;
 Rf=Circuit.Rf;

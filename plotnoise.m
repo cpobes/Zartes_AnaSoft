@@ -28,13 +28,13 @@ noise.squid=3e-12*ones(1,length(f));
 % set(h(1),'linewidth',3)
 % legend('jhonson','phonon','shunt','squid','total')
 totnoise=noise.sum+noise.squid;
-%totnoise=noise.sum;
+%totnoise=noise.sum+noise.squid+noise.max;
 %loglog(f,noise.NEP)
 
-%loglog(f,totnoise)
+loglog(f,totnoise)  %%%COMENT AND UNCOMMENT TO TOGGLE COMPONENTS
 axis([10 1e5 1e-11 1e-9])
-loglog(f,totnoise,f,noise.jo,f,noise.ph,f,noise.sh)%%uncomment para mostrar componentes
-legend('exp','total','jhonson','phonon','shunt')%%uncomment para mostrar componentes
+%loglog(f,totnoise,f,noise.jo,f,noise.ph,f,noise.sh)%%uncomment para mostrar componentes
+%legend('exp','total','jhonson','phonon','shunt')%%uncomment para mostrar componentes
 
 h=get(gca,'children');
 set(h(1),'linewidth',3);
