@@ -10,7 +10,7 @@ for jj=1:length(perc)
         %txt=strcat('P',num2str(100*perc(jj)));
         %exec=strcat(txt,'(i)=','ppval(spline(IVTESset{i}.rtes,IVTESset{i}.ptes),jj)')
         %evalin('caller',exec);
-        ind=find(IVTESset(i).rtes>0.15&IVTESset(i).rtes<0.95)%%%algunas IVs fallan.
+        ind=find(IVTESset(i).rtes>0.15&IVTESset(i).rtes<0.95);%%%algunas IVs fallan.
         Paux(i)=ppval(spline(IVTESset(i).rtes(ind),IVTESset(i).ptes(ind)),perc(jj));
     end
     %fitaux=fit(Tbath',Paux'*1e12,'a*x^b+c','startpoint',[0 3 0]);

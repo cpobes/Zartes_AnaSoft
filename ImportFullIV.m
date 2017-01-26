@@ -12,7 +12,7 @@ if nargin==1
     path=pwd;
     path=strcat(path,'\');
 end
-T=strcat(path,file);
+T=strcat(path,file)
 if ~iscell(T)
     T={T};
 end
@@ -20,6 +20,7 @@ if ~iscell(file)
     file={file};
 end
 for i=1:length(T)
+    %T{i}
     %cargamos datos.Ojo al formato.
     data=importdata(T{i},'\t');%%%si hay header hace falta skip.
     if isstruct(data) data=data.data;end
