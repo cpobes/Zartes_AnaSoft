@@ -7,7 +7,7 @@ L=circuit.L;
 %Rpar=0.12e-3;
 
 %[file,path]=uigetfile('C:\Users\Carlos\Desktop\ATHENA\medidas\TES\2016\May2016\Mayo2016_pcZ(w)\Z(w)\*','','Multiselect','on');
-[file,path]=uigetfile('C:\Users\Carlos\Desktop\LastTESdir\*','TF*','Multiselect','on');
+[file,path]=uigetfile('C:\Users\Carlos\Desktop\LastTESdir\TF*','*','Multiselect','on');
 
 %file
 T=strcat(path,file);
