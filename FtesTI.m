@@ -3,7 +3,7 @@ function [ftes,varargout] = FtesTI(ttes,ites)
 %temperatura y corrientes normalizadas: ttes=T/Tc, ites=I/Ic.
 
 %Definimos la norma modulo 'p'.
-p=0.82;
+p=0.82;%%%p=0.82
 %%%distancia_p. Esto en realidad supone tomar ya una forma para Ic(Ttes). 
 %%%Si queremos probar otras expresiones, hay que modificar las definiciones de alfa y beta.
 r=exp(log(exp(p*log(ttes))+exp(p*log(ites)))/p);
@@ -13,7 +13,7 @@ r=exp(log(exp(p*log(ttes))+exp(p*log(ites)))/p);
 %Se puede hacer n=1.
 
 %%%available models:'power', 'erf', 'recta', 'ere', 'TFM'
-model='recta';%'erf';%'recta';
+model='ere';%'erf';%'recta';
 if strcmp(model,'1')
 %model1. %Dr=0.2;%0.01%for model 1 and model 2.
 %Rtes=Rn./(1+exp(-(sqrt((Ttes/Tc).^2+(Ites/Ic).^2).^4-1)./Dr));
@@ -53,7 +53,7 @@ varargout{2}=alfa-varargout{1};
 
 elseif strcmp(model,'erf')
 %%%%Model 4. f='erf'
-delta=0.005;
+delta=0.01;
 ftes=(erf((r-1)/delta)+1)/2;
 alfar=(1/(delta))*r.*normpdf(r,1,delta/sqrt(2))./ftes;
 varargout{1}=alfar.*(ttes./r).^p;
@@ -71,11 +71,28 @@ elseif strcmp(model,'recta')
     
 elseif strcmp(model,'ere')
     %%%modelo expo+recta+expo.
-    param=[0.1 0.95 0.01 0.9 1.05 0.01];
-        T3=param(5)-param(6)*log(param(3)*param(4)/(param(6)*param(1)));
-    ftes=param(1)*(1-heaviside(r-param(2))).*exp((r-param(2))/param(3))+...
-        param(1)*(heaviside(r-param(2))-heaviside(r-param(5))).*(1+(r-param(2))/param(3))+...
-        param(4)*heaviside(r-param(5)).*(1-exp(-(r-T3)/param(6)));
+    %param=[0.1 0.95 0.01 0.9 1.05 0.01];
+%      param=[0.1 0.95 0.005 1.0 1.02 0.01];
+%         T3=param(5)-param(6)*log(param(3)*param(4)/(param(6)*param(1)));
+%         %T3=param(5)+param(6)*log(1-param(1)*(1+(param(5)-param(2))/param(3)));
+%     ftes=param(1)*(1-heaviside(r-param(2))+0.5*dirac(r-param(2))).*exp((r-param(2))/param(3))+...
+%         param(1)*(heaviside(r-param(2))-heaviside(r-param(5))-0.5*dirac(r-param(2))-0.5*dirac(r-param(5))).*(1+(r-param(2))/param(3))+...
+%         param(4)*(heaviside(r-param(5))+0.5*dirac(r-param(5))).*(1-exp(-(r-T3)/param(6)));
+%         %(heaviside(r-param(5))+0.5*dirac(r-param(5))).*(1-exp(-(r-T3)/param(6)));
+        
+        %%%param=[] = (p1 p2 m)
+            param=[0.9974 1.0017 74.5];
+            T1=param(1);T2=param(2);m=param(3);
+            
+            P1=T1-1+1/(2*m);
+            R1=T1-P1*log(P1*m);
+            P2=1-T2+1/(2*m);
+            R2=T2+P2*log(P2*m);
+            ftes=(1-heaviside(r-T1)+0.5*dirac(r-T1)).*exp((r-R1)/P1)+...
+        (heaviside(r-T1)-heaviside(r-T2)-0.5*dirac(r-T1)-0.5*dirac(r-T2))...
+        .*(m*(r-1)+0.5)+...
+        (heaviside(r-T2)+0.5*dirac(r-T2)).*(1-exp(-(r-R2)/P2));
+    
      alfar=r./((r-1)+0.01/2);%%%from 'recta'
     varargout{1}=alfar.*(ttes./r).^p;
     varargout{2}=alfar-varargout{1};

@@ -1,14 +1,15 @@
-function IVsim=BuildIVsimStruct(Ttes,Ites,TES)
+function IVsim=BuildIVsimStruct(IV,TES)
 
 Ic=TES.Ic;
 Tc=TES.Tc;
 Rn=TES.Rn;
-IVsim.ites=Ites/Ic;
-IVsim.ttes=Ttes/Tc;
+IVsim.ites=IV.ites/Ic;
+IVsim.ttes=IV.ttes/Tc;
 %Vtes=Ib*Rsh-Ites*(Rsh+Rpar);
 IVsim.rtes=FtesTI(IVsim.ttes,IVsim.ites);
 IVsim.Rtes=IVsim.rtes*Rn;
-IVsim.Vtes=Ites.*IVsim.Rtes;
-IVsim.Ptes=Ites.*IVsim.Vtes;
-IVsim.Ites=Ites;
-IVsim.Ttes=Ttes;
+IVsim.Vtes=IV.ites.*IVsim.Rtes;
+IVsim.Ptes=IV.ites.*IVsim.Vtes;
+IVsim.Ites=IV.ites;
+IVsim.ttes=IV.ttes;%%%%
+IVsim.Tbath=IV.Tbath;

@@ -1,5 +1,5 @@
 function opt=BuildPlotOptionsScript()
-%%%podemos ir creando diferentes estilos y llamar a la función con el
+%%%podemos ir creando diferentes estilos y llamar a la funciÃ³n con el
 %%%estilo que necesitemos en cada llamada.
 
 %%%list of propertiy names:

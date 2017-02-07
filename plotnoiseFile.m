@@ -1,7 +1,7 @@
 function [thres,expres]=plotnoiseFile(IVset,P,circuit,ZTES,varargin)
 %pinta ruido y compara con Irwin a partir de fichero
-%V170112. IVstr es la estructura a la temperatura de interés, y p es la
-%estructura de parámetros también a esa temepratura.
+%V170112. IVstr es la estructura a la temperatura de interÃ©s, y p es la
+%estructura de parÃ¡metros tambiÃ©n a esa temepratura.
 
 %v170113. Paso ya el IVset completo y P completo.
 
