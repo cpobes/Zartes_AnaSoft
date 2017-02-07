@@ -19,6 +19,5 @@ elseif nargin==2
     values=options.values;
 
 end
-
-set(handle,names,values(1:length(handle),:));
 %set(handle,'fontsize',11);
+set(handle,names,values(1:length(handle),:));
