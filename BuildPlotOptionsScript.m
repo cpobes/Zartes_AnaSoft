@@ -6,7 +6,7 @@ function opt=BuildPlotOptionsScript()
 %names={'Color' 'LineStyle' 'LineWidth' 'Marker' 'MarkerSize' 'MarkerEdgeColor' 'MarkerFaceColor'};
 lineColors = {[0,0,1];[1,0,0];[0,0.5,0];[0,0,0];[1,0,1];[0,1,1];[0.5 0.5 0.5];[1,1,0]};
 
-style='IVsZTES13';%'IVsZTES20'(16 lines);%'3param';%'IVsZTES13'(15 lines);%'8transitionswithfit';
+style='IVsZTES28';%'IVsZTES20'(16 lines);%'3param';%'IVsZTES13'(15 lines);%'8transitionswithfit';
 if strcmp(style,'8transitionswithfit')
     
     lineWidthArray([1:16],1)={2};
@@ -57,7 +57,7 @@ elseif strcmp(style,'IVsZTES13')
     opt.names={'Color' 'LineStyle' 'LineWidth'  'Marker' 'MarkerSize' 'displayname'};
     opt.values=[ lineColorArray lineStyleArray lineWidthArray MarkerArray MarkerSizeArray displaynameArray];
 
-    elseif strcmp(style,'IVsZTES20')%sirve tb para ZTES18 cambiando Tbaths
+elseif strcmp(style,'IVsZTES20')%sirve tb para ZTES18 cambiando Tbaths
     
     lineStyleArray([1:4],1)={'-'};
     lineStyleArray([5:8],1)={':'};
@@ -80,6 +80,30 @@ elseif strcmp(style,'IVsZTES13')
     %displaynameArray={'40mK' '45mK' '50mK' '55mK' '60mK' '65mK' '70mK' '75mK' '80mK' '85mK' '87mK' '89mK' '90mK' '91mK' '92mK' '95mK'}';%%ZTES20
     displaynameArray={'30mK' '40mK' '50mK' '60mK' '70mK' '80mK' '90mK' '100mK' '102mK' '104mK' '105mK' '106mK' '107mK' '108mK' '109mK' '110mK'}';%%%ZTES25
     fontsize([1:16],1)={11};
+    
+    opt.names={'Color' 'LineStyle' 'LineWidth'  'Marker' 'MarkerSize' 'displayname'};
+    opt.values=[ lineColorArray lineStyleArray lineWidthArray MarkerArray MarkerSizeArray displaynameArray];
+    
+elseif strcmp(style,'IVsZTES28')
+    
+    lineStyleArray([1:4],1)={'-'};
+    lineStyleArray([5:8],1)={':'};
+    lineStyleArray([9:12],1)={'--'};
+  
+    lineColorArray([1:4],1)=lineColors(1:4);
+    lineColorArray([5:8],1)=lineColors(1:4);
+    lineColorArray([9:12],1)=lineColors(1:4);
+
+    lineWidthArray([1:12],1)={1};
+    
+    MarkerArray([1:4],1)={'.';'*';'^';'v'};
+    MarkerArray([5:8],1)={'.';'*';'^';'v'};
+    MarkerArray([9:12],1)={'.';'*';'^';'v'};
+    
+    MarkerSizeArray([1:12],1)={4};
+    
+    displaynameArray={'30mK' '40mK' '50mK' '60mK' '80mK' '90mK' '100mK' '105mK' '110mK' '112mK' '115mK' '200mK'}';
+    %fontsize([1:12],1)={11};
     
     opt.names={'Color' 'LineStyle' 'LineWidth'  'Marker' 'MarkerSize' 'displayname'};
     opt.values=[ lineColorArray lineStyleArray lineWidthArray MarkerArray MarkerSizeArray displaynameArray];

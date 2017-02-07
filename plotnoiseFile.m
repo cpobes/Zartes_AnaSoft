@@ -67,7 +67,7 @@ if iscell(file)
         ncols=max(ceil(N/nrows),1);
         subplot(ceil(N/ncols),ncols,i)
         hold off;%figure
-        loglog(noise{i}(:,1),V2I(noise{i}(:,2),circuit.Rf),'.-r'),hold on,grid on,%%%for noise in Current
+        loglog(noise{i}(:,1),V2I(noise{i}(:,2)*1e12,circuit.Rf),'.-r'),hold on,grid on,%%%for noise in Current.  Multiplico 1e12 para pA/sqrt(Hz)!Ojo, tb en plotnoise!
         
         %%ZTES.Tc=1.3*ZTES.Tc;%%effect of Tc error.
         auxnoise=plotnoise('irwin',ZTES,OP,circuit);hold on;

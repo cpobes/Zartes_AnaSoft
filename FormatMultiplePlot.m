@@ -21,5 +21,5 @@ elseif nargin==2
 end
 
 set(handle,names,values(1:length(handle),:));
-set(handle,'fontsize',11);
+%set(handle,'fontsize',11);
     

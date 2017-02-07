@@ -32,6 +32,10 @@ V0=IVstruct.vtes;
 P0=V0.*I0;
 %G=716e-12;
 R0=V0/I0;
+%%%%%test
+%G0=spline([TES.Gset.rp],[TES.Gset.G],R0/Rn)*1e-12
+%T0=spline([TES.Gset.rp],[TES.Gset.Tc],R0/Rn)
+%pause(1)
 %R0/Rn
 
 rp=p;
