@@ -1,6 +1,6 @@
 function param=GetModelParameters(p,IVmeasure,Ib,TES,Circuit)
-%extrae los par·metros tÈrmicos del sistema a partir de un modelo tÈrmico y
-%conociendo el punto de operaciÛn y la 'G'
+%extrae los par√°metros t√©rmicos del sistema a partir de un modelo t√©rmico y
+%conociendo el punto de operaci√≥n y la 'G'
 
 %known parameters
 %R0=210e-3;%79e-3;
@@ -13,7 +13,7 @@ function param=GetModelParameters(p,IVmeasure,Ib,TES,Circuit)
 Rn=TES.Rn;
 T0=TES.Tc;
 G0=TES.G0;
-pp=spline(IVmeasure.ibias,IVmeasure.vout);%%ojo, el spline no es bueno fuera de la transiciÛn.
+pp=spline(IVmeasure.ibias,IVmeasure.vout);%%ojo, el spline no es bueno fuera de la transici√≥n.
 Vout=ppval(pp,Ib);
 %ind=find(abs(IVmeasure.ib-Ib)<1e-10);
 %Vout=IVmeasure.vout(ind);
@@ -32,6 +32,10 @@ V0=IVstruct.vtes;
 P0=V0.*I0;
 %G=716e-12;
 R0=V0/I0;
+%%%%%test
+%G0=spline([TES.Gset.rp],[TES.Gset.G],R0/Rn)*1e-12
+%T0=spline([TES.Gset.rp],[TES.Gset.Tc],R0/Rn)
+%pause(1)
 %R0/Rn
 
 rp=p;
