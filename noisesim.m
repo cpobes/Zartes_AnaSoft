@@ -3,14 +3,14 @@ function noise=noisesim(model,varargin)
 %de donde salen las distintas componentes de la fig13.24 de la pag.201 de
 %la tesis de maria? ahi estan dadas en pA/rhz.
 %Las ecs 2.31-2.33 de la tesis de Wouter dan nep(f) pero no tienen la
-%dependencia con la freq adecuada. Cuadra más con las ecuaciones 2.25-2.27
+%dependencia con la freq adecuada. Cuadra mÃ¡s con las ecuaciones 2.25-2.27
 %que de hecho son ruido en corriente.
-%La tesis de Maria hce referencia (p199) al capítulo de Irwin y Hilton
-%sobre TES en el libro Cryogenic Particle detection. Tanto en ese capítulo
+%La tesis de Maria hce referencia (p199) al capÃ­tulo de Irwin y Hilton
+%sobre TES en el libro Cryogenic Particle detection. Tanto en ese capÃ­tulo
 %como en el Ch1 de McCammon salen expresiones para las distintas
 %componentes de ruido. 
 
-%definimos unos valores razonables para los parámetros del sistema e
+%definimos unos valores razonables para los parÃ¡metros del sistema e
 %intentamos aplicar las expresiones de las distintas referencias.
 
 gamma=0.5;
@@ -89,16 +89,17 @@ t=Ts/T0;
 %n=3.1;
 F=t^(n+1)*(t^(n+2)+1)/2;%F de boyle y rogers. n= exponente de la ley de P(T). El primer factor viene de la pag22 del cap de Irwin.
 %F=t^(n+1)*(n+1)*(t^(2*n+3)-1)/((2*n+3)*(t^(n+1)-1));%F de Mather. La
-%diferencia entre las dos fórmulas es menor del 1%.
+%diferencia entre las dos fÃ³rmulas es menor del 1%.
 stfn=4*Kb*T0^2*G*abs(sI).^2*F;%Thermal Fluctuation Noise
 ssh=4*Kb*Ts*I0^2*RL*(L0-1)^2*(1+4*pi^2*f.^2*tau^2/(1-L0)^2).*abs(sI).^2/L0^2; %Load resistor Noise
-stes=4*Kb*T0*I0^2*R0*(1+2*bI)*(1+4*pi^2*f.^2*tau^2).*abs(sI).^2/L0^2;
+M=0;
+stes=4*Kb*T0*I0^2*R0*(1+2*bI)*(1+4*pi^2*f.^2*tau^2).*abs(sI).^2/L0^2*(1+M^2).^2;%%%Johnson noise at TES.
 smax=4*Kb*T0^2*G.*abs(sI).^2;
 sfaser=0;%21/(2*pi^2)*((6.626e-34)^2/(1.602e-19)^2)*(10e-9)*P0/R0^2/(2.25e-8)/(1.38e-23*T0);%%%eq22 faser
 
 
 NEP=sqrt(stfn+ssh+stes)./abs(sI);
-Res=2.35/sqrt(trapz(f,1./NEP.^2))/2/1.609e-19;%resolución en eV. Tesis Wouter (2.37).
+Res=2.35/sqrt(trapz(f,1./NEP.^2))/2/1.609e-19;%resoluciÃ³n en eV. Tesis Wouter (2.37).
 M=1.;
 %stes=stes*M^2;
 i_ph=sqrt(stfn);
