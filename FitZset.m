@@ -69,8 +69,11 @@ for i=1:length(dirs)
         %%%importamos la TF
             data=importdata(thefile);%size(data)
             tf=data(:,2)+1i*data(:,3);
-            Rth=Rsh+Rpar+2*pi*L*data(:,1)*1i;
-            ztes=(TFS.tf./tf-1).*Rth;
+            %Rth=Rsh+Rpar+2*pi*L*data(:,1)*1i;
+            %ztes=(TFS.tf./tf-1).*Rth;
+            Cp=100e-12;
+            Zth=Rsh./(1+2*pi*Cp*data(:,1)*1i*Rsh)+Rpar+2*pi*L*data(:,1)*1i;
+            ztes=(TFS.tf./tf-1).*Zth;
             %plot(ztes,'.'),hold on
             %size(ztes)
         %%%valores iniciales del fit
@@ -108,8 +111,18 @@ for i=1:length(dirs)
             RES=2.35/sqrt(trapz(noisedata{1}(:,1),1./NEP.^2))/2/1.609e-19;
             P(i).ExRes(jj)=RES;
             P(i).ThRes(jj)=noiseIrwin.Res;
-            %P(i).p(jj).ExRes=RES;
-            %P(i).p(jj).ThRes=noiseIrwin.Res;
+            
+            %%%Excess noise trials.
+%             findx=find(noisedata{1}(:,1)>1e4);
+%             xdata=noisedata{1}(findx,1);
+%             ydata=V2I(noisedata{1}(findx,2)-noiseIrwin.squid,circuit.Rf);
+%             size(ydata)
+%             P(i).M(jj)=lsqcurvefit(@(x,xdata) fitnoise(x,xdata,TES,OP,circuit),1,xdata,ydata);
+        ns=ppval(spline(f,noiseIrwin.sum),noisedata{1}(:,1));
+        excess(:,1)=noisedata{1}(:,1);
+        excess(:,2)=V2I(noisedata{1}(:,2),circuit.Rf)-noiseIrwin.squid-ns;
+        excess;
+        P(i).exnoise{jj}=excess;
          end         
     end
         %%%Pasamos ExRes y ThRes dentro de P.p

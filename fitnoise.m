@@ -1,27 +1,26 @@
-function noise=noisesim(model,varargin)
-%simulacion de componentes de ruido.
-%de donde salen las distintas componentes de la fig13.24 de la pag.201 de
-%la tesis de maria? ahi estan dadas en pA/rhz.
-%Las ecs 2.31-2.33 de la tesis de Wouter dan nep(f) pero no tienen la
-%dependencia con la freq adecuada. Cuadra más con las ecuaciones 2.25-2.27
-%que de hecho son ruido en corriente.
-%La tesis de Maria hce referencia (p199) al capítulo de Irwin y Hilton
-%sobre TES en el libro Cryogenic Particle detection. Tanto en ese capítulo
-%como en el Ch1 de McCammon salen expresiones para las distintas
-%componentes de ruido. 
+function OutNoise=fitnoise(M,f,varargin)
 
-%definimos unos valores razonables para los parámetros del sistema e
-%intentamos aplicar las expresiones de las distintas referencias.
+% %%%funcion para tratar de ajustar el excess jhonson noise
+% auxnoise=noisesim('irwin',TES,OP,circuit,M);
+% ff=logspace(0,6,1000);
+% for i=1:length(f)
+% findx(i)= find((abs(ff-f(i)))==(min(abs(ff-f(i)))));
+% end
+% noise=auxnoise.sum(findx);
+% size(noise)
 
+
+%%%TES,OP,circuit
 gamma=0.5;
 Kb=1.38e-23;
-
-if nargin==1
+model='irwin';
+if nargin==2
     C=2.3e-15;%p220
     L=77e-9;%400e-9;%inductancia. arbitrario.
     G=310e-12;%1.7e-12;% p220 maria.
     alfa=1;%arbitrario.
     bI=0.96;%p220
+    n=3.2;
     Rn=15e-3;%32.7e-3;%p220.
     Rs=1e-3;%Rshunt.
     Rpar=0.12e-3;%0.11e-3;%R parasita.
@@ -38,7 +37,6 @@ if nargin==1
     V0=I0*R0;%
     P0=I0*V0;
     L0=P0*alfa/(G*T0);
-    M=1;
 else
     TES=varargin{1};
     OP=varargin{2};
@@ -65,10 +63,6 @@ else
     V0=OP.V0;
     L0=P0*alfa/(G*T0);
     n=TES.n;
-    M=1;
-end
-if nargin==5
-    M=varargin{4};
 end
 
 tau=C/G;
@@ -77,7 +71,7 @@ tauI=tau/(1-L0);
 tau_el=L/(RL+R0*(1+bI));
 
 %f=1:1e6;
-f=logspace(0,6,1000);
+%f=logspace(0,6,1000);
 if strcmp(model,'wouter')
 %%%ecuaciones 2.25-2.27 Tesis de Wouter.
 i_ph=sqrt(4*gamma*Kb*T0^2*G)*alfa*I0*R0./(G*T0*(R0+Rs)*(1+beta*L0)*sqrt(1+4*pi^2*taueff^2.*f.^2));
@@ -103,9 +97,10 @@ smax=4*Kb*T0^2*G.*abs(sI).^2;
 sfaser=0;%21/(2*pi^2)*((6.626e-34)^2/(1.602e-19)^2)*(10e-9)*P0/R0^2/(2.25e-8)/(1.38e-23*T0);%%%eq22 faser
 
 
-NEP=sqrt(stfn+ssh+stes)./abs(sI);
-Res=2.35/sqrt(trapz(f,1./NEP.^2))/2/1.609e-19;%resolución en eV. Tesis Wouter (2.37).
-M=1.0;
+% NEP=sqrt(stfn+ssh+stes)./abs(sI);
+% Res=2.35/sqrt(trapz(f,1./NEP.^2))/2/1.609e-19;%resolución en eV. Tesis Wouter (2.37).
+% M=1.;
+
 %stes=stes*M^2;
 i_ph=sqrt(stfn);
 i_jo=sqrt(stes);
@@ -115,7 +110,12 @@ i_sh=sqrt(ssh);
 i_temp=(n*TES.K*Ts.^n)*0e-6*abs(sI);%%%ruido en Tbath.(5e-4=200uK, 5e-5=20uK, 5e-6=2uK)
 
 noise.ph=i_ph;noise.jo=i_jo;noise.sh=i_sh;noise.sum=M*sqrt(stfn+stes+ssh+i_temp.^2+sfaser);%noise.sum=i_ph+i_jo+i_sh;
-noise.sI=abs(sI);noise.NEP=NEP;noise.max=sqrt(smax);noise.Res=Res;noise.tbath=i_temp;
+noise.sI=abs(sI);
+%noise.NEP=NEP;
+noise.max=sqrt(smax);
+%noise.Res=Res;
+noise.tbath=i_temp;
+OutNoise=noise.sum;
 else
     error('no valid model')
 end

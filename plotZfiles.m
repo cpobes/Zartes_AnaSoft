@@ -34,7 +34,11 @@ for i=1:length(T),
     Rth=Rsh+Rpar+2*pi*L*data{i}(:,1)*1i;
     %tf{i}=conj(tf{i});
     %size(TFS),size(tf{i}),size(Rth)
-    ztes{i}=1.0*((TFS.tf./tf{i}-1).*Rth);
+    %ztes{i}=1.0*((TFS.tf./tf{i}-1).*Rth);
+    
+            Cp=5e-3;
+            Zth=Rsh./(1+2*pi*Cp*data{i}(:,1)*1i*Rsh)+Rpar+2*pi*L*data{i}(:,1)*1i;
+            ztes{i}=(TFS.tf./tf{i}-1).*Zth;
 
     %T{i}
 %     figure(h(1)),plot(ztes{i}(ind),'.'),grid on,hold on,
