@@ -19,8 +19,8 @@ for jj=1:length(perc)
     %Tbath
     %Paux
     plot(Tbath,Paux*1e12,'.'),hold on
-    %X0=[-3500 3 1];XDATA=Tbath;
-    X0=[-5000 3.0 10 1e4]; XDATA=[Tbath;Iaux*1e6];LB=[-Inf 2 0 0];
+    %X0=[-3500 3 1];XDATA=Tbath;LB=[-Inf 2 0 ];%%%Uncomment for model1
+    X0=[-5000 3.0 10 1e4]; XDATA=[Tbath;Iaux*1e6];LB=[-Inf 2 0 0];%%%Uncoment for model2
     fit=lsqcurvefit(@fitP,X0,XDATA,Paux*1e12,LB);
     plot(Tbath,fitP(fit,XDATA),'-r')
 %     fitaux.a=fit(1);

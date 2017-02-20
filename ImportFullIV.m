@@ -14,13 +14,17 @@ if nargin==1
 end
 T=strcat(path,file)
 if ~iscell(T)
-    T={T};
+    [ii,jj]=size(T);
+    for i=1:ii, T2{i}=T(i,:);end
+    T=T2;
 end
 if ~iscell(file)
-    file={file};
+    [ii,jj]=size(file);
+    for i=1:ii, file2{i}=file(i,:);end
+    file=file2;
 end
 for i=1:length(T)
-    %T{i}
+    T{i}
     %cargamos datos.Ojo al formato.
     %data=importdata(T{i},'\t');%%%si hay header hace falta skip.
     data=importdata(T{i});

@@ -7,7 +7,9 @@ function param=GetGfromFit(fit)
 param.n=fit(2);
 param.K=-fit(1);
 param.Tc=(fit(3)/-fit(1))^(1/fit(2));
-param.Ic=fit(4);
+if length(fit)==4
+    param.Ic=fit(4);%%%used in model2
+end
 
 param.G=param.n*param.K*param.Tc^(param.n-1);
 
