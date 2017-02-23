@@ -32,13 +32,19 @@ for i=1:length(dirs)
     %dirs{i},pause(1)
 %    files=ls(strcat(d,'\',dirs{i}));
     
-%%%devolvemos los ficheros en orden!
-    D=dir(strcat(d,'\',dirs{i},'\TF*'));
-    [~,s2]=sort([D(:).datenum]',1,'descend');
-    filesZ={D(s2).name}%%%ficheros en orden de %Rn!!!
-    D=dir(strcat(d,'\',dirs{i},'\HP*'));
-    [~,s2]=sort([D(:).datenum]',1,'descend');
-    filesNoise={D(s2).name}%%%ficheros en orden de %Rn!!!
+%%%devolvemos los ficheros en orden de fecha. Pero ojo si se pierde esa
+%%%info. Creo ListInBiasOrder para que se listen siempre en orden de
+%%%corriente.
+    %D=dir(strcat(d,'\',dirs{i},'\TF*'));
+    D=strcat(d,'\',dirs{i},'\TF*');
+%     [~,s2]=sort([D(:).datenum]',1,'descend');
+%     filesZ={D(s2).name}%%%ficheros en orden de %Rn!!!
+    filesZ=ListInBiasOrder(D);
+    %D=dir(strcat(d,'\',dirs{i},'\HP*'));
+    D=strcat(d,'\',dirs{i},'\HP*');
+%     [~,s2]=sort([D(:).datenum]',1,'descend');
+%     filesNoise={D(s2).name}%%%ficheros en orden de %Rn!!!
+    filesNoise=ListInBiasOrder(D);
     
 %     [ii,jj]=size(files);
 %     filesc=mat2cell(files,ones(1,ii),jj);
@@ -62,18 +68,21 @@ for i=1:length(dirs)
     %%%hacemos loop en cada fichero a analizar.
 
     for jj=1:length(filesZ)
-        thefile=strcat(d,'\',dirs{i},'\',filesZ{jj});%%%quito '.txt' respecto a version anterior. 
-        if ~isempty(filesNoise) thenoisefile=strcat(d,'\',dirs{i},'\',filesNoise{jj});end%%%quito'.txt'
-        Ib=sscanf(char(regexp(thefile,'-?\d+.?\d+uA','match')),'%fuA')*1e-6
+        thefile=strcat(d,'\',dirs{i},'\',filesZ{jj}); %%%quito '.txt' respecto a version anterior. 
+        if ~isempty(filesNoise) thenoisefile=strcat(d,'\',dirs{i},'\',filesNoise{jj}); end%%%quito'.txt'
+        offset=-9e-6;
+        Ib=sscanf(char(regexp(thefile,'-?\d+.?\d+uA','match')),'%fuA')*1e-6+offset
         
         %%%importamos la TF
             data=importdata(thefile);%size(data)
             tf=data(:,2)+1i*data(:,3);
-            %Rth=Rsh+Rpar+2*pi*L*data(:,1)*1i;
-            %ztes=(TFS.tf./tf-1).*Rth;
-            Cp=100e-12;
-            Zth=Rsh./(1+2*pi*Cp*data(:,1)*1i*Rsh)+Rpar+2*pi*L*data(:,1)*1i;
-            ztes=(TFS.tf./tf-1).*Zth;
+            Rth=Rsh+Rpar+2*pi*L*data(:,1)*1i;
+            ztes=(TFS.tf./tf-1).*Rth;
+            
+%             Cp=100e-12;
+%             Zth=Rsh./(1+2*pi*Cp*data(:,1)*1i*Rsh)+Rpar+2*pi*L*data(:,1)*1i;
+%             ztes=(TFS.tf./tf-1).*Zth;
+            
             %plot(ztes,'.'),hold on
             %size(ztes)
         %%%valores iniciales del fit
@@ -93,6 +102,7 @@ for i=1:length(dirs)
                 %p=[p(1) 1/p(2) 1/p(3)];%solo para 1/Ztesvfits.                
          
          %%%Extraemos los parámetros del ajuste.
+         
             param=GetModelParameters(p,IV,Ib,TES,circuit);
             resN=aux1;
             P(i).p(jj)=param;

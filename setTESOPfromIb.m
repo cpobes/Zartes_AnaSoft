@@ -2,11 +2,12 @@ function OP=setTESOPfromIb(Ib,IV,p)
 %set the TES operating point from Ibias and IV curves and fitted
 %parameters p.
 
-OP.r0=ppval(spline(IV.ibias,IV.rtes),Ib);
-OP.V0=ppval(spline(IV.ibias,IV.vtes),Ib);
-OP.I0=ppval(spline(IV.ibias,IV.ites),Ib);
+[iaux,ii]=unique(IV.ibias,'stable');
+OP.r0=ppval(spline(iaux,IV.rtes(ii)),Ib);
+OP.V0=ppval(spline(iaux,IV.vtes(ii)),Ib);
+OP.I0=ppval(spline(iaux,IV.ites(ii)),Ib);
 OP.R0=OP.V0/OP.I0;
-OP.P0=ppval(spline(IV.ibias,IV.ptes),Ib);
+OP.P0=ppval(spline(iaux,IV.ptes(ii)),Ib);
 OP.Tbath=IV.Tbath;
 
 if length(p)>1
