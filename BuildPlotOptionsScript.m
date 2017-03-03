@@ -6,7 +6,7 @@ function opt=BuildPlotOptionsScript()
 %names={'Color' 'LineStyle' 'LineWidth' 'Marker' 'MarkerSize' 'MarkerEdgeColor' 'MarkerFaceColor'};
 lineColors = {[0,0,1];[1,0,0];[0,0.5,0];[0,0,0];[1,0,1];[0,1,1];[0.5 0.5 0.5];[1,1,0]};
 
-style='IVsZTES28';%'IVsZTES20'(16 lines);%'3param';%'IVsZTES13'(15 lines);%'8transitionswithfit';
+style='IVsZTES13';%'IVsZTES20'(16 lines);%'3param';%'IVsZTES13'(15 lines);%'8transitionswithfit';
 if strcmp(style,'8transitionswithfit')
     
     lineWidthArray([1:16],1)={2};
@@ -49,8 +49,9 @@ elseif strcmp(style,'IVsZTES13')
     MarkerSizeArray([1:15],1)={4};
     MarkerSizeArray([1 6 11],1)={8};
     
-    displaynameArray={'40mK' '50mK' '60mK' '70mK' '80mK' '90mK' '95mK' '102mK' '104mK' '106mK' '110mK' '111mK' '112mK' '113mK' '114mK'}';%%%ZTES13
-    displaynameArray={'30mK' '40mK' '50mK' '60mK' '70mK' '80mK' '90mK' '95mK' '100mK' '105mK' '107mK' '108mK' '109mK' '110mK' '120mK'}';%%%ZTES26
+    %displaynameArray={'40mK' '50mK' '60mK' '70mK' '80mK' '90mK' '95mK' '102mK' '104mK' '106mK' '110mK' '111mK' '112mK' '113mK' '114mK'}';%%%ZTES13
+    %displaynameArray={'30mK' '40mK' '50mK' '60mK' '70mK' '80mK' '90mK' '95mK' '100mK' '105mK' '107mK' '108mK' '109mK' '110mK' '120mK'}';%%%ZTES26
+    displaynameArray={'40mK' '50mK' '60mK' '70mK' '80mK' '85mK' '90mK' '93mK' '95mK' '96mK' '98mK' '99mK' '100mK' '120mK' '200mK'}';%%%1Z1_54A
   
     fontsize([1:15],1)={11};
     

@@ -32,13 +32,13 @@ for i=1:length(h)
 end  
 subplot(2,2,1),title('V_{out} vs I_{bias}','fontsize',11,'fontweight','bold'),xlabel('I_{bias}(\muA)','fontsize',11,'fontweight','bold'),ylabel('V_{out}(V)','fontsize',11,'fontweight','bold'),grid on
 FormatMultiplePlot(get(gca,'children'));
-set(gca,'fontsize',12)
+set(gca,'fontsize',12,'linewidth',2)
 subplot(2,2,2),title('I_{tes} vs V_{tes}','fontsize',11,'fontweight','bold'),xlabel('V_{tes}(\muV)','fontsize',11,'fontweight','bold'),ylabel('I_{tes}(\muA)','fontsize',11,'fontweight','bold'),grid on
 FormatMultiplePlot(get(gca,'children'));
-set(gca,'fontsize',12)
+set(gca,'fontsize',12,'linewidth',2)
 subplot(2,2,3),title('P_{tes} vs V_{tes}','fontsize',11,'fontweight','bold'),xlabel('V_{tes}(\muV)','fontsize',11,'fontweight','bold'),ylabel('P_{tes}(pW)','fontsize',11,'fontweight','bold'),grid on
 FormatMultiplePlot(get(gca,'children'));
-set(gca,'fontsize',12)
+set(gca,'fontsize',12,'linewidth',2)
 subplot(2,2,4),title('Ptes vs R_{tes}%','fontsize',11,'fontweight','bold'),xlabel('R_{tes}%','fontsize',11,'fontweight','bold'),ylabel('P_{tes}(pW)','fontsize',11,'fontweight','bold'),grid on
 FormatMultiplePlot(get(gca,'children'));
-set(gca,'fontsize',12)
+set(gca,'fontsize',12,'linewidth',2)

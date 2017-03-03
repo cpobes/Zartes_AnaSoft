@@ -34,9 +34,10 @@ end
 if nargin==5
     wdir=varargin{1};
     d=pwd;
-    D=dir(strcat(d,'\',wdir,'\HP*'));
-    [~,s2]=sort([D(:).datenum]',1,'descend');
-    filesNoise={D(s2).name}%%%ficheros en orden de %Rn!!!
+%     D=dir(strcat(d,'\',wdir,'\HP*'));
+%     [~,s2]=sort([D(:).datenum]',1,'descend');
+%     filesNoise={D(s2).name}%%%ficheros en orden de %Rn!!!
+    filesNoise=ListInBiasOrder(strcat(wdir,'\HP*'),'ascend')
     [noise,file]=loadnoise(0,wdir,filesNoise);
     Tbath=sscanf(wdir,'%dmK');
     [~,Tind]=min(abs([IVset.Tbath]*1e3-Tbath));%%%En general Tbath de la IVsest tiene que ser exactamente la misma que la del directorio, pero en algun run he puesto el valor 'real'.(ZTES20)
@@ -70,7 +71,7 @@ if iscell(file)
         loglog(noise{i}(:,1),V2I(noise{i}(:,2)*1e12,circuit.Rf),'.-r'),hold on,grid on,%%%for noise in Current.  Multiplico 1e12 para pA/sqrt(Hz)!Ojo, tb en plotnoise!
         
         %%ZTES.Tc=1.3*ZTES.Tc;%%effect of Tc error.
-        auxnoise=plotnoise('irwin',ZTES,OP,circuit);hold on;
+        auxnoise=plotnoise('irwin',ZTES,OP,circuit,0);hold on;%%%quinto argumento 'M'.
         set(gca,'fontsize',11);
         title(strcat(num2str(round(OP.r0*100)),'%Rn'),'fontsize',11);
         
@@ -94,6 +95,11 @@ if iscell(file)
         set(gca,'xlim',[100 1e5]);
         %set(gca,'ylim',[1e-11 1e-9]);
         %set(gca,'ylim',[1e-18 1e-16]);
+        
+        %%%Salvar la figura 
+        fi=strcat('-f',num2str(gcf));
+        name=strcat('figs\Noise',num2str(Tbath),'mK');
+        print(fi,name,'-dpng','-r0')
          
     end
 else

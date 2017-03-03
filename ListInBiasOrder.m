@@ -1,5 +1,12 @@
-function files=ListInBiasOrder(D)
+function files=ListInBiasOrder(D,varargin)
 %%%Listar ficheros en orden de corriente de bias.
+%%%D es un string tipo 'HP*' 'TF*' ec.
+
+if nargin==2
+    order=varargin{1};
+else
+    order='descend';
+end
 
 f=dir(D);
 %length(f)
@@ -8,6 +15,6 @@ for i=1:length(f)
     Ibs(i)=sscanf(char(str),'%fuA');
 end
 
-[ii,jj]=sort(abs(Ibs),'descend');
+[ii,jj]=sort(abs(Ibs),order);
 f=f(jj);
 files={f(:).name};

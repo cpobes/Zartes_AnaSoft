@@ -13,12 +13,12 @@ if nargin==4
     [i,j]=size(f);
     fc=mat2cell(f,ones(1,i),j);
     dirs=regexp(fc,'^\d+mK','match');
-    dirs=dirs(~cellfun('isempty',dirs));
-    for i=1:length(dirs) dirs{i}=char(dirs{i});end
+    dirs=dirs(~cellfun('isempty',dirs))
+    for i=1:length(dirs) dirs{i}=char(dirs{i}),end
     
     for i=1:length(dirs),aux(i)=sscanf(dirs{i},'%d');end
     aux=sort(aux);
-    for i=1:length(aux) dirs{i}=strcat(num2str(aux(i)),'mK');end
+    for i=1:length(aux) dirs{i}=strcat(num2str(aux(i)),'mK'),end
 elseif nargin==5
     t=varargin{1};
     for i=1:length(t) dirs{i}=strcat(num2str(t(i)),'mK');end
@@ -70,7 +70,7 @@ for i=1:length(dirs)
     for jj=1:length(filesZ)
         thefile=strcat(d,'\',dirs{i},'\',filesZ{jj}); %%%quito '.txt' respecto a version anterior. 
         if ~isempty(filesNoise) thenoisefile=strcat(d,'\',dirs{i},'\',filesNoise{jj}); end%%%quito'.txt'
-        offset=-9e-6;
+        offset=0;%-9e-6;
         Ib=sscanf(char(regexp(thefile,'-?\d+.?\d+uA','match')),'%fuA')*1e-6+offset
         
         %%%importamos la TF
@@ -93,11 +93,12 @@ for i=1:length(dirs)
             feff0=1e2;
             
          %%%Hacemos el ajuste a Z(w)
-            p0=[Zinf Z0 tau0];
+            %p0=[Zinf Z0 tau0];
+            p0=[Zinf Z0 tau0 1e-3 1e-6];%%%p0 for 2 block model.
             pinv0=[Zinf 1/Y0 tau0];
-             %[p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,p0,fS,[real(ztes) imag(ztes)]);%%%uncomment for real parameters.
+             [p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,p0,fS,[real(ztes) imag(ztes)]);%%%uncomment for real parameters.
                 %[p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,pinv0,fS,[real(1./zt{i}) imag(1./zt{i})]);%%%uncomment for inverse Ztes fit.
-            [p,aux1,aux2,aux3,out]=lsqcurvefit(@fitReZ,p0,fS,[real(ztes)],[0 -Inf 0],[1 Inf 1]);%%%uncomment for real part only.
+            %[p,aux1,aux2,aux3,out]=lsqcurvefit(@fitReZ,p0,fS,[real(ztes)],[0 -Inf 0],[1 Inf 1]);%%%uncomment for real part only.
                 %[p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,p0,fS,zt{i});%%%uncommetn for complex parameters
                 %p=[p(1) 1/p(2) 1/p(3)];%solo para 1/Ztesvfits.                
          
@@ -123,16 +124,16 @@ for i=1:length(dirs)
             P(i).ThRes(jj)=noiseIrwin.Res;
             
             %%%Excess noise trials.
-%             findx=find(noisedata{1}(:,1)>1e4);
-%             xdata=noisedata{1}(findx,1);
-%             ydata=V2I(noisedata{1}(findx,2)-noiseIrwin.squid,circuit.Rf);
-%             size(ydata)
-%             P(i).M(jj)=lsqcurvefit(@(x,xdata) fitnoise(x,xdata,TES,OP,circuit),1,xdata,ydata);
-        ns=ppval(spline(f,noiseIrwin.sum),noisedata{1}(:,1));
-        excess(:,1)=noisedata{1}(:,1);
-        excess(:,2)=V2I(noisedata{1}(:,2),circuit.Rf)-noiseIrwin.squid-ns;
-        excess;
-        P(i).exnoise{jj}=excess;
+            findx=find(noisedata{1}(:,1)>1e2);
+            xdata=noisedata{1}(findx,1);
+            ydata=V2I(noisedata{1}(findx,2)-noiseIrwin.squid,circuit.Rf);
+            %size(ydata)
+            P(i).M(jj).M=lsqcurvefit(@(x,xdata) fitnoise(x,xdata,TES,OP,circuit),0,xdata,ydata);
+%         ns=ppval(spline(f,noiseIrwin.sum),noisedata{1}(:,1));
+%         excess(:,1)=noisedata{1}(:,1);
+%         excess(:,2)=V2I(noisedata{1}(:,2),circuit.Rf)-noiseIrwin.squid-ns;
+%         excess;
+%         P(i).exnoise{jj}=excess;
          end         
     end
         %%%Pasamos ExRes y ThRes dentro de P.p

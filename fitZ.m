@@ -36,7 +36,7 @@ D=(1+(w.^2)*(p(3).^2));
 %fz=p(1)-(p(2)+p(1))./(-1+2*pi*f*p(3)*1i);
 %rfz=real(fz);imz=imag(fz);
 
-modelo='1b';
+modelo='2b';
 if strcmp(modelo,'1b')
     %%%p=[Zinf Z0 tau];
     rfz=p(1)-(p(1)-p(2))./D;%%%modelo de 1 bloque.

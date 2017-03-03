@@ -12,4 +12,4 @@ if length(fit)==4
 end
 
 param.G=param.n*param.K*param.Tc^(param.n-1);
-
+param.G100=param.n*param.K*0.1^(param.n-1);%%%Añadimos la G a una temperatura concreta, 100mK para poder comparar distintos TES.
