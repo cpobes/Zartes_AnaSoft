@@ -3,7 +3,7 @@ function [IVsim,xf]=simIV(Tb,varargin)
 %scan parameters
 %Imax=2e-3; %en mA %2e-3;
 Imax=0.2e-3;
-Imin=0.1e-3;%0.5e-3;
+Imin=0.e-3;%0.5e-3;
 Ib=linspace(Imin,Imax,1000);
 %relatstep=-1e-2;
 %Ib=Imin:relatstep*Imax:Imax;
@@ -15,8 +15,11 @@ if nargin==1
     Rsh=2e-3;Rpar=0.4e-3;%circuito
     n=3.2;K=1e-11;%membrana
     Rn=20e-3;Tc=0.1;Ic=1e-3;%TES
-    TESparam.Rsh=Rsh;TESparam.Rpar=Rpar;TESparam.Rn=Rn;
-    TESparam.Ic=Ic;TESparam.Tc=Tc;
+    Circuitparam.Rsh=Rsh;Circuitparam.Rpar=Rpar;TESparam.Rn=Rn;
+    TESparam.Ic=Ic;TESparam.Tc=Tc;TESparam.n=n;TESparam.K=K;
+    Circuitparam.Rf=3e3;
+    Circuitparam.invMf=66;
+    Circuitparam.invMin=24.1;
 else
     TESparam=varargin{1};
     Circuitparam=varargin{2};
@@ -64,8 +67,10 @@ Ttes=ttes*Tc;
 % TESparam.Rsh=Rsh;TESparam.Rpar=Rpar;TESparam.Rn=Rn;
 % TESparam.Ic=Ic;TESparam.Tc=Tc;
 
-showIVsims(Ttes,Ites,Tb,Ib,TESparam,Circuitparam)
-IVsim=BuildIVsimStruct(Ttes,Ites,TESparam);
+showIVsims(Ttes,Ites,Tb,Ib,TESparam,Circuitparam);
+IV.ites=Ites;IV.ttes=Ttes;
+IV.Tbath=Tb;
+IVsim=BuildIVsimStruct(IV,TESparam);
 
 
 %Ttes(find(abs(Ttes>5)))=0;
