@@ -32,7 +32,6 @@ for i=1:length(T)
     %corregir el vout.
     %auxS=corregir4ramas(data);%%para importar ficheros con 4 ramas (sin header)
     auxS=corregir1rama(data);%% para importar ficheros con 1 rama.
-    
     auxS.Tbath=sscanf(file{i},'%dmK*')*1e-3;
     IVset(i)=auxS;
 end
