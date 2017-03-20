@@ -24,7 +24,9 @@ elseif nargin==4
 elseif nargin==5
     noise=noisesim(models{i},TES,OP,circuit,M);
 end
-noise.squid=3e-12*ones(1,length(f));
+
+%noise.squid=3e-12*ones(1,length(f));
+
 % loglog(f,noise.jo,f,noise.ph,f,noise.sh,f,noise.squid,f,noise.sum+noise.squid)
 % grid on
 % title(models{i})
@@ -32,13 +34,14 @@ noise.squid=3e-12*ones(1,length(f));
 % h=get(gca,'children');
 % set(h(1),'linewidth',3)
 % legend('jhonson','phonon','shunt','squid','total')
-totnoise=noise.sum+noise.squid;
+
+totnoise=sqrt(noise.sum.^2+noise.squidarray.^2); %%%Hasta 20Mar2017 sumaba norma 1.
 %totnoise=noise.sum+noise.squid+noise.max;
-%loglog(f,noise.NEP)
+%loglog(f,noise.NEP*1e18)
 
 loglog(f,totnoise*1e12)  %%%COMENT AND UNCOMMENT TO TOGGLE COMPONENTS
 %axis([10 1e5 1e-11 1e-9])
-axis([10 1e5 10 1000])
+axis([1 1e5 10 1000])
 ylabel('pA/Hz^{0.5}')
 %loglog(f,totnoise*1e12,f,noise.jo*1e12,f,noise.ph*1e12,f,noise.sh*1e12)%%uncomment para mostrar componentes
 %legend('exp','total','jhonson','phonon','shunt')%%uncomment para mostrar componentes
