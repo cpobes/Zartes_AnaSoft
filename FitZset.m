@@ -96,9 +96,9 @@ for i=1:length(dirs)
             %p0=[Zinf Z0 tau0];
             p0=[Zinf Z0 tau0 1e-3 1e-6];%%%p0 for 2 block model.
             pinv0=[Zinf 1/Y0 tau0];
-             [p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,p0,fS,[real(ztes) imag(ztes)]);%%%uncomment for real parameters.
+            %[p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,p0,fS,[real(ztes) imag(ztes)]);%%%uncomment for real parameters.
                 %[p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,pinv0,fS,[real(1./zt{i}) imag(1./zt{i})]);%%%uncomment for inverse Ztes fit.
-            %[p,aux1,aux2,aux3,out]=lsqcurvefit(@fitReZ,p0,fS,[real(ztes)],[0 -Inf 0],[1 Inf 1]);%%%uncomment for real part only.
+            [p,aux1,aux2,aux3,out]=lsqcurvefit(@fitReZ,p0,fS,[real(ztes)],[0 -Inf 0],[1 Inf 1]);%%%uncomment for real part only.
                 %[p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,p0,fS,zt{i});%%%uncommetn for complex parameters
                 %p=[p(1) 1/p(2) 1/p(3)];%solo para 1/Ztesvfits.                
          
@@ -114,21 +114,27 @@ for i=1:length(dirs)
             [noisedata,file]=loadnoise(0,dirs{i},filesNoise{jj});%%%quito '.txt'
             OP=setTESOPfromIb(Ib,IV,param);
             noiseIrwin=noisesim('irwin',TES,OP,circuit);
-            noiseIrwin.squid=3e-12;
+            %noiseIrwin.squid=3e-12;
             %size(noisedata),size(noiseIrwin.sum)
             f=logspace(0,6,1000);
             sIaux=ppval(spline(f,noiseIrwin.sI),noisedata{1}(:,1));
-            NEP=(V2I(noisedata{1}(:,2),circuit.Rf)-noiseIrwin.squid)./sIaux;
+            NEP=sqrt(V2I(noisedata{1}(:,2),circuit.Rf).^2-noiseIrwin.squid.^2)./sIaux;
             RES=2.35/sqrt(trapz(noisedata{1}(:,1),1./NEP.^2))/2/1.609e-19;
             P(i).ExRes(jj)=RES;
             P(i).ThRes(jj)=noiseIrwin.Res;
             
             %%%Excess noise trials.
-            findx=find(noisedata{1}(:,1)>1e2);
+            findx=find(noisedata{1}(:,1)>1e4);
             xdata=noisedata{1}(findx,1);
-            ydata=V2I(noisedata{1}(findx,2)-noiseIrwin.squid,circuit.Rf);
+            %ydata=sqrt(V2I(noisedata{1}(findx,2),circuit.Rf).^2-noiseIrwin.squid.^2);
+            ydata=NEP(findx)*1e18;
             %size(ydata)
-            P(i).M(jj).M=lsqcurvefit(@(x,xdata) fitnoise(x,xdata,TES,OP,circuit),0,xdata,ydata);
+            P(i).M(jj)=lsqcurvefit(@(x,xdata) fitnoise(x,xdata,TES,OP,circuit),0,xdata,ydata);
+            
+            %%%funciona igual fitnoise y fitjohnson.
+%             parameters.OP=OP;parameters.circuit=circuit;parameters.TES=TES;          
+%             P(i).M(jj)=lsqcurvefit(@(x,xdata) fitjohnson(x,xdata,parameters),0,xdata,ydata);
+
 %         ns=ppval(spline(f,noiseIrwin.sum),noisedata{1}(:,1));
 %         excess(:,1)=noisedata{1}(:,1);
 %         excess(:,2)=V2I(noisedata{1}(:,2),circuit.Rf)-noiseIrwin.squid-ns;
@@ -138,9 +144,9 @@ for i=1:length(dirs)
     end
         %%%Pasamos ExRes y ThRes dentro de P.p
         if ~isempty(filesNoise)
-        for jj=1:length(filesZ) P(i).p(jj).ExRes=P(i).ExRes(jj);P(i).p(jj).ThRes=P(i).ThRes(jj);end
+        for jj=1:length(filesZ) P(i).p(jj).ExRes=P(i).ExRes(jj);P(i).p(jj).ThRes=P(i).ThRes(jj);P(i).p(jj).M=real(P(i).M(jj));end
         end
         P(i).Tbath=Tbath*1e-3;%%%se lee en mK
 end
-if ~isempty(filesNoise) P=rmfield(P,{'ExRes','ThRes'});end
+if ~isempty(filesNoise) P=rmfield(P,{'ExRes','ThRes','M'});end
     

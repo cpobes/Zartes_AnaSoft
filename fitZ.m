@@ -36,12 +36,15 @@ D=(1+(w.^2)*(p(3).^2));
 %fz=p(1)-(p(2)+p(1))./(-1+2*pi*f*p(3)*1i);
 %rfz=real(fz);imz=imag(fz);
 
-modelo='2b';
-if strcmp(modelo,'1b')
+%modelo='2b';
+%if strcmp(modelo,'1b')
+
+if length(p)==3
     %%%p=[Zinf Z0 tau];
     rfz=p(1)-(p(1)-p(2))./D;%%%modelo de 1 bloque.
     imz=-(p(1)-p(2))*w*p(3)./D;%%% modelo de 1 bloque.
-elseif strcmp(modelo,'2b')
+%elseif strcmp(modelo,'2b')
+elseif length(p)==5
     %p=[Zinf Z0 tau_eff c tau_A]; c=CA/C0, tauA=CA/Gtes.
     rfz=p(1)-(p(1)-p(2))./D+(p(4)-p(5))*w*p(3)./D;%%%modelo de 2bloques.
     imz=p(4)-(p(1)-p(2))*w*p(3)./D-(p(4)-p(5))./D;%%%modelos de 2 bloques.

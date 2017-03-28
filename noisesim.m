@@ -115,6 +115,7 @@ i_sh=sqrt(ssh);
 %(n*TES.K*Ts.^n)*5e-6
 %i_temp=(n*TES.K*Ts.^n)*0e-6*abs(sI);%%%ruido en Tbath.(5e-4=200uK, 5e-5=20uK, 5e-6=2uK)
 
+noise.f=f;
 noise.ph=i_ph;noise.jo=i_jo;noise.sh=i_sh;noise.sum=sqrt(stfn+stes+ssh);%noise.sum=i_ph+i_jo+i_sh;
 noise.sI=abs(sI);noise.NEP=NEP;noise.max=sqrt(smax);noise.Res=Res;%noise.tbath=i_temp;
 noise.squid=3e-12;noise.squidarray=3e-12*ones(1,length(f));

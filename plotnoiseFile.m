@@ -59,7 +59,7 @@ end
 % [P(Tind).Tbath]
 
 tipo='current';%%% 'NEP' or 'current'
-tipo='NEP';
+%tipo='NEP';
 
 if ~iscell(file) file={file};end
 if iscell(file)
@@ -77,7 +77,9 @@ if iscell(file)
         
         %%ZTES.Tc=1.3*ZTES.Tc;%%effect of Tc error.
         %auxnoise=plotnoise('irwin',ZTES,OP,circuit,0);hold on;%%%quinto argumento 'M'.
-        auxnoise=noisesim('irwin',ZTES,OP,circuit,0);
+        M=OP.M
+        M=0;
+        auxnoise=noisesim('irwin',ZTES,OP,circuit,M);
         f=logspace(0,6,1000);
         
         boolcomponents=0;%%%%para pintar o no las componentes

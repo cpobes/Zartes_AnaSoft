@@ -75,7 +75,7 @@ tau_el=L/(RL+R0*(1+bI));
 if strcmp(model,'wouter')
 %%%ecuaciones 2.25-2.27 Tesis de Wouter.
 i_ph=sqrt(4*gamma*Kb*T0^2*G)*alfa*I0*R0./(G*T0*(R0+Rs)*(1+beta*L0)*sqrt(1+4*pi^2*taueff^2.*f.^2));
-i_jo=sqrt(4*Kb*T0*R0)*sqrt(1+4*pi^2*tau^2.*f.^2)./((R0+Rs)*(1+beta*L0)*sqrt(1+4*pi^2*taueff^2.*f.^2));
+i_jo=sqrt(4*Kb*T0*R0)*sqrt(1+4*pi^2*tau^2.*f.^2)./((R0+Rs)*(1+beta*L0)*sqrt(1+4*pi^2*taueff^2.*f.^2))*(1+M^2);
 i_sh=sqrt(4*Kb*Ts*Rs)*sqrt((1-L0)^2+4*pi^2*tau^2.*f.^2)./((R0+Rs)*(1+beta*L0)*sqrt(1+4*pi^2*taueff^2.*f.^2));%%%
 noise.ph=i_ph;noise.jo=i_jo;noise.sh=i_sh;noise.sum=i_ph+i_jo+i_sh;
 
@@ -108,15 +108,16 @@ i_sh=sqrt(ssh);
 %G*5e-8
 %(n*TES.K*Ts.^n)*5e-6
 i_temp=(n*TES.K*Ts.^n)*0e-6*abs(sI);%%%ruido en Tbath.(5e-4=200uK, 5e-5=20uK, 5e-6=2uK)
+NEP=sqrt(smax+ssh+stes)./abs(sI);
 
 i_squid=3e-12;
-noise.ph=i_ph;noise.jo=i_jo;noise.sh=i_sh;noise.sum=M*sqrt(smax+stes+ssh+i_temp.^2+sfaser+i_squid^2);%noise.sum=i_ph+i_jo+i_sh;
+noise.ph=i_ph;noise.jo=i_jo;noise.sh=i_sh;noise.sum=sqrt(smax+stes+ssh+i_temp.^2+sfaser+i_squid^2);%noise.sum=i_ph+i_jo+i_sh;
 noise.sI=abs(sI);
-%noise.NEP=NEP;
+noise.NEP=NEP;
 noise.max=sqrt(smax);
 %noise.Res=Res;
 noise.tbath=i_temp;
-OutNoise=noise.sum;
+OutNoise=noise.NEP*1e18;
 else
     error('no valid model')
 end
