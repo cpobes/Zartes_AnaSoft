@@ -71,7 +71,7 @@ if nargin==5
     M=varargin{4};
 end
 
-tau=C/G;
+tau=C/G
 taueff=tau/(1+beta*L0);
 tauI=tau/(1-L0);
 tau_el=L/(RL+R0*(1+bI));
@@ -83,7 +83,7 @@ if strcmp(model,'wouter')
 i_ph=sqrt(4*gamma*Kb*T0^2*G)*alfa*I0*R0./(G*T0*(R0+Rs)*(1+beta*L0)*sqrt(1+4*pi^2*taueff^2.*f.^2));
 i_jo=sqrt(4*Kb*T0*R0)*sqrt(1+4*pi^2*tau^2.*f.^2)./((R0+Rs)*(1+beta*L0)*sqrt(1+4*pi^2*taueff^2.*f.^2));
 i_sh=sqrt(4*Kb*Ts*Rs)*sqrt((1-L0)^2+4*pi^2*tau^2.*f.^2)./((R0+Rs)*(1+beta*L0)*sqrt(1+4*pi^2*taueff^2.*f.^2));%%%
-noise.ph=i_ph;noise.jo=i_jo;noise.sh=i_sh;noise.sum=i_ph+i_jo+i_sh;
+noise.ph=i_ph;noise.jo=i_jo;noise.sh=i_sh;noise.sum=sqrt(i_ph.^2+i_jo.^2+i_sh.^2);
 
 elseif strcmp(model,'irwin') 
 %%% ecuaciones capitulo Irwin
@@ -91,10 +91,14 @@ elseif strcmp(model,'irwin')
 sI=-(1/(I0*R0))*(L/(tau_el*R0*L0)+(1-RL/R0)-L*tau*(2*pi*f).^2/(L0*R0)+1i*(2*pi*f)*L*tau*(1/tauI+1/tau_el)/(R0*L0)).^-1;%funcion de transferencia.
 
 t=Ts/T0;
+%%%calculo factor F. See McCammon p11.
 %n=3.1;
-F=t^(n+1)*(t^(n+2)+1)/2;%F de boyle y rogers. n= exponente de la ley de P(T). El primer factor viene de la pag22 del cap de Irwin.
+%F=t^(n+1)*(t^(n+2)+1)/2;%F de boyle y rogers. n= exponente de la ley de P(T). El primer factor viene de la pag22 del cap de Irwin.
+F=(t^(n+2)+1)/2;%%%specular limit
 %F=t^(n+1)*(n+1)*(t^(2*n+3)-1)/((2*n+3)*(t^(n+1)-1));%F de Mather. La
 %diferencia entre las dos fórmulas es menor del 1%.
+%F=(n+1)*(t^(2*n+3)-1)/((2*n+3)*(t^(n+1)-1));%%%diffusive limit.
+
 stfn=4*Kb*T0^2*G*abs(sI).^2*F;%Thermal Fluctuation Noise
 ssh=4*Kb*Ts*I0^2*RL*(L0-1)^2*(1+4*pi^2*f.^2*tau^2/(1-L0)^2).*abs(sI).^2/L0^2; %Load resistor Noise
 %M=1.8;

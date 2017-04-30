@@ -1,4 +1,4 @@
-function [zs,file]=plotZfiles(TFS,circuit,varargin)
+function [zs,file,path]=plotZfiles(TFS,circuit,varargin)
 %plot Ztes at different OP from files a partir de TFS y L.
 Rsh=circuit.Rsh;
 Rpar=circuit.Rpar;

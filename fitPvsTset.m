@@ -2,7 +2,7 @@ function Gaux=fitPvsTset(IVTESset,perc)
 %funcion para ajustar automaticamente curvas P-Tbath a un valor o valores
 %de porcentaje de Rn. Ojo al uso de cells o arrays en IVset.
 
-model=1;
+model=2;
 
 for i=1:length(IVTESset), Tbath(i)=IVTESset(i).Tbath;end
 
@@ -25,7 +25,7 @@ for jj=1:length(perc)
     if model==1
         X0=[-3500 3 1];XDATA=Tbath;LB=[-Inf 2 0 ];%%%Uncomment for model1
     elseif model==2
-        X0=[-5000 3.0 10 1e4]; XDATA=[Tbath;Iaux*1e6];LB=[-Inf 2 0 0];%%%Uncoment for model2
+        X0=[-5000 3.0 10 1e4 0]; XDATA=[Tbath;Iaux*1e6];LB=[-Inf 2 0 0 0];%%%Uncoment for model2
     end
     fit=lsqcurvefit(@fitP,X0,XDATA,Paux*1e12,LB);
     plot(Tbath,fitP(fit,XDATA),'-r')

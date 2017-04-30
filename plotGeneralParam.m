@@ -25,12 +25,14 @@ for i=indx%length(P),
     %%ecX='ai./sqrt(1+2*bi)';%%%Ecuacion para la X
     %%ecX='ai./bi';
     %%%ecX='ai./L0-1';
-    ecX='rp';    
+    ecX='(1+2*bi)';    
     x=eval(ecX);
     ecY='M';%%%Ecuacion para la Y
     %ecY='ai./L0-1';
+    %ecY='ai./(1+bi)';
+    %ecY='ai.*(2*L0+bi)./(2+bi)./L0';
     y=eval(ecY);
-    h=plot(x,y,'.');hold on
+    h=plot(x,y,'.r');hold on
     set(h,optname,optvalue);
 end
 

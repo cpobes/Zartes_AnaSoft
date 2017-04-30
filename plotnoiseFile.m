@@ -1,4 +1,4 @@
-function [thres,expres]=plotnoiseFile(IVset,P,circuit,ZTES,varargin)
+function si0=plotnoiseFile(IVset,P,circuit,ZTES,varargin)
 %pinta ruido y compara con Irwin a partir de fichero
 %V170112. IVstr es la estructura a la temperatura de interés, y p es la
 %estructura de parámetros también a esa temepratura.
@@ -77,17 +77,26 @@ if iscell(file)
         
         %%ZTES.Tc=1.3*ZTES.Tc;%%effect of Tc error.
         %auxnoise=plotnoise('irwin',ZTES,OP,circuit,0);hold on;%%%quinto argumento 'M'.
-        M=OP.M
+        M=OP.M;
         M=0;
         auxnoise=noisesim('irwin',ZTES,OP,circuit,M);
         f=logspace(0,6,1000);
-        
+        si0(i)=auxnoise.sI(1);
         boolcomponents=0;%%%%para pintar o no las componentes
             if(strcmp(tipo,'current'))
                 loglog(noise{i}(:,1),V2I(noise{i}(:,2)*1e12,circuit.Rf),'.-r'),hold on,grid on,%%%for noise in Current.  Multiplico 1e12 para pA/sqrt(Hz)!Ojo, tb en plotnoise!
                 totnoise=sqrt(auxnoise.sum.^2+auxnoise.squidarray.^2);
+                
+                %%%normalization test
+                %ind=find(noise{i}(:,1)>100&noise{i}(:,1)<1000);
+                %loglog(noise{i}(:,1),noise{i}(:,2)/median(noise{i}(ind,2)),'.-r'),hold on,grid on,%%%for noise in Current.  Multiplico 1e12 para pA/sqrt(Hz)!Ojo, tb en plotnoise!
+                %totnoise=sqrt(auxnoise.sum.^2+auxnoise.squidarray.^2)/auxnoise.sI(1);
+                
+                %totnoise=sqrt(auxnoise.max.^2+auxnoise.jo.^2+auxnoise.sh.^2+auxnoise.squidarray.^2);%%%To make F=1;
 
                 if ~boolcomponents
+                    %loglog(f,totnoise/totnoise(1));%%para pintar
+                    %normalizados.
                     loglog(f,totnoise*1e12);
                 else
                     loglog(f,auxnoise.jo*1e12,f,auxnoise.ph*1e12,f,auxnoise.sh*1e12,f,totnoise*1e12)
@@ -100,7 +109,9 @@ if iscell(file)
                 loglog(noise{i}(:,1),NEP*1e18,'.-r'),hold on,grid on,
                 
                 if ~boolcomponents
-                    loglog(f,auxnoise.NEP*1e18);hold on;grid on;
+                    totNEP=auxnoise.NEP;
+                 %   totNEP=sqrt(auxnoise.max.^2+auxnoise.jo.^2+auxnoise.sh.^2)./auxnoise.sI;
+                    loglog(f,totNEP*1e18);hold on;grid on;
                 else
                     loglog(f,auxnoise.jo*1e18./auxnoise.sI,f,auxnoise.ph*1e18./auxnoise.sI,f,auxnoise.sh*1e18./auxnoise.sI,f,auxnoise.NEP*1e18)
                     legend('experimental','jhonson','phonon','shunt','total')
@@ -108,10 +119,11 @@ if iscell(file)
                 ylabel('aW/Hz^{0.5}','fontsize',11)
             end
             
-        axis([100 1e5 1 1000])
+        axis([10 1e5 0 1000])
         h=get(gca,'children');
         set(h(1),'linewidth',3);
         set(gca,'fontsize',11);
+        set(gca,'linewidth',2)
         title(strcat(num2str(round(OP.r0*100)),'%Rn'),'fontsize',11);
         
         %para pintar NEP.
