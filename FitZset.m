@@ -44,7 +44,8 @@ for i=1:length(dirs)
     D=strcat(d,'\',dirs{i},'\HP*');
 %     [~,s2]=sort([D(:).datenum]',1,'descend');
 %     filesNoise={D(s2).name}%%%ficheros en orden de %Rn!!!
-    filesNoise=ListInBiasOrder(D);
+    filesNoise=dir(D)
+    if ~isempty(filesNoise) filesNoise=ListInBiasOrder(D);end
     
 %     [ii,jj]=size(files);
 %     filesc=mat2cell(files,ones(1,ii),jj);
@@ -129,7 +130,20 @@ for i=1:length(dirs)
             %ydata=sqrt(V2I(noisedata{1}(findx,2),circuit.Rf).^2-noiseIrwin.squid.^2);
             ydata=NEP(findx)*1e18;
             %size(ydata)
-            P(i).M(jj)=lsqcurvefit(@(x,xdata) fitnoise(x,xdata,TES,OP,circuit),0,xdata,ydata);
+            if sum(ydata==Inf) %%%1Z1_23A @70mK 1er punto da error.
+                P(i).M(jj)=0;
+            else
+                P(i).M(jj)=lsqcurvefit(@(x,xdata) fitnoise(x,xdata,TES,OP,circuit),0,xdata,ydata);
+            end
+            %%%phonon Excess
+            findx=find(noisedata{1}(:,1)>1e2&noisedata{1}(:,1)<1e3);
+            ydata=median(NEP(findx)*1e18);
+            if sum(ydata==inf)
+                P(i).Mph(jj)=0;
+            else
+                ymod=median(ppval(spline(f,noiseIrwin.NEP*1e18),noisedata{1}(findx,1)));
+                P(i).Mph(jj)=sqrt(ydata/ymod-1);
+            end
             
             %%%funciona igual fitnoise y fitjohnson.
 %             parameters.OP=OP;parameters.circuit=circuit;parameters.TES=TES;          
@@ -144,9 +158,14 @@ for i=1:length(dirs)
     end
         %%%Pasamos ExRes y ThRes dentro de P.p
         if ~isempty(filesNoise)
-        for jj=1:length(filesZ) P(i).p(jj).ExRes=P(i).ExRes(jj);P(i).p(jj).ThRes=P(i).ThRes(jj);P(i).p(jj).M=real(P(i).M(jj));end
+        for jj=1:length(filesZ) 
+            P(i).p(jj).ExRes=P(i).ExRes(jj);
+            P(i).p(jj).ThRes=P(i).ThRes(jj);
+            P(i).p(jj).M=real(P(i).M(jj));
+            P(i).p(jj).Mph=real(P(i).Mph(jj));
+        end
         end
         P(i).Tbath=Tbath*1e-3;%%%se lee en mK
 end
-if ~isempty(filesNoise) P=rmfield(P,{'ExRes','ThRes','M'});end
+if ~isempty(filesNoise) P=rmfield(P,{'ExRes','ThRes','M','Mph'});end
     

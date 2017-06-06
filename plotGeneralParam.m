@@ -20,19 +20,26 @@ for i=indx%length(P),
     %y=eval(strcat('[','P(i).p.',yl,']'));
     ALL=GetAllPparam(P(i));
     %%%%%expand parameters
-    rp=ALL.rp;L0=ALL.L0;ai=ALL.ai;bi=ALL.bi;tau0=ALL.tau0;taueff=ALL.taueff;C=ALL.C;Zinf=ALL.Zinf;Z0=ALL.Z0;ExRes=ALL.ExRes;ThRes=ALL.ThRes;M=ALL.M;
-    
+    rp=ALL.rp;L0=ALL.L0;ai=ALL.ai;bi=ALL.bi;tau0=ALL.tau0;taueff=ALL.taueff;C=ALL.C;Zinf=ALL.Zinf;Z0=ALL.Z0;ExRes=ALL.ExRes;ThRes=ALL.ThRes;M=ALL.M;Mph=ALL.Mph;
+    Tb=ALL.Tb;
     %%ecX='ai./sqrt(1+2*bi)';%%%Ecuacion para la X
     %%ecX='ai./bi';
     %%%ecX='ai./L0-1';
-    ecX='(1+2*bi)';    
+    %%%ecX='(1+2*bi)';    
+    ecX='rp';
+    %ecX='Tb';
+    
     x=eval(ecX);
-    ecY='M';%%%Ecuacion para la Y
+    ecY='Mph';%%%Ecuacion para la Y
+    %ecY='abs(tau0)';
     %ecY='ai./L0-1';
-    %ecY='ai./(1+bi)';
-    %ecY='ai.*(2*L0+bi)./(2+bi)./L0';
+    %ecY='ai./(1+bi)';%%alfa_eff_Aprox
+    %ecY='ai.*(2*L0+bi)./(2+bi)./L0';%%%alfa_eff1
+    RL=2.028e-3;
+    Rn=16.7e-3;
+    %ecY='ai./(1+bi./(1+RL./(rp*Rn)))';%%%alfa_eff2
     y=eval(ecY);
-    h=plot(x,y,'.r');hold on
+    h=plot(x,y,'.m-');hold on
     set(h,optname,optvalue);
 end
 

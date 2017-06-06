@@ -15,3 +15,5 @@ ALL.Z0=[P.p.Z0];
 ALL.ExRes=[P.p.ExRes];
 ALL.ThRes=[P.p.ThRes];
 ALL.M=[P.p.M];
+ALL.Mph=[P.p.Mph];
+ALL.Tb=P.Tbath;
