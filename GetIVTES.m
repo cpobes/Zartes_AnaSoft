@@ -38,7 +38,7 @@ for i=1:length(IVmeasure)
     IVstruct(i).vtes=vtes;
     
     if nargin==3
-        IVstruct(i).ttes=(ptes./TES.K+Tbath.^(TES.n)).^(1/TES.n);
+        IVstruct(i).ttes=(ptes./[TES.K]+Tbath.^([TES.n])).^(1./[TES.n]);
     end
     IVstruct(i).ptes=ptes;
     IVstruct(i).Tbath=Tbath;
