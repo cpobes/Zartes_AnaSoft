@@ -39,7 +39,7 @@ for i=indx%length(P),
     Rn=16.7e-3;
     %ecY='ai./(1+bi./(1+RL./(rp*Rn)))';%%%alfa_eff2
     y=eval(ecY);
-    h=plot(x,y,'.m-');hold on
+    h=plot(x,y,'.k-');hold on
     set(h,optname,optvalue);
 end
 

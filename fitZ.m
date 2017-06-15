@@ -43,11 +43,22 @@ if length(p)==3
     %%%p=[Zinf Z0 tau];
     rfz=p(1)-(p(1)-p(2))./D;%%%modelo de 1 bloque.
     imz=-(p(1)-p(2))*w*p(3)./D;%%% modelo de 1 bloque.
+    imz=-abs(imz);
 %elseif strcmp(modelo,'2b')
 elseif length(p)==5
     %p=[Zinf Z0 tau_eff c tau_A]; c=CA/C0, tauA=CA/Gtes.
-    rfz=p(1)-(p(1)-p(2))./D+(p(4)-p(5))*w*p(3)./D;%%%modelo de 2bloques.
-    imz=p(4)-(p(1)-p(2))*w*p(3)./D-(p(4)-p(5))./D;%%%modelos de 2 bloques.
+%     rfz=p(1)-(p(1)-p(2))./D+(p(4)-p(5))*w*p(3)./D;%%%modelo de 2bloques.
+%     imz=p(4)-(p(1)-p(2))*w*p(3)./D-(p(4)-p(5))./D;%%%modelos de 2 bloques.
+    
+%     %p=[Zinf Z0 tau_eff d1 tau1];
+     fz=p(1)+(p(2)-p(1)).*(1-p(4)).*(1-1i*w*p(3)-p(4)./(1-1i*w*p(5))).^-1;
+     rfz=real(fz);
+     imz=-abs(imag(fz));
+elseif length(p)==7
+    %p=[Zinf Z0 tau_I tau_1 tau_2 d1 d2]. Maasilta IH.
+    fz=p(1)+(p(2)-p(1)).*(1-p(6)-p(7)).*(1+1i*w*p(3)-p(6)./(1+1i*w*p(4))-p(7)./(1+1i*w*p(5))).^-1;
+    rfz=real(fz);
+    imz=-abs(imag(fz));
 end
 %fz=rfz+1i*imz;%%%uncomment for complex parameters.
 fz=[rfz imz];%%%uncomment for real parameters.

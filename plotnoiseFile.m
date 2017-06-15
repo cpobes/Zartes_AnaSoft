@@ -73,7 +73,7 @@ if iscell(file)
         nrows=3;
         ncols=max(ceil(N/nrows),1);
         subplot(ceil(N/ncols),ncols,i)
-        hold off;%figure
+        %hold off;%figure
         
         %%ZTES.Tc=1.3*ZTES.Tc;%%effect of Tc error.
         %auxnoise=plotnoise('irwin',ZTES,OP,circuit,0);hold on;%%%quinto argumento 'M'.
@@ -84,7 +84,7 @@ if iscell(file)
         si0(i)=auxnoise.sI(1);
         boolcomponents=0;%%%%para pintar o no las componentes
             if(strcmp(tipo,'current'))
-                loglog(noise{i}(:,1),V2I(noise{i}(:,2)*1e12,circuit.Rf),'.-r'),hold on,grid on,%%%for noise in Current.  Multiplico 1e12 para pA/sqrt(Hz)!Ojo, tb en plotnoise!
+                %loglog(noise{i}(:,1),V2I(noise{i}(:,2)*1e12,circuit.Rf),'.-r'),hold on,grid on,%%%for noise in Current.  Multiplico 1e12 para pA/sqrt(Hz)!Ojo, tb en plotnoise!
                 totnoise=sqrt(auxnoise.sum.^2+auxnoise.squidarray.^2);
                 
                 %%%normalization test
@@ -97,7 +97,9 @@ if iscell(file)
                 if ~boolcomponents
                     %loglog(f,totnoise/totnoise(1));%%para pintar
                     %normalizados.
-                    loglog(f,totnoise*1e12);
+                    loglog(f,totnoise*1e12,'b');
+                    %legend({'Experimental','STM'})
+                    
                 else
                     loglog(f,auxnoise.jo*1e12,f,auxnoise.ph*1e12,f,auxnoise.sh*1e12,f,totnoise*1e12)
                     legend('experimental','jhonson','phonon','shunt','total')

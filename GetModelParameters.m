@@ -72,6 +72,8 @@ if(length(p)==3)
         param.GA=param.CA/p(5);
         param.tauA=rp(5);
         param.ca0=p(4);
+    elseif(length(p)==7)
+        param=nan;
 end
 
 
