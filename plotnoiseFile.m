@@ -23,6 +23,11 @@ function si0=plotnoiseFile(IVset,P,circuit,ZTES,varargin)
 %     [noise,file]=loadnoise(0,wdir,filesNoise);
 % end
 
+    option.tipo='current';
+    option.boolcomponents=0;
+    option.Mph=0;
+    option.Mjo=0;
+    
 if nargin==4
     [noise,file,path]=loadnoise();
     %%%buscamos la IV y P correspondientes a la Tbath dada
@@ -32,10 +37,6 @@ if nargin==4
     IVstr=IVset(Tind);
     [~,Tind]=min(abs([P.Tbath]*1e3-Tbath));
     p=P(Tind).p;
-    option.tipo='current';
-    option.boolcomponents=0;
-    option.Mph=0;
-    option.Mjo=0;
 end
 if nargin==5
     if isstruct(varargin{1})
@@ -89,6 +90,18 @@ if nargin==6
     p=P(Tind).p;
     end
 end 
+if nargin==7
+    wdir=varargin{1};
+    wfiles=varargin{2};
+    option=varargin{3};
+   [noise,file]=loadnoise(0,wdir,wfiles);
+      Tbath=sscanf(wdir,'%dmK');
+    [~,Tind]=min(abs([IVset.Tbath]*1e3-Tbath));%%%En general Tbath de la IVsest tiene que ser exactamente la misma que la del directorio, pero en algun run he puesto el valor 'real'.(ZTES20)
+    IVstr=IVset(Tind);
+    [~,Tind]=min(abs([P.Tbath]*1e3-Tbath));
+    p=P(Tind).p;
+end
+
 % [IVstr.Tbath]
 % [P(Tind).Tbath]
 
@@ -110,7 +123,7 @@ if iscell(file)
         %%OP.Tbath=1.5*OP.Tbath;%%%effect of Tbath error.Despreciable.
         nrows=3;
         ncols=max(ceil(N/nrows),1);
-        subplot(ceil(N/ncols),ncols,i)
+        subplot(ceil(N/ncols),ncols,i);
         hold off;%figure
         
         %%ZTES.Tc=1.3*ZTES.Tc;%%effect of Tc error.
@@ -127,11 +140,12 @@ if iscell(file)
         si0(i)=auxnoise.sI(1);
         
             if(strcmp(tipo,'current'))
+                
                 loglog(noise{i}(:,1),V2I(noise{i}(:,2)*1e12,circuit.Rf),'.-r'),hold on,grid on,%%%for noise in Current.  Multiplico 1e12 para pA/sqrt(Hz)!Ojo, tb en plotnoise!
                 if Mph==0
                     totnoise=sqrt(auxnoise.sum.^2+auxnoise.squidarray.^2);
                 else
-                    totnoise=sqrt(auxnoise.max.^2+auxnoise.jo.^2+auxnoise.sh.^2+auxnoise.squidarray.^2)
+                    totnoise=sqrt(auxnoise.max.^2+auxnoise.jo.^2+auxnoise.sh.^2+auxnoise.squidarray.^2);
                 end
                 %%%normalization test
                 %ind=find(noise{i}(:,1)>100&noise{i}(:,1)<1000);
@@ -141,17 +155,20 @@ if iscell(file)
                 %totnoise=sqrt(auxnoise.max.^2+auxnoise.jo.^2+auxnoise.sh.^2+auxnoise.squidarray.^2);%%%To make F=1;
 
                 if ~boolcomponents
-                    %loglog(f,totnoise/totnoise(1));%%para pintar
-                    %normalizados.
+                    %loglog(f,totnoise/totnoise(1));%%para pintar normalizados.
                     loglog(f,totnoise*1e12,'b');
+                    h=findobj(gca,'color','b');
                     %legend({'Experimental','STM'})
                     
                 else
-                    loglog(f,auxnoise.jo*1e12,f,auxnoise.ph*1e12,f,auxnoise.sh*1e12,f,totnoise*1e12)
+                    loglog(f,auxnoise.jo*1e12,f,auxnoise.ph*1e12,f,auxnoise.sh*1e12,f,totnoise*1e12);
                     legend('experimental','jhonson','phonon','shunt','total')
+                    h=findobj(gca,'displayname','total');
                 end
+                ylabel('pA/Hz^{0.5}','fontsize',12,'fontweight','bold')
                 
             elseif (strcmp(tipo,'NEP'))
+                
                 sIaux=ppval(spline(f,auxnoise.sI),noise{i}(:,1));
                 NEP=sqrt((V2I(noise{i}(:,2),circuit.Rf).^2-auxnoise.squid.^2))./sIaux;
                 loglog(noise{i}(:,1),NEP*1e18,'.-r'),hold on,grid on,
@@ -161,28 +178,25 @@ if iscell(file)
                         totNEP=sqrt(auxnoise.max.^2+auxnoise.jo.^2+auxnoise.sh.^2)./auxnoise.sI;
                     end
                 if ~boolcomponents
-                    loglog(f,totNEP*1e18);hold on;grid on;
+                    loglog(f,totNEP*1e18,'b');hold on;grid on;
+                    h=findobj(gca,'color','b');
                 else
-                    loglog(f,auxnoise.jo*1e18./auxnoise.sI,f,auxnoise.ph*1e18./auxnoise.sI,f,auxnoise.sh*1e18./auxnoise.sI,f,totNEP*1e18)
-                    legend('experimental','jhonson','phonon','shunt','total')
+                    loglog(f,auxnoise.jo*1e18./auxnoise.sI,f,auxnoise.ph*1e18./auxnoise.sI,f,auxnoise.sh*1e18./auxnoise.sI,f,totNEP*1e18);
+                    legend('experimental','jhonson','phonon','shunt','total');
+                    h=findobj(gca,'displayname','total');
                 end
-               
+               ylabel('aW/Hz^{0.5}','fontsize',12,'fontweight','bold')
             end
-            xlabel('\nu(Hz)','fontsize',11)
-            ylabel('pA/Hz^{0.5}','fontsize',11)
+            xlabel('\nu(Hz)','fontsize',12,'fontweight','bold')
+            
             
         axis([10 1e5 1 1e4])
-        h=get(gca,'children');
+        %h=get(gca,'children')
         set(h(1),'linewidth',3);
         set(gca,'fontsize',11);
         set(gca,'linewidth',2)
         set(gca,'XMinorGrid','off','YMinorGrid','off','GridLineStyle','-')
-        title(strcat(num2str(round(OP.r0*100)),'%Rn'),'fontsize',11);
-        
-        %para pintar NEP.
-         
-         %figure(17)
-         %loglog(f,auxnoise.sI),hold on
+        title(strcat(num2str(round(OP.r0*100)),'%Rn'),'fontsize',12);
          
          %%%obsolet0.
          if(0)
