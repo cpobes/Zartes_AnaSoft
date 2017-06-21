@@ -61,7 +61,7 @@ feff0=1e2;
 for i=1:length(zt)
 
     p0=[Zinf(i) Z0(i) tau0];
-    %p0=[Zinf(i) Z0(i) tau0 1e-3 1e-6];%%%p0 for 2 block model.
+    %p0=[Zinf(i) Z0(i) tau0 1e-2 1e-5];%%%p0 for 2 block model.
     %p0=[Zinf(i) Z0(i) tau0 tau1 tau2 d1 d2];%%%p0 for 3 block model.
     %pinv0=[Zinf(i) 1/Y0(i) tau0];%%%p0 for 1/Z fits.
     %size(zt{i})
@@ -82,8 +82,9 @@ for i=1:length(zt)
     %fZ=fitZ(p,fS);figure(h(1)),plot(fZ(:,1),fZ(:,2),'r');hold on
     figure(h(2)),semilogx(fS,fZ(:,1),'k',fS,fZ(:,2),'k','linewidth',2),hold on
 end
-if ~isnan(param(1).rp)
+if ~isnan(param(1).rp) && isfield(TES,'sides')
 P.p=param;
+figure
 plotABCT(P,'b',TES)
 end
 % figure

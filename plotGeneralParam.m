@@ -36,10 +36,12 @@ for i=indx%length(P),
     %ecY='ai./(1+bi)';%%alfa_eff_Aprox
     %ecY='ai.*(2*L0+bi)./(2+bi)./L0';%%%alfa_eff1
     RL=2.028e-3;
-    Rn=16.7e-3;
+    Rn=23.2e-3;
     %ecY='ai./(1+bi./(1+RL./(rp*Rn)))';%%%alfa_eff2
+    %ecY='tau0./(1+L0.*(1-RL./(rp*Rn))./(1+bi+RL./(rp*Rn)))';
+    ecY='taueff';
     y=eval(ecY);
-    h=plot(x,y,'.k-');hold on
+    h=plot(x,y,'.r-');hold on
     set(h,optname,optvalue);
 end
 
