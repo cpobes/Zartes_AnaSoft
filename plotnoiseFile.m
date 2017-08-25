@@ -121,10 +121,10 @@ if iscell(file)
         Ib=sscanf(file{i},'HP_noise_%duA*')*1e-6 %%%HP_noise para ZTES18.!!!
         OP=setTESOPfromIb(Ib,IVstr,p);
         %%OP.Tbath=1.5*OP.Tbath;%%%effect of Tbath error.Despreciable.
-        nrows=3;
+        nrows=4;
         ncols=max(ceil(N/nrows),1);
         subplot(ceil(N/ncols),ncols,i);
-        hold off;%figure
+        %hold off;%figure
         
         %%ZTES.Tc=1.3*ZTES.Tc;%%effect of Tc error.
         %auxnoise=plotnoise('irwin',ZTES,OP,circuit,0);hold on;%%%quinto argumento 'M'.
@@ -195,7 +195,7 @@ if iscell(file)
         set(h(1),'linewidth',3);
         set(gca,'fontsize',11);
         set(gca,'linewidth',2)
-        set(gca,'XMinorGrid','off','YMinorGrid','off','GridLineStyle','-')
+        set(gca,'XMinorGrid','off','YMinorGrid','on','GridLineStyle','-')
         title(strcat(num2str(round(OP.r0*100)),'%Rn'),'fontsize',12);
          
          %%%obsolet0.

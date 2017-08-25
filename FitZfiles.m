@@ -61,7 +61,7 @@ feff0=1e2;
 for i=1:length(zt)
 
     p0=[Zinf(i) Z0(i) tau0];
-    %p0=[Zinf(i) Z0(i) tau0 1e-2 1e-5];%%%p0 for 2 block model.
+    %p0=[Zinf(i) Z0(i) tau0 5e-1 5e-6];%%%p0 for 2 block model.
     %p0=[Zinf(i) Z0(i) tau0 tau1 tau2 d1 d2];%%%p0 for 3 block model.
     %pinv0=[Zinf(i) 1/Y0(i) tau0];%%%p0 for 1/Z fits.
     %size(zt{i})

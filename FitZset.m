@@ -98,8 +98,8 @@ for i=1:length(dirs)
             feff0=1e2;
             
          %%%Hacemos el ajuste a Z(w)
-            p0=[Zinf Z0 tau0];
-            %p0=[Zinf Z0 tau0 1e-3 1e-6];%%%p0 for 2 block model.
+            %p0=[Zinf Z0 tau0];
+            p0=[Zinf Z0 tau0 1e-1 1e-6];%%%p0 for 2 block model.
             %p0=[Zinf Z0 tau0 tau1 tau2 d1 d2];%%%p0 for 3 block model.
             pinv0=[Zinf 1/Y0 tau0];
             [p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,p0,fS,[real(ztes) imag(ztes)]);%%%uncomment for real parameters.
