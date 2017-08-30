@@ -82,6 +82,7 @@ elseif strcmp(model,'ere')
         
         %%%param=[] = (p1 p2 m)
             param=[0.9974 1.0017 74.5];
+            param=[0.98 1.005 30];
             T1=param(1);T2=param(2);m=param(3);
             
             P1=T1-1+1/(2*m);

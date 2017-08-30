@@ -2,9 +2,10 @@ function [IVsim,xf]=simIV(Tb,varargin)
 
 %scan parameters
 %Imax=2e-3; %en mA %2e-3;
-Imax=0.2e-3;
+Imax=0.5e-3;
 Imin=0.e-3;%0.5e-3;
-Ib=linspace(Imin,Imax,1000);
+Ib=linspace(Imin,Imax,500);
+
 %relatstep=-1e-2;
 %Ib=Imin:relatstep*Imax:Imax;
 %Ib=Imax:-1e-2*Imax:Imin;
@@ -40,10 +41,20 @@ tb=Tb/Tc;ib=Ib/Ic;ub=tb^n;
 options = optimset( 'TolFun', 1.0e-15, 'TolX',1.0e-15,'jacobian','off','algorithm','trust-region-reflective');%{'levenberg-marquardt',0.001});
 ites=zeros(1,length(Ib));
 ttes=zeros(1,length(Ib));
-for i=1:length(Ib)
+
+%out(1)=crn*ib(1);
+%out(2)=(((Ic*ites(1)).^2*Rn/K+Tb^n).^(1/n))/Tc;
+ 
+out(1)=K*(Tc^n-Tb^n)/(Ib(end)*Rsh*Rn/(Rsh+Rpar+Rn))/Ic;
+out(2)=1;
+
+for i=length(Ib):-1:1
      y0up=[crs*ib(i) tb];%%%!!!ub<->tb.
-     it0=crn*ib(i);
-     tt0=(((Ic*it0).^2*Rn*0.9/K+Tb^n).^(1/n))/Tc;
+     %it0=crn*ib(i)
+     %tt0=(((Ic*it0).^2*Rn*0.9/K+Tb^n).^(1/n))/Tc
+     it0=out(1)
+     tt0=out(2)
+     %pause(0.5)
      y0down=[it0 tt0];%%%1.5^n<->1.5
      y0=y0down;%poner y0up para trazar subiendo.
         %TESparam.T0=Tb;TESparam.I0=cr*Ib(i);
@@ -64,10 +75,11 @@ end
 
 Ites=ites*Ic;
 Ttes=ttes*Tc;
+% return
 % TESparam.Rsh=Rsh;TESparam.Rpar=Rpar;TESparam.Rn=Rn;
 % TESparam.Ic=Ic;TESparam.Tc=Tc;
 
-showIVsims(Ttes,Ites,Tb,Ib,TESparam,Circuitparam);
+%showIVsims(Ttes,Ites,Tb,Ib,TESparam,Circuitparam);
 IV.ites=Ites;IV.ttes=Ttes;
 IV.Tbath=Tb;
 IVsim=BuildIVsimStruct(IV,TESparam);
