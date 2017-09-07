@@ -2,7 +2,7 @@ function Gaux=fitPvsTset(IVTESset,perc)
 %funcion para ajustar automaticamente curvas P-Tbath a un valor o valores
 %de porcentaje de Rn. Ojo al uso de cells o arrays en IVset.
 
-model=1;
+model=2;
 
 for i=1:length(IVTESset), Tbath(i)=IVTESset(i).Tbath;end
 
@@ -13,7 +13,7 @@ for jj=1:length(perc)
         %txt=strcat('P',num2str(100*perc(jj)));
         %exec=strcat(txt,'(i)=','ppval(spline(IVTESset{i}.rtes,IVTESset{i}.ptes),jj)')
         %evalin('caller',exec);
-        ind=find(IVTESset(i).rtes>0.15&IVTESset(i).rtes<0.95);%%%algunas IVs fallan.
+        ind=find(IVTESset(i).rtes>0.2&IVTESset(i).rtes<0.9);%%%algunas IVs fallan.
         Paux(i)=ppval(spline(IVTESset(i).rtes(ind),IVTESset(i).ptes(ind)),perc(jj));
         Iaux(i)=ppval(spline(IVTESset(i).rtes(ind),IVTESset(i).ites(ind)),perc(jj));%%%
     end
@@ -25,7 +25,9 @@ for jj=1:length(perc)
     if model==1
         X0=[-3500 3 1];XDATA=Tbath;LB=[-Inf 2 0 ];%%%Uncomment for model1
     elseif model==2
-        X0=[-5000 3.0 10 1e4 0]; XDATA=[Tbath;Iaux*1e6];LB=[-1e5 2 0 0 0];%%%Uncoment for model2
+        %%%p(1)=-K, p(2)=n, p(3)=P0=K*Tc^n, p(4)=Ic0.
+        %X0=[-5000 3.0 10 1e4 0]; XDATA=[Tbath;Iaux*1e6];LB=[-1e5 2 0 0 0];%%%Uncoment for model2
+        X0=[-6500 3.03 13 1.9e4]; XDATA=[Tbath;Iaux*1e6];LB=[-1e5 2 0 0];
     end
     fit=lsqcurvefit(@fitP,X0,XDATA,Paux*1e12,LB);
     plot(Tbath,fitP(fit,XDATA),'-r')

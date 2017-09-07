@@ -49,10 +49,12 @@ elseif strcmp(style,'IVsZTES13')
     MarkerSizeArray([1:15],1)={4};
     MarkerSizeArray([1 6 11],1)={8};
     
-    displaynameArray={'40mK' '50mK' '60mK' '70mK' '80mK' '90mK' '95mK' '102mK' '104mK' '106mK' '110mK' '111mK' '112mK' '113mK' '114mK'}';%%%ZTES13
+    %%%ATENCIÓN a la comilla ' al final {}';
+    %displaynameArray={'40mK' '50mK' '60mK' '70mK' '80mK' '90mK' '95mK' '102mK' '104mK' '106mK' '110mK' '111mK' '112mK' '113mK' '114mK'}';%%%ZTES13
     %displaynameArray={'30mK' '40mK' '50mK' '60mK' '70mK' '80mK' '90mK' '95mK' '100mK' '105mK' '107mK' '108mK' '109mK' '110mK' '120mK'}';%%%ZTES26
     %displaynameArray={'40mK' '50mK' '60mK' '70mK' '80mK' '85mK' '90mK' '93mK' '95mK' '96mK' '98mK' '99mK' '100mK' '120mK' '200mK'}';%%%1Z1_54A
     %displaynameArray={'30mK' '40mK' '50mK' '60mK' '70mK' '80mK' '85mK' '90mK' '95mK' '96mK' '98mK' '100mK' '102mK' '105mK' '120mK' }';%%%1Z1_54B
+     displaynameArray={'30mK' '40mK' '50mK' '60mK' '70mK' '80mK' '90mK' '100mK' '110mK' '115mK' '120mK' '125mK' '128mK' '135mK' '200mK'}';%%%1Z1_54B
     
     fontsize([1:15],1)={11};
     

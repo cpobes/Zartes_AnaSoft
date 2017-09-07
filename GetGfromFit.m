@@ -7,9 +7,9 @@ function param=GetGfromFit(fit)
 param.n=fit(2);
 param.K=-fit(1);
 param.Tc=(fit(3)/-fit(1))^(1/fit(2));
-if length(fit)>4
+if length(fit)>3
     param.Ic=fit(4);%%%used in model2
-    param.Pnoise=fit(5);%%%efecto de posible fuente extra de ruido.
+    %param.Pnoise=fit(5);%%%efecto de posible fuente extra de ruido.
 end
 
 param.G=param.n*param.K*param.Tc^(param.n-1);

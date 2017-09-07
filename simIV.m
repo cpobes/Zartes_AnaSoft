@@ -4,7 +4,7 @@ function [IVsim,xf]=simIV(Tb,varargin)
 %Imax=2e-3; %en mA %2e-3;
 Imax=0.5e-3;
 Imin=0.e-3;%0.5e-3;
-Ib=linspace(Imin,Imax,500);
+Ib=linspace(Imin,Imax,100);
 
 %relatstep=-1e-2;
 %Ib=Imin:relatstep*Imax:Imax;
@@ -46,20 +46,21 @@ ttes=zeros(1,length(Ib));
 %out(2)=(((Ic*ites(1)).^2*Rn/K+Tb^n).^(1/n))/Tc;
  
 out(1)=K*(Tc^n-Tb^n)/(Ib(end)*Rsh*Rn/(Rsh+Rpar+Rn))/Ic;
-out(2)=1;
+out(2)=1.2;
 
 for i=length(Ib):-1:1
      y0up=[crs*ib(i) tb];%%%!!!ub<->tb.
      %it0=crn*ib(i)
      %tt0=(((Ic*it0).^2*Rn*0.9/K+Tb^n).^(1/n))/Tc
-     it0=out(1)
-     tt0=out(2)
+     it0=abs(out(1));
+     tt0=abs(out(2));
      %pause(0.5)
      y0down=[it0 tt0];%%%1.5^n<->1.5
      y0=y0down;%poner y0up para trazar subiendo.
         %TESparam.T0=Tb;TESparam.I0=cr*Ib(i);
         %cond=StabilityCheck(TESparam);
         %estab(i)=cond.stab;
+        %Ib(i)
      problem=DefineSolverProblem(ib(i),tb,y0,TESparam,Circuitparam,options);  
     %f = @(y) NormalizedGeneralModelSteadyState(y,ib(i),tb,A,rp,rn,n); % function of dummy variable y
     %[out,fval,flag]=fsolve(f,y0,options);
@@ -73,16 +74,26 @@ end
 %plot(Ttes,Ites)
 %plot(Ib,Ites)
 
-Ites=ites*Ic;
-Ttes=ttes*Tc;
+Ites=real(ites*Ic);
+Ttes=real(ttes*Tc);
 % return
 % TESparam.Rsh=Rsh;TESparam.Rpar=Rpar;TESparam.Rn=Rn;
 % TESparam.Ic=Ic;TESparam.Tc=Tc;
 
-%showIVsims(Ttes,Ites,Tb,Ib,TESparam,Circuitparam);
+Rf=Circuitparam.Rf;
+invMf=Circuitparam.invMf;
+invMin=Circuitparam.invMin;
+%Rf=1e3;%ojo, este parametro puede cambiar.
+Mq=invMf/invMin;%cociente de inductancias mutuas 66/22.
+
+Vout=Ites*Rf*Mq;%
+
+showIVsims(Ttes,Ites,Tb,Ib,TESparam,Circuitparam);
 IV.ites=Ites;IV.ttes=Ttes;
 IV.Tbath=Tb;
 IVsim=BuildIVsimStruct(IV,TESparam);
+IVsim.Ibias=Ib;
+IVsim.vout=Vout;
 
 
 %Ttes(find(abs(Ttes>5)))=0;

@@ -1,20 +1,33 @@
-function [ftes,varargout] = FtesTI(ttes,ites)
+function [ftes,varargout] = FtesTI(ttes,ites,varargin)
 %version de RtesTI pero normalizada. Hacemos Rn=1. También pasamos la
 %temperatura y corrientes normalizadas: ttes=T/Tc, ites=I/Ic.
 
+if nargin==3
+    param=varargin{1};
+end
+
 %Definimos la norma modulo 'p'.
-p=0.82;%%%p=0.82
+p=0.74;%%%p=0.82(TES?),(p=0.75 1Z2_35A)
 %%%distancia_p. Esto en realidad supone tomar ya una forma para Ic(Ttes). 
 %%%Si queremos probar otras expresiones, hay que modificar las definiciones de alfa y beta.
-r=exp(log(exp(p*log(ttes))+exp(p*log(ites)))/p);
+
+if ites<0 | ttes<0, ftes=0;return;end %%%%Prueba para bypasar wrong fits.
+
+%r=exp(log(exp(p*log(ttes))+exp(p*log(ites)))/p);
+%plot(ttes,ites,'o'),hold on
 
 %BCS model for i(t)
-%r=(ttes+ites.^(2/3)).^1; %i=(1-t)^(3/2) -> i^(2/3)+t=1 -> (i^(2/3)+t)^n=r.
+r=(ttes+ites.^(2/3)).^1; %i=(1-t)^(3/2) -> i^(2/3)+t=1 -> (i^(2/3)+t)^n=r.
 %Se puede hacer n=1.
 
-%%%available models:'power', 'erf', 'recta', 'ere', 'TFM'
-model='ere';%'erf';%'recta';
-if strcmp(model,'1')
+%%%available models:'power', 'erf', 'recta', 'ere', 'TFM', 'tanh'
+model='RTI';%'erf';%'recta';
+global RTI
+if strcmp(model,'RTI')
+    %RTI=param;
+    
+    ftes=griddata(RTI.x,RTI.y,RTI.z,ttes,ites)
+elseif strcmp(model,'1')
 %model1. %Dr=0.2;%0.01%for model 1 and model 2.
 %Rtes=Rn./(1+exp(-(sqrt((Ttes/Tc).^2+(Ites/Ic).^2).^4-1)./Dr));
 elseif strcmp(model,'2')
@@ -34,7 +47,7 @@ elseif strcmp(model,'power')
 %%%%%model3.R(T)=(T/Tc)^alfa.
 %profiler notes. las operaciones '.^' son costosas. Reescribo para
 %minimizarlas.
-alfa=100;
+alfa=50;
 %r=(ttes.^p+ites.^p).^(1/p);
 %r=(ttes.^p+(1-ttes).^p).^(1/p);
 %r=exp(log(exp(p*log(ttes))+exp(p*log(ites)))/p);%%%distancia_p
@@ -61,7 +74,7 @@ varargout{2}=alfar-varargout{1};
 
 elseif strcmp(model,'recta')
     %%%modelo lineal en toda la transición.
-    delta=0.02;
+    delta=0.1;
     ftes=(r-1)/delta+0.5;%%%R(Tc)=Rn/2.
     ftes(ftes<0)=0;
     ftes(ftes>1)=1;
@@ -82,7 +95,7 @@ elseif strcmp(model,'ere')
         
         %%%param=[] = (p1 p2 m)
             param=[0.9974 1.0017 74.5];
-            param=[0.98 1.005 30];
+            %param=[0.99 1.0 30];
             T1=param(1);T2=param(2);m=param(3);
             
             P1=T1-1+1/(2*m);
@@ -93,6 +106,9 @@ elseif strcmp(model,'ere')
         (heaviside(r-T1)-heaviside(r-T2)-0.5*dirac(r-T1)-0.5*dirac(r-T2))...
         .*(m*(r-1)+0.5)+...
         (heaviside(r-T2)+0.5*dirac(r-T2)).*(1-exp(-(r-R2)/P2));
+    ftes(ftes<0)=0;
+    %ftes(isnan(ftes))=0.5;
+    %size(ftes)
     
      alfar=r./((r-1)+0.01/2);%%%from 'recta'
     varargout{1}=alfar.*(ttes./r).^p;
