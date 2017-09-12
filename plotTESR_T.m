@@ -3,13 +3,13 @@ function plotTESR_T(Circuit,IVmeasure,TES)
 %%Esta función funciona sólo para una única curva.
 
 for i=1:length(IVmeasure)
-    if isfield(IVmeasure(i),'ttes')
-        IVstruct=IVmeasure(i);
-    else
+    %if isfield(IVmeasure(i),'ttes')
+     %   IVstruct=IVmeasure(i);
+    %else
         IVstruct=GetIVTES(Circuit,IVmeasure(i),TES);
-    end
+    %end
 
-    plot(IVstruct.ttes,IVstruct.Rtes*1e3,'.-r','DisplayName',strcat(num2str(1000*IVstruct.Tbath),'mK'));
+    plot(IVstruct.ttes,IVstruct.Rtes*1e3,'.-k','DisplayName',strcat(num2str(1000*IVstruct.Tbath),'mK'));
     xlabel('T_{tes}(K)','fontsize',12);ylabel('R_{tes}(m\Omega)','fontsize',12);grid on,hold on
     legend('-DynamicLegend')
     set(gca,'fontsize',12);

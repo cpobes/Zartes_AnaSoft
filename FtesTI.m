@@ -21,11 +21,12 @@ r=(ttes+ites.^(2/3)).^1; %i=(1-t)^(3/2) -> i^(2/3)+t=1 -> (i^(2/3)+t)^n=r.
 %Se puede hacer n=1.
 
 %%%available models:'power', 'erf', 'recta', 'ere', 'TFM', 'tanh'
-model='RTI';%'erf';%'recta';
-global RTI
+model='ere';%'erf';%'recta';
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+global RTI %%%intento de crear modelo spline de la superficie.
 if strcmp(model,'RTI')
     %RTI=param;
-    
     ftes=griddata(RTI.x,RTI.y,RTI.z,ttes,ites)
 elseif strcmp(model,'1')
 %model1. %Dr=0.2;%0.01%for model 1 and model 2.
