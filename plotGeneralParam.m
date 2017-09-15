@@ -4,8 +4,11 @@ function plotGeneralParam(P,varargin)
 %xl='ai';
 %yl='M';
 
-if nargin>1
-    opt=varargin{1};
+if nargin ==2
+    TES=varargin{1};
+end
+if nargin>2
+    opt=varargin{2};
     optname=[opt.name];
     optvalue=[opt.value];
 else
@@ -14,7 +17,7 @@ else
 end
 
 indx=[1:length(P)];
-%indx=13;
+indx=12;
 for i=indx%length(P),
     %x=eval(strcat('[','P(i).p.',xl,']'));
     %y=eval(strcat('[','P(i).p.',yl,']'));
@@ -33,13 +36,16 @@ for i=indx%length(P),
     ecY='Mph';%%%Ecuacion para la Y
     %ecY='abs(tau0)';
     %ecY='ai./L0-1';
-    %ecY='ai./(1+bi)';%%alfa_eff_Aprox
+    ecY='ai./(1+bi)';%%alfa_eff_Aprox
     %ecY='ai.*(2*L0+bi)./(2+bi)./L0';%%%alfa_eff1
+    ecY='bi+(2+bi).*L0./(1-L0)';%%%beta_eff
+    n=TES.n;K=TES.K
+    ecY='(2+bi)./(n*(1-K*Tb.^n)-ai)'
     RL=2.028e-3;
     Rn=23.2e-3;
     %ecY='ai./(1+bi./(1+RL./(rp*Rn)))';%%%alfa_eff2
     %ecY='tau0./(1+L0.*(1-RL./(rp*Rn))./(1+bi+RL./(rp*Rn)))';
-    ecY='taueff';
+    %ecY='taueff';
     y=eval(ecY);
     h=plot(x,y,'.r-');hold on
     set(h,optname,optvalue);
