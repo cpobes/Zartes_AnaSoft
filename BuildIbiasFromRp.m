@@ -1,5 +1,5 @@
 function Ibs=BuildIbiasFromRp(IVset,rp)
-%%%Función para devolver un vector de valores de Ibias para unos %Rn dados
+%%%Función para devolver un vector de valores de Ibias en uA para unos %Rn dados
 %%% v0: solo una IV
 %%% v1: todo el IVset y devuelve IZvalues. falla.
 
