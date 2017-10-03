@@ -17,7 +17,7 @@ else
 end
 
 indx=[1:length(P)];
-%indx=2;
+indx=1;
 for i=indx%length(P),
     %x=eval(strcat('[','P(i).p.',xl,']'));
     %y=eval(strcat('[','P(i).p.',yl,']'));
@@ -39,8 +39,8 @@ for i=indx%length(P),
     ecY='ai./(1+bi)';%%alfa_eff_Aprox
     ecY='ai.*(2*L0+bi)./(2+bi)./L0';%%%alfa_eff1
 
-    ecY='(bi+2*L0)./(1-L0)';%%%beta_eff
-    ecY='(1-L0)./(bi+2*L0)'; %%%inverse beta_eff
+    %ecY='(bi+2*L0)./(1-L0)';%%%beta_eff
+    %ecY='(1-L0)./(bi+2*L0)'; %%%inverse beta_eff
     n=TES.n;K=TES.K
     %ecY='(2+bi)./(n*(1-K*Tb.^n)-ai)'
     RL=2.028e-3;

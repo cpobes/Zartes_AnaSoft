@@ -37,14 +37,16 @@ for i=1:length(IVmeasure)
     IVstruct(i).ites=ites;
     IVstruct(i).vtes=vtes;
     
-    %%%%alfa y beta from IV
-    IVstruct(i).rp2=0.5*([IVmeasure(i).rtes(1:end-1)]+[IVmeasure(i).rtes(2:end)]);%%% el vector de X.
-    IVstruct(i).aIV=diff(log(IVmeasure(i).Rtes))./diff(log(IVmeasure(i).ttes));
-    IVstruct(i).bIV=diff(log(IVmeasure(i).Rtes))./diff(log(IVmeasure(i).ites));
-    
     if nargin==3
         IVstruct(i).ttes=(ptes./[TES.K]+Tbath.^([TES.n])).^(1./[TES.n]);
+                %%%%alfa y beta from IV
+     IVstruct(i).rp2=0.5*([IVstruct(i).rtes(1:end-1)]+[IVstruct(i).rtes(2:end)]);%%% el vector de X.
+     IVstruct(i).aIV=diff(log(IVstruct(i).Rtes))./diff(log(IVstruct(i).ttes));
+     IVstruct(i).bIV=diff(log(IVstruct(i).Rtes))./diff(log(IVstruct(i).ites));
     end
     IVstruct(i).ptes=ptes;
+    
+
+    
     IVstruct(i).Tbath=Tbath;
 end
