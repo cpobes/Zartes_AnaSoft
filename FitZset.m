@@ -108,6 +108,7 @@ for i=1:length(dirs)
                 %[p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,p0,fS,zt{i});%%%uncommetn for complex parameters
                 %p=[p(1) 1/p(2) 1/p(3)];%solo para 1/Ztesvfits.                
          
+                p=Analize_STB_Z(fS,ztes)%%%Otra forma de estimar los parámetros
          %%%Extraemos los parámetros del ajuste.
          
             param=GetModelParameters(p,IV,Ib,TES,circuit);
