@@ -3,10 +3,13 @@ function CompareIV_Z(IVset,P,Tbath)
 %%%las Z(w)a una Tbath pasada en milikelvin.
 
     %Extraemos la IV y la P asociadas a la Tbath de interés.
-    [~,Tind]=min(abs([IVset.Tbath]*1e3-Tbath));%%%En general Tbath de la IVsest tiene que ser exactamente la misma que la del directorio, pero en algun run he puesto el valor 'real'.(ZTES20)
+    [m1,Tind]=min(abs([IVset.Tbath]*1e3-Tbath));%%%En general Tbath de la IVsest tiene que ser exactamente la misma que la del directorio, pero en algun run he puesto el valor 'real'.(ZTES20)
     IVstr=IVset(Tind);
-    [~,Tind]=min(abs([P.Tbath]*1e3-Tbath));
+    [m2,Tind]=min(abs([P.Tbath]*1e3-Tbath));
     p=P(Tind).p;
+    
+    thr=1;%%%umbral en 1mK de diferencia entre la Tbath pasada y la Tbath más cercana de los datos.
+    if (m1>thr || m2>thr) error('Tbath not in the measured data');end
     
     xiv=0.5*([IVstr.rtes(1:end-1)]+[IVstr.rtes(2:end)]);
     a_eff=diff(log(IVstr.Rtes))./diff(log([IVstr.ttes]));
