@@ -40,14 +40,18 @@ for i=indx%length(P),
     ecY='ai.*(2*L0+bi)./(2+bi)./L0';%%%alfa_eff1
 
     %ecY='(bi+2*L0)./(1-L0)';%%%beta_eff
-    %ecY='(1-L0)./(bi+2*L0)'; %%%inverse beta_eff
+    ecY='(1-L0)./(bi+2*L0)'; %%%inverse beta_eff
     n=TES.n;K=TES.K
     %ecY='(2+bi)./(n*(1-K*Tb.^n)-ai)'
     RL=2.028e-3;
-    Rn=23.2e-3;
+    %Rn=23.2e-3;
+    Rn=TES.Rn;
+    Tc=TES.Tc;
     %ecY='ai./(1+bi./(1+RL./(rp*Rn)))';%%%alfa_eff2
     %ecY='tau0./(1+L0.*(1-RL./(rp*Rn))./(1+bi+RL./(rp*Rn)))';
     %ecY='taueff';
+    %ecY='ai.*(RL-rp*Rn).*(1-n.*L0./ai)./(L0.*(rp*Rn-RL)+RL+rp*Rn.*(1+bi))';%factor conversión Tbath->Ptes
+    %ecY='ai.*(RL-rp*Rn).*((Tb/Tc).^n)./(L0.*(rp*Rn-RL)+RL+rp*Rn.*(1+bi))';%factor conversión Tbath->Ptes v2.sale distinto?
     y=eval(ecY);
     h=plot(x,y,'.-r');hold on
     set(h,optname,optvalue);
