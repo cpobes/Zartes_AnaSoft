@@ -10,8 +10,13 @@ Z0=rz(1);
 [im,fm]=min(imz);
 taueff=1/(2*pi*fS(fm));
 
-f0=spline(rz,fS,0);
-Zinf=-Z0/(taueff*2*pi*f0)^2;
+if Z0<0 
+    f0=spline(rz,fS,0);
+    Zinf=-Z0/(taueff*2*pi*f0)^2;
+else
+    Zinf=rz(end);
+end
+
 
 % p.Z0=Z0;
 % p.Zinf=Zinf;
