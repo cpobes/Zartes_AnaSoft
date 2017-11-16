@@ -108,7 +108,7 @@ for i=1:length(dirs)
                 %[p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,p0,fS,zt{i});%%%uncommetn for complex parameters
                 %p=[p(1) 1/p(2) 1/p(3)];%solo para 1/Ztesvfits.                
          
-                p=Analize_STB_Z(fS,ztes)%%%Otra forma de estimar los parámetros
+                %p=Analize_STB_Z(fS,ztes)%%%Otra forma de estimar los parámetros
          %%%Extraemos los parámetros del ajuste.
          
             param=GetModelParameters(p,IV,Ib,TES,circuit);
@@ -125,7 +125,7 @@ for i=1:length(dirs)
             %size(noisedata),size(noiseIrwin.sum)
             f=logspace(0,6,1000);
             sIaux=ppval(spline(f,noiseIrwin.sI),noisedata{1}(:,1));
-            NEP=sqrt(V2I(noisedata{1}(:,2),circuit.Rf).^2-noiseIrwin.squid.^2)./sIaux;
+            NEP=sqrt(V2I(noisedata{1}(:,2),circuit).^2-noiseIrwin.squid.^2)./sIaux;
             RES=2.35/sqrt(trapz(noisedata{1}(:,1),1./NEP.^2))/2/1.609e-19;
             P(i).ExRes(jj)=RES;
             P(i).ThRes(jj)=noiseIrwin.Res;
