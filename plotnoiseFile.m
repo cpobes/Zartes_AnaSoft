@@ -141,7 +141,7 @@ if iscell(file)
         
             if(strcmp(tipo,'current'))
                 
-                loglog(noise{i}(:,1),V2I(noise{i}(:,2)*1e12,circuit.Rf),'.-r'),hold on,grid on,%%%for noise in Current.  Multiplico 1e12 para pA/sqrt(Hz)!Ojo, tb en plotnoise!
+                loglog(noise{i}(:,1),V2I(noise{i}(:,2)*1e12,circuit),'.-r'),hold on,grid on,%%%for noise in Current.  Multiplico 1e12 para pA/sqrt(Hz)!Ojo, tb en plotnoise!
                 if Mph==0
                     totnoise=sqrt(auxnoise.sum.^2+auxnoise.squidarray.^2);
                 else
@@ -219,7 +219,10 @@ if iscell(file)
         %set(gca,'ylim',[1e-18 1e-16]);
         
         %%%Salvar la figura 
-        fi=strcat('-f',num2str(gcf));
+        %num2str(gcf) deja de funcionar en matlab2015a
+        n=get(gcf,'number')
+        fi=strcat('-f',num2str(n))
+        mkdir('figs')
         name=strcat('figs\Noise',num2str(Tbath),'mK');
         print(fi,name,'-dpng','-r0')
          
