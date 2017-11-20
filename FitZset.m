@@ -9,16 +9,30 @@ fS=TFS.f;
 
 %%%si no pasamos files busca todos los directorios del tipo xxxmK
 if nargin==4
-    f=ls;
-    [i,j]=size(f);
-    fc=mat2cell(f,ones(1,i),j);
-    dirs=regexp(fc,'^\d+mK','match');
+%     f=ls;
+%     [i,j]=size(f);
+%     fc=mat2cell(f,ones(1,i),j)
+%     fc=deblank(fc)
+%     %dirs=regexp(fc,'^\d+mK','match');
+%     dirs=regexp(fc,'^\d+.?\d*mK$','match');
+%     dirs=dirs(~cellfun('isempty',dirs))
+%     for i=1:length(dirs) dirs{i}=char(dirs{i}),end
+%     for i=1:length(dirs),aux(i)=sscanf(dirs{i},'%f');end
+%     aux=sort(aux);
+%     for i=1:length(aux) dirs{i}=strcat(num2str(aux(i)),'mK'),end
+    f=dir;
+    f=f([f.isdir]);
+    dirs={};
+    for i=1:length(f)
+            dirs{end+1}=regexp(f(i).name,'^\d+.?\d*mK$','match');
+    end
     dirs=dirs(~cellfun('isempty',dirs))
-    for i=1:length(dirs) dirs{i}=char(dirs{i}),end
-    
-    for i=1:length(dirs),aux(i)=sscanf(dirs{i},'%d');end
-    aux=sort(aux);
-    for i=1:length(aux) dirs{i}=strcat(num2str(aux(i)),'mK'),end
+    for i=1:length(dirs) dirs{i}=char(dirs{i}), end
+    for i=1:length(dirs),aux(i)=sscanf(dirs{i},'%f');end
+    [ii,jj]=sort(aux)
+    %for i=1:length(aux) dirs{i}=strcat(num2str(aux(i)),'mK'),end
+    dirs=dirs(jj)
+
 elseif nargin==5
     t=varargin{1};
     for i=1:length(t) dirs{i}=strcat(num2str(t(i)),'mK');end
@@ -26,6 +40,7 @@ end
 
 dirs
 pause(1)
+
 for i=1:length(dirs)
     %%%buscamos los ficheros a analizar en cada directorio.
     d=pwd;

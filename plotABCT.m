@@ -1,5 +1,6 @@
 function plotABCT(P,varargin)
 
+warning off
 if nargin==1
     color='b';
 elseif nargin>2
@@ -18,7 +19,7 @@ end
 %global hc ht ha hb hl
 for i=1:length(P)
     
-subplot(2,2,1)
+shc=subplot(2,2,1)
 [~,jj]=sort([P(i).p.rp]);
 hc(i)=plot([P(i).p(jj).rp],abs([P(i).p(jj).C])*1e15,'.-','color',color),grid on,hold on
 if nargin>2
@@ -28,19 +29,19 @@ end
 xlabel('Rtes(%Rn)','fontsize',11,'fontweight','bold');ylabel('C(fJ/K)','fontsize',11,'fontweight','bold');
 set(gca,'fontsize',11,'fontweight','bold','linewidth',2)
 
-subplot(2,2,2)
+sht=subplot(2,2,2)
 [~,jj]=sort([P(i).p.rp]);
 ht(i)=semilogy([P(i).p(jj).rp],[P(i).p(jj).taueff],'.-','color',color),grid on,hold on
 xlabel('Rtes(%Rn)','fontsize',11,'fontweight','bold');ylabel('\tau_{eff}(s)','fontsize',11,'fontweight','bold');
 set(gca,'fontsize',11,'fontweight','bold','linewidth',2)
 
-subplot(2,2,3)
+sha=subplot(2,2,3)
 [~,jj]=sort([P(i).p.rp]);
 ha(i)=plot([P(i).p(jj).rp],[P(i).p(jj).ai],'.-','color',color),grid on,hold on
 xlabel('Rtes(%Rn)','fontsize',11,'fontweight','bold');ylabel('\alpha_i','fontsize',11,'fontweight','bold');
 set(gca,'fontsize',11,'fontweight','bold','linewidth',2)
 
-subplot(2,2,4)
+shb=subplot(2,2,4)
 [~,jj]=sort([P(i).p.rp]);
 hb(i)=semilogy([P(i).p(jj).rp],[P(i).p(jj).bi],'.-','color',color),grid on,hold on
 semilogy(0.1:0.01:0.9,1./(0.1:0.01:0.9)-1,'r','linewidth',2)
@@ -48,10 +49,13 @@ xlabel('Rtes(%Rn)','fontsize',11,'fontweight','bold');ylabel('\beta_i','fontsize
 set(gca,'fontsize',11,'fontweight','bold','linewidth',2)
 
 % [hc(i) ht(i) ha(i) hb(i)]
-% hl=linkprop([hc(i) ht(i) ha(i) hb(i)],'brushdata');
-% set(hc(i),'userdata',hl);
-% set(ht(i),'userdata',hl);
-% set(ha(i),'userdata',hl);
-% set(hb(i),'userdata',hl);
+brush on;
+hl{i}=linkprop([hc(i) ht(i) ha(i) hb(i)],'brushdata')
 
+%brush off;
+linkaxes([shc sht sha shb],'x');
 end
+set(hc,'userdata',hl);
+set(ht,'userdata',hl);
+set(ha,'userdata',hl);
+set(hb,'userdata',hl);
