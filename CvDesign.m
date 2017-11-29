@@ -1,13 +1,18 @@
-function cv=CvDesign(T)
+function Cv=CvDesign(T)
 %Calculo capacidades termicas para varios materiales.
 R=8.31;
 
 %definicion materiales
+%%%ORO
 oro.Ef=5.53;oro.Tf=6.42e4;oro.TD=165;oro.densidad=19.32e6;oro.masa_molar=196.967;oro.att_length6K=1.1755e-6;
 oro.conductivity=5e-9;
+%%%Bismuto
 bismuto.Ef=9.9;bismuto.Tf=11.5e4;bismuto.TD=119;bismuto.densidad=9.7e6;bismuto.masa_molar=208.98;bismuto.att_length6K=2.091e-6;
+%%%COBRE
 cobre.Ef=7;cobre.Tf=8.16e4;cobre.TD=315;cobre.densidad=8.96e6;cobre.masa_molar=63.536;cobre.att_length6K=9.85e-6;
+%%%SILICIO
 silicio.Ef=Inf;silicio.Tf=Inf;silicio.TD=645;silicio.densidad=2.33e6;silicio.masa_molar=28.09;silicio.att_length6K=30.345e-6;
+%%%NITRURO SILICIO
 Si3N4.Ef=Inf;Si3N4.Tf=Inf;Si3N4.TD=1060;Si3N4.densidad=3.2e6;Si3N4.masa_molar=140.28;Si3N4.att_length6K=30e-6;%%%esto es la membrana, no interesa como absorbente.
 Si3N4.conductivity=0;
 
@@ -23,9 +28,9 @@ Si3N4.conductivity=0;
 %M=196.967; %masa molar en g/mol
 %cve=8.31*pi^2*(.5*(T/Tf))
 
-material=Si3N4;
+material=oro;%Si3N4;
 Tf=material.Tf;TD=material.TD;d=material.densidad;M=material.masa_molar;L=material.att_length6K;
-rho=material.conductivity;
+%rho=material.conductivity;
 
 cv=8.31*pi^2*(.5*(T/Tf)+(12*pi^2/5)*(T/TD).^3); % J/K*mol
 
@@ -35,16 +40,19 @@ cv=8.31*pi^2*(.5*(T/Tf)+(12*pi^2/5)*(T/TD).^3); % J/K*mol
 
 %geometria y parametros del TES.
 sizes=[50, 100, 150,200,250]*1e-6;
+sizes=20e-6;
 A=sizes.^2; %area
 h=3.500e-6;   %altura.
+h=340e-9;
 
-sizes=[0.5 1]*1e-3
-h=500e-9
-A=sizes.^2; %area
-Cv=cv*d*A*h/M
+% sizes=[1]*1e-3%%%membrana
+% h=500e-9
+% A=sizes.^2; %area
+
+Cv=cv*d*A*h/M;
 
 disp(Cv)
-
+return;
 %S=M/(cv*d*A*h)*1.602e-19 *1e3; %K/keV
 alfa=100;
 Emax=10; %keV
