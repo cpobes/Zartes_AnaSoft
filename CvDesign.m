@@ -40,9 +40,9 @@ cv=8.31*pi^2*(.5*(T/Tf)+(12*pi^2/5)*(T/TD).^3); % J/K*mol
 
 %geometria y parametros del TES.
 sizes=[50, 100, 150,200,250]*1e-6;
-sizes=20e-6;
+sizes=120e-6;
 A=sizes.^2; %area
-h=3.500e-6;   %altura.
+h=1.50e-6;   %altura.
 h=340e-9;
 
 % sizes=[1]*1e-3%%%membrana

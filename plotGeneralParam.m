@@ -17,7 +17,7 @@ else
 end
 
 indx=[1:length(P)];
-indx=1;
+%indx=1;
 for i=indx%length(P),
     %x=eval(strcat('[','P(i).p.',xl,']'));
     %y=eval(strcat('[','P(i).p.',yl,']'));
@@ -33,11 +33,11 @@ for i=indx%length(P),
     %ecX='Tb';
     
     x=eval(ecX);
-    ecY='Mph';%%%Ecuacion para la Y
+    ecY='ExRes./ThRes';%%%Ecuacion para la Y
     %ecY='abs(tau0)';
     %ecY='ai./L0-1';
-    ecY='ai./(1+bi)';%%alfa_eff_Aprox
-    ecY='ai.*(2*L0+bi)./(2+bi)./L0';%%%alfa_eff1
+    %ecY='ai./(1+bi)';%%alfa_eff_Aprox
+    %ecY='ai.*(2*L0+bi)./(2+bi)./L0';%%%alfa_eff1
 
     %ecY='(bi+2*L0)./(1-L0)';%%%beta_eff
     %ecY='(1-L0)./(bi+2*L0)'; %%%inverse beta_eff

@@ -170,7 +170,7 @@ if iscell(file)
             elseif (strcmp(tipo,'NEP'))
                 
                 sIaux=ppval(spline(f,auxnoise.sI),noise{i}(:,1));
-                NEP=sqrt((V2I(noise{i}(:,2),circuit.Rf).^2-auxnoise.squid.^2))./sIaux;
+                NEP=sqrt((V2I(noise{i}(:,2),circuit).^2-auxnoise.squid.^2))./sIaux;
                 loglog(noise{i}(:,1),NEP*1e18,'.-r'),hold on,grid on,
                     if Mph==0
                         totNEP=auxnoise.NEP;
@@ -201,7 +201,7 @@ if iscell(file)
          %%%obsolet0.
          if(0)
          sIaux=ppval(spline(f,auxnoise.sI),noise{i}(:,1));
-         NEP=sqrt((V2I(noise{i}(:,2),circuit.Rf).^2-auxnoise.squid.^2))./sIaux;
+         NEP=sqrt((V2I(noise{i}(:,2),circuit).^2-auxnoise.squid.^2))./sIaux;
          %figure
             loglog(noise{i}(:,1),NEP*1e18,'r'),hold on,grid on,%%%for noise in Power
          %   loglog(f,auxnoise.NEP*1e18,'b'),hold on,grid on,%%%for noise in Power
@@ -233,7 +233,7 @@ else
 
     hold off;%figure
     %loglog(noise(:,1),V2I(noise(:,2),circuit.Rf),'r'),hold on,grid on,%%%for noise in Current
-    loglog(noise(:,1),V2I(noise(:,2),circuit.Rf).*OP.V0,'r'),hold on,grid on,%%%for noise in Power
+    loglog(noise(:,1),V2I(noise(:,2),circuit).*OP.V0,'r'),hold on,grid on,%%%for noise in Power
     plotnoise('irwin',ZTES,OP,circuit)
 end
 

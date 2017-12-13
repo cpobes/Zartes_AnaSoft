@@ -2,12 +2,17 @@ function plotIVs(Circuit,IVmeasure)
 %Versión para usar como parámetros de entrada una estructura IVmeasure con
 %toda la información necesaria.
 
-IVstruct=GetIVTES(Circuit,IVmeasure);
-
+%IVstruct=GetIVTES(Circuit,IVmeasure);
+IVstruct=IVmeasure;
 % plot(vtes,ites,'.--'),grid on,hold on
 % xlabel('Vtes(V)');ylabel('Ites(A)');
 
+
 for i=1:length(IVstruct)
+    
+    if isfield(IVstruct,'good') good=IVstruct(i).good;else good=1;end
+if good,
+    %good
 ibias=IVstruct(i).ibias;
 vout=IVstruct(i).vout;%valor corregido de Vout.
 
@@ -30,4 +35,5 @@ set(gca,'fontsize',12,'linewidth',2,'fontweight','bold')
 subplot(2,2,4);plot(IVstruct(i).rtes,IVstruct(i).ptes*1e12,'.--','DisplayName',num2str(IVstruct(i).Tbath)),grid on,hold on
 xlabel('Rtes(%)','fontweight','bold');ylabel('Ptes(pW)','fontweight','bold');
 set(gca,'fontsize',12,'linewidth',2,'fontweight','bold')
+end
 end

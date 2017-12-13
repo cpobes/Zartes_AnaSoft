@@ -4,18 +4,24 @@ function Gaux=fitPvsTset(IVTESset,perc)
 
 model=1;
 
-for i=1:length(IVTESset), Tbath(i)=IVTESset(i).Tbath;end
+%for i=1:length(IVTESset), Tbath(i)=IVTESset(i).Tbath;end
+
 
 for jj=1:length(perc)
     Paux=[];
     Iaux=[];
-    for i=1:length(Tbath) 
+    Tbath=[];
+    for i=1:length(IVTESset) 
+        if isfield(IVTESset,'good') good=IVTESset(i).good;else good=1;end
+            if good
         %txt=strcat('P',num2str(100*perc(jj)));
         %exec=strcat(txt,'(i)=','ppval(spline(IVTESset{i}.rtes,IVTESset{i}.ptes),jj)')
         %evalin('caller',exec);
-        ind=find(IVTESset(i).rtes>0.2&IVTESset(i).rtes<0.9);%%%algunas IVs fallan.
-        Paux(i)=ppval(spline(IVTESset(i).rtes(ind),IVTESset(i).ptes(ind)),perc(jj));
-        Iaux(i)=ppval(spline(IVTESset(i).rtes(ind),IVTESset(i).ites(ind)),perc(jj));%%%
+        ind=find(IVTESset(i).rtes>0.25&IVTESset(i).rtes<0.85);%%%algunas IVs fallan.
+        Paux(end+1)=ppval(spline(IVTESset(i).rtes(ind),IVTESset(i).ptes(ind)),perc(jj));
+        Iaux(end+1)=ppval(spline(IVTESset(i).rtes(ind),IVTESset(i).ites(ind)),perc(jj));%%%
+        Tbath(end+1)=IVTESset(i).Tbath;
+            end
     end
     %fitaux=fit(Tbath',Paux'*1e12,'a*x^b+c','startpoint',[0 3 0]);
     %Tbath
@@ -23,7 +29,7 @@ for jj=1:length(perc)
     plot(Tbath,Paux*1e12,'.'),hold on
     
     if model==1
-        X0=[-3500 3 1];XDATA=Tbath;LB=[-Inf 2 0 ];%%%Uncomment for model1
+        X0=[-500 3 1];XDATA=Tbath;LB=[-Inf 2 0 ];%%%Uncomment for model1
     elseif model==2
         %%%p(1)=-K, p(2)=n, p(3)=P0=K*Tc^n, p(4)=Ic0.
         %X0=[-5000 3.0 10 1e4 0]; XDATA=[Tbath;Iaux*1e6];LB=[-1e5 2 0 0 0];%%%Uncoment for model2

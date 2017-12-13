@@ -12,11 +12,14 @@ function CompareIV_Z(IVset,P,Tbath)
     if (m1>=thr || m2>=thr) error('Tbath not in the measured data');end
     
     xiv=0.5*([IVstr.rtes(1:end-1)]+[IVstr.rtes(2:end)]);
+    indx1=find(xiv>0.15);
+    
     a_eff=diff(log(IVstr.Rtes))./diff(log([IVstr.ttes]));
     b_eff=diff(log(IVstr.Rtes))./diff(log([IVstr.ites]));
     invb_eff=diff(log(IVstr.ites))./diff(log([IVstr.Rtes]));
     
     xz=[p.rp];
+    indx2=find(xz>0.15);
     
     Za_effAprox=[p.ai]./(1+[p.bi]);
     %ecY='ai./(1+bi)';%%alfa_eff_Aprox
@@ -30,19 +33,22 @@ function CompareIV_Z(IVset,P,Tbath)
     %ecY='(1-L0)./(bi+2*L0)'; %%%inverse beta_eff
     
     subplot(1,3,1)
-    plot(xiv,a_eff,'.-',xz,Za_eff,'.-',xz,Za_effAprox,'.-','linewidth',2,'markersize',15);
-    grid on,xlim([0 1]),ylim([0 100]), title('\alpha_{eff}','fontsize',12,'fontweight','bold')
+    plot(xiv(indx1),a_eff(indx1),'.-',xz(indx2),Za_eff(indx2),'.-',xz(indx2),Za_effAprox(indx2),'.-','linewidth',2,'markersize',15);
+    grid on,xlim([0 1]),ylim([0 100]), ylabel('\alpha_{eff}','fontsize',12,'fontweight','bold')
+    xlabel('%R_n','fontsize',12,'fontweight','bold')
     set(gca,'linewidth',2,'fontsize',12,'fontweight','bold')
     legend('IV','Z','Z_{aprox}')
     
     subplot(1,3,2)
-    plot(xiv,b_eff,'.-',xz,Zb_eff,'.-','linewidth',2,'markersize',15)
-    grid on,xlim([0 1]),ylim([-5 5]),title('\beta_{eff}','fontsize',12,'fontweight','bold')
+    plot(xiv(indx1),b_eff(indx1),'.-',xz(indx2),Zb_eff(indx2),'.-','linewidth',2,'markersize',15)
+    grid on,xlim([0 1]),ylim([-5 5]),ylabel('\beta_{eff}','fontsize',12,'fontweight','bold')
+    xlabel('%R_n','fontsize',12,'fontweight','bold')
     set(gca,'linewidth',2,'fontsize',12,'fontweight','bold')
     legend('IV','Z')
     
     subplot(1,3,3)
-    plot(xiv,invb_eff,'.-',xz,invZb_eff,'.-','linewidth',2,'markersize',15)
-    grid on,xlim([0 1]),ylim([-1 1]),title('inv\beta_{eff}','fontsize',12,'fontweight','bold')
+    plot(xiv(indx1),invb_eff(indx1),'.-',xz(indx2),invZb_eff(indx2),'.-','linewidth',2,'markersize',15)
+    grid on,xlim([0 1]),ylim([-1 1]),ylabel('inv\beta_{eff}','fontsize',12,'fontweight','bold')
+    xlabel('%R_n','fontsize',12,'fontweight','bold')
     set(gca,'linewidth',2,'fontsize',12,'fontweight','bold')
     legend('IV','Z')
