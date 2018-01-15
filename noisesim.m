@@ -39,6 +39,7 @@ if nargin==1
     P0=I0*V0;
     L0=P0*alfa/(G*T0);
     M=1;
+    Nsquid=3e-12;
 else
     TES=varargin{1};
     OP=varargin{2};
@@ -66,6 +67,11 @@ else
     L0=P0*alfa/(G*T0);
     n=TES.n;
     M=0;
+    if isfield(Circuit,'Nsquid') Nsquid=Circuit.Nsquid;else Nsquid=3e-12;end
+    if abs(OP.Z0-OP.Zinf)<1e-3, 
+        %R0=0; L0=0;V0=0;P0=0;
+        I0=(Rs/RL)*OP.Ibias;
+    end
 end
 if nargin==5
     M=varargin{4};
@@ -103,6 +109,7 @@ stfn=4*Kb*T0^2*G*abs(sI).^2*F;%Thermal Fluctuation Noise
 ssh=4*Kb*Ts*I0^2*RL*(L0-1)^2*(1+4*pi^2*f.^2*tau^2/(1-L0)^2).*abs(sI).^2/L0^2; %Load resistor Noise
 %M=1.8;
 stes=4*Kb*T0*I0^2*R0*(1+2*bI)*(1+4*pi^2*f.^2*tau^2).*abs(sI).^2/L0^2*(1+M^2);%%%Johnson noise at TES.
+if ~isreal(sqrt(stes)) stes=zeros(1,length(f));end
 smax=4*Kb*T0^2*G.*abs(sI).^2;
 
 sfaser=0;%21/(2*pi^2)*((6.626e-34)^2/(1.602e-19)^2)*(10e-9)*P0/R0^2/(2.25e-8)/(1.38e-23*T0);%%%eq22 faser
@@ -113,7 +120,7 @@ Res=2.35/sqrt(trapz(f,1./NEP.^2))/2/1.609e-19;%resolución en eV. Tesis Wouter (
 
 %stes=stes*M^2;
 i_ph=sqrt(stfn);
-i_jo=sqrt(stes);
+i_jo=sqrt(stes); if ~isreal(i_jo) i_jo=zeros(1,length(f));end
 i_sh=sqrt(ssh);
 %G*5e-8
 %(n*TES.K*Ts.^n)*5e-6
@@ -122,7 +129,7 @@ i_sh=sqrt(ssh);
 noise.f=f;
 noise.ph=i_ph;noise.jo=i_jo;noise.sh=i_sh;noise.sum=sqrt(stfn+stes+ssh);%noise.sum=i_ph+i_jo+i_sh;
 noise.sI=abs(sI);noise.NEP=NEP;noise.max=sqrt(smax);noise.Res=Res;%noise.tbath=i_temp;
-noise.squid=3e-12;noise.squidarray=3e-12*ones(1,length(f));
+noise.squid=Nsquid;noise.squidarray=Nsquid*ones(1,length(f));
 else
     error('no valid model')
 end

@@ -32,7 +32,7 @@ if nargin==4
     [noise,file,path]=loadnoise();
     %%%buscamos la IV y P correspondientes a la Tbath dada
     path
-    Tbath=sscanf(char(regexp(path,'\d*mK','match')),'%dmK');
+    Tbath=sscanf(char(regexp(path,'\d*.\d*mK','match')),'%fmK');
     [~,Tind]=min(abs([IVset.Tbath]*1e3-Tbath));%%%En general Tbath de la IVsest tiene que ser exactamente la misma que la del directorio, pero en algun run he puesto el valor 'real'.(ZTES20)
     IVstr=IVset(Tind);
     [~,Tind]=min(abs([P.Tbath]*1e3-Tbath));
@@ -44,7 +44,7 @@ if nargin==5
             [noise,file,path]=loadnoise();
             %%%buscamos la IV y P correspondientes a la Tbath dada
             path
-            Tbath=sscanf(char(regexp(path,'\d*mK','match')),'%dmK');
+            Tbath=sscanf(char(regexp(path,'\d*.\d*mK','match')),'%fmK');
             [~,Tind]=min(abs([IVset.Tbath]*1e3-Tbath));%%%En general Tbath de la IVsest tiene que ser exactamente la misma que la del directorio, pero en algun run he puesto el valor 'real'.(ZTES20)
             IVstr=IVset(Tind);
             [~,Tind]=min(abs([P.Tbath]*1e3-Tbath));
@@ -118,7 +118,8 @@ if iscell(file)
     
     for i=1:N        
         i
-        Ib=sscanf(file{i},'HP_noise_%duA*')*1e-6 %%%HP_noise para ZTES18.!!!
+        
+        Ib=sscanf(file{i},'HP_noise_%fuA*')*1e-6 %%%HP_noise para ZTES18.!!!
         OP=setTESOPfromIb(Ib,IVstr,p);
         %%OP.Tbath=1.5*OP.Tbath;%%%effect of Tbath error.Despreciable.
         nrows=4;
@@ -137,7 +138,8 @@ if iscell(file)
         
         auxnoise=noisesim('irwin',ZTES,OP,circuit,M);
         f=logspace(0,6,1000);
-        si0(i)=auxnoise.sI(1);
+        %si0(i)=auxnoise.sI(1);
+        si0=auxnoise;%debug,para N=1 ver la SI.
         
             if(strcmp(tipo,'current'))
                 
@@ -167,7 +169,7 @@ if iscell(file)
                 end
                 ylabel('pA/Hz^{0.5}','fontsize',12,'fontweight','bold')
                 
-            elseif (strcmp(tipo,'NEP'))
+            elseif (strcmp(lower(tipo),'nep'))
                 
                 sIaux=ppval(spline(f,auxnoise.sI),noise{i}(:,1));
                 NEP=sqrt((V2I(noise{i}(:,2),circuit).^2-auxnoise.squid.^2))./sIaux;
@@ -187,7 +189,7 @@ if iscell(file)
                 end
                ylabel('aW/Hz^{0.5}','fontsize',12,'fontweight','bold')
             end
-            xlabel('\nu(Hz)','fontsize',12,'fontweight','bold')
+            xlabel('\nu (Hz)','fontsize',12,'fontweight','bold')
             
             
         axis([10 1e5 1 1e4])
@@ -197,22 +199,23 @@ if iscell(file)
         set(gca,'linewidth',2)
         set(gca,'XMinorGrid','off','YMinorGrid','on','GridLineStyle','-')
         title(strcat(num2str(round(OP.r0*100)),'%Rn'),'fontsize',12);
+        if abs(OP.Z0-OP.Zinf)<1e-3 set(get(findobj(gca,'type','axes'),'title'),'color','r');end
          
          %%%obsolet0.
-         if(0)
-         sIaux=ppval(spline(f,auxnoise.sI),noise{i}(:,1));
-         NEP=sqrt((V2I(noise{i}(:,2),circuit).^2-auxnoise.squid.^2))./sIaux;
-         %figure
-            loglog(noise{i}(:,1),NEP*1e18,'r'),hold on,grid on,%%%for noise in Power
-         %   loglog(f,auxnoise.NEP*1e18,'b'),hold on,grid on,%%%for noise in Power
-        
-         %%resolucion experimental o teorica. Devolver un parametro u otro.
-         expres(1,i)=OP.R0/ZTES.Rn;
-         RES=2.35/sqrt(trapz(noise{i}(:,1),1./NEP.^2))/2/1.609e-19;
-         expres(2,i)=RES;
-         thres(1,i)=OP.R0/ZTES.Rn;
-         thres(2,i)=auxnoise.Res;
-         end
+%          if(0)
+%          sIaux=ppval(spline(f,auxnoise.sI),noise{i}(:,1));
+%          NEP=sqrt((V2I(noise{i}(:,2),circuit).^2-auxnoise.squid.^2))./sIaux;
+%          %figure
+%             loglog(noise{i}(:,1),NEP*1e18,'r'),hold on,grid on,%%%for noise in Power
+%          %   loglog(f,auxnoise.NEP*1e18,'b'),hold on,grid on,%%%for noise in Power
+%         
+%          %%resolucion experimental o teorica. Devolver un parametro u otro.
+%          expres(1,i)=OP.R0/ZTES.Rn;
+%          RES=2.35/sqrt(trapz(noise{i}(:,1),1./NEP.^2))/2/1.609e-19;
+%          expres(2,i)=RES;
+%          thres(1,i)=OP.R0/ZTES.Rn;
+%          thres(2,i)=auxnoise.Res;
+%          end
          
         %set(gca,'xlim',[100 1e5]);
         %set(gca,'ylim',[1e-11 1e-9]);
@@ -220,11 +223,11 @@ if iscell(file)
         
         %%%Salvar la figura 
         %num2str(gcf) deja de funcionar en matlab2015a
-        n=get(gcf,'number')
-        fi=strcat('-f',num2str(n))
-        mkdir('figs')
+        n=get(gcf,'number');
+        fi=strcat('-f',num2str(n));
+        mkdir('figs');
         name=strcat('figs\Noise',num2str(Tbath),'mK');
-        print(fi,name,'-dpng','-r0')
+        print(fi,name,'-dpng','-r0');
          
     end
 else

@@ -76,7 +76,8 @@ for i=1:length(dirs)
 %     %filesc
     
     %%%buscamos la IV correspondiente a la Tmc dada
-    Tbath=sscanf(dirs{i},'%dmK');
+    Tbath=sscanf(dirs{i},'%dmK')
+    pause(1)
     %Tind=[IVset.Tbath]*1e3==Tbath;
     [~,Tind]=min(abs([IVset.Tbath]*1e3-Tbath));%%%En general Tbath de la IVsest tiene que ser exactamente la misma que la del directorio, pero en algun run he puesto el valor 'real'.(ZTES20)
     IV=IVset(Tind);
@@ -146,6 +147,7 @@ for i=1:length(dirs)
             P(i).ThRes(jj)=noiseIrwin.Res;
             
             %%%Excess noise trials.
+            %%%Johnson Excess
             findx=find(noisedata{1}(:,1)>1e4);
             xdata=noisedata{1}(findx,1);
             %ydata=sqrt(V2I(noisedata{1}(findx,2),circuit.Rf).^2-noiseIrwin.squid.^2);
