@@ -3,7 +3,13 @@ function OP=setTESOPfromIb(Ib,IV,p)
 %parameters p.
 
 [iaux,ii]=unique(IV.ibias,'stable');
-OP.r0=ppval(spline(iaux,IV.rtes(ii)),Ib);
+vaux=IV.vout(ii);
+raux=IV.rtes(ii);
+[m,i3]=min(diff(vaux)./diff(iaux))
+%[m,i3]=min(diff(IV.vout)./diff(IV.ibias));%%%Calculamos el índice del salto de estado N->S.
+
+%OP.r0=ppval(spline(IV.ibias(ii(1:i3+1)),IV.rtes(ii(1:i3+1))),Ib);
+OP.r0=ppval(spline(iaux((1:i3+1)),raux((1:i3+1))),Ib);
 OP.V0=ppval(spline(iaux,IV.vtes(ii)),Ib);
 OP.I0=ppval(spline(iaux,IV.ites(ii)),Ib);
 OP.R0=OP.V0/OP.I0;
