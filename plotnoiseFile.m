@@ -32,7 +32,8 @@ if nargin==4
     [noise,file,path]=loadnoise();
     %%%buscamos la IV y P correspondientes a la Tbath dada
     path
-    Tbath=sscanf(char(regexp(path,'\d*.\d*mK','match')),'%fmK');
+    auxstr=char(regexp(path,'\d*(.\d*)?mK','match'));
+    Tbath=sscanf(strrep(auxstr,'\',''),'%fmK'); %se hace necesario este apaño porque al ejecutar desde Directorio de datos general path contiene '\' y da error.
     [~,Tind]=min(abs([IVset.Tbath]*1e3-Tbath));%%%En general Tbath de la IVsest tiene que ser exactamente la misma que la del directorio, pero en algun run he puesto el valor 'real'.(ZTES20)
     IVstr=IVset(Tind);
     [~,Tind]=min(abs([P.Tbath]*1e3-Tbath));
@@ -44,7 +45,8 @@ if nargin==5
             [noise,file,path]=loadnoise();
             %%%buscamos la IV y P correspondientes a la Tbath dada
             path
-            Tbath=sscanf(char(regexp(path,'\d*.\d*mK','match')),'%fmK');
+            auxstr=char(regexp(path,'\d*(.\d*)?mK','match'));
+            Tbath=sscanf(strrep(auxstr,'\',''),'%fmK');%se hace necesario este apaño porque al ejecutar desde Directorio de datos general path contiene '\' y da error.
             [~,Tind]=min(abs([IVset.Tbath]*1e3-Tbath));%%%En general Tbath de la IVsest tiene que ser exactamente la misma que la del directorio, pero en algun run he puesto el valor 'real'.(ZTES20)
             IVstr=IVset(Tind);
             [~,Tind]=min(abs([P.Tbath]*1e3-Tbath));
@@ -72,6 +74,7 @@ if nargin==6
         %     D=dir(strcat(d,'\',wdir,'\HP*'));
         %     [~,s2]=sort([D(:).datenum]',1,'descend');
         %     filesNoise={D(s2).name}%%%ficheros en orden de %Rn!!!
+        %strcat(wdir,'\HP*')
         filesNoise=ListInBiasOrder(strcat(wdir,'\HP*'),'ascend')
         [noise,file]=loadnoise(0,wdir,filesNoise);
         Tbath=sscanf(wdir,'%dmK');
@@ -120,7 +123,7 @@ if iscell(file)
         i
         
         Ib=sscanf(file{i},'HP_noise_%fuA*')*1e-6 %%%HP_noise para ZTES18.!!!
-        OP=setTESOPfromIb(Ib,IVstr,p);
+        OP=setTESOPfromIb(Ib,IVstr,p)
         %%OP.Tbath=1.5*OP.Tbath;%%%effect of Tbath error.Despreciable.
         nrows=4;
         ncols=max(ceil(N/nrows),1);
@@ -144,10 +147,14 @@ if iscell(file)
             if(strcmp(tipo,'current'))
                 
                 loglog(noise{i}(:,1),V2I(noise{i}(:,2)*1e12,circuit),'.-r'),hold on,grid on,%%%for noise in Current.  Multiplico 1e12 para pA/sqrt(Hz)!Ojo, tb en plotnoise!
+                loglog(noise{i}(:,1),medfilt1(V2I(noise{i}(:,2)*1e12,circuit),20),'.-k'),hold on,grid on,%%%for noise in Current.  Multiplico 1e12 para pA/sqrt(Hz)!Ojo, tb en plotnoise!
+                %loglog(noise{i}(:,1),sgolayfilt(V2I(noise{i}(:,2)*1e12,circuit),3,41),'.-k'),hold on,grid on,%%%for noise in Current.  Multiplico 1e12 para pA/sqrt(Hz)!Ojo, tb en plotnoise!
                 if Mph==0
                     totnoise=sqrt(auxnoise.sum.^2+auxnoise.squidarray.^2);
                 else
                     totnoise=sqrt(auxnoise.max.^2+auxnoise.jo.^2+auxnoise.sh.^2+auxnoise.squidarray.^2);
+                    Mexph=OP.Mph;
+                    totnoise=sqrt((auxnoise.ph*(1+Mexph^2)).^2+auxnoise.jo.^2+auxnoise.sh.^2+auxnoise.squidarray.^2);
                 end
                 %%%normalization test
                 %ind=find(noise{i}(:,1)>100&noise{i}(:,1)<1000);
@@ -164,7 +171,8 @@ if iscell(file)
                     
                 else
                     loglog(f,auxnoise.jo*1e12,f,auxnoise.ph*1e12,f,auxnoise.sh*1e12,f,totnoise*1e12);
-                    legend('experimental','jhonson','phonon','shunt','total')
+                    %legend('experimental','jhonson','phonon','shunt','total');
+                    legend('experimental','exp\_filtered','jhonson','phonon','shunt','total');
                     h=findobj(gca,'displayname','total');
                 end
                 ylabel('pA/Hz^{0.5}','fontsize',12,'fontweight','bold')
@@ -173,7 +181,9 @@ if iscell(file)
                 
                 sIaux=ppval(spline(f,auxnoise.sI),noise{i}(:,1));
                 NEP=sqrt((V2I(noise{i}(:,2),circuit).^2-auxnoise.squid.^2))./sIaux;
-                loglog(noise{i}(:,1),NEP*1e18,'.-r'),hold on,grid on,
+                loglog(noise{i}(:,1),(NEP*1e18),'.-r'),hold on,grid on,
+                loglog(noise{i}(:,1),medfilt1(NEP*1e18,20),'.-k'),hold on,grid on,
+                %loglog(noise{i}(:,1),sgolayfilt(NEP*1e18,3,41),'.-k'),hold on,grid on,
                     if Mph==0
                         totNEP=auxnoise.NEP;
                     else
@@ -183,8 +193,9 @@ if iscell(file)
                     loglog(f,totNEP*1e18,'b');hold on;grid on;
                     h=findobj(gca,'color','b');
                 else
-                    loglog(f,auxnoise.jo*1e18./auxnoise.sI,f,auxnoise.ph*1e18./auxnoise.sI,f,auxnoise.sh*1e18./auxnoise.sI,f,totNEP*1e18);
-                    legend('experimental','jhonson','phonon','shunt','total');
+                    loglog(f,auxnoise.jo*1e18./auxnoise.sI,f,auxnoise.ph*1e18./auxnoise.sI,f,auxnoise.sh*1e18./auxnoise.sI,f,(totNEP*1e18));
+                    %legend('experimental','jhonson','phonon','shunt','total');
+                    legend('experimental','exp\_filtered','jhonson','phonon','shunt','total');
                     h=findobj(gca,'displayname','total');
                 end
                ylabel('aW/Hz^{0.5}','fontsize',12,'fontweight','bold')
@@ -192,14 +203,14 @@ if iscell(file)
             xlabel('\nu (Hz)','fontsize',12,'fontweight','bold')
             
             
-        axis([10 1e5 1 1e4])
+        axis([1e1 1e5 1 1e4])
         %h=get(gca,'children')
         set(h(1),'linewidth',3);
         set(gca,'fontsize',11);
         set(gca,'linewidth',2)
         set(gca,'XMinorGrid','off','YMinorGrid','on','GridLineStyle','-')
         title(strcat(num2str(round(OP.r0*100)),'%Rn'),'fontsize',12);
-        if abs(OP.Z0-OP.Zinf)<1e-3 set(get(findobj(gca,'type','axes'),'title'),'color','r');end
+        if abs(OP.Z0-OP.Zinf)<1.5e-3 set(get(findobj(gca,'type','axes'),'title'),'color','r');end
          
          %%%obsolet0.
 %          if(0)

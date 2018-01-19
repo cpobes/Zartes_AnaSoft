@@ -68,7 +68,7 @@ else
     n=TES.n;
     M=0;
     if isfield(Circuit,'Nsquid') Nsquid=Circuit.Nsquid;else Nsquid=3e-12;end
-    if abs(OP.Z0-OP.Zinf)<1e-3, 
+    if abs(OP.Z0-OP.Zinf)<1.5e-3, 
         %R0=0; L0=0;V0=0;P0=0;
         I0=(Rs/RL)*OP.Ibias;
     end

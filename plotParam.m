@@ -9,8 +9,8 @@ if nargin>3
     optname=[opt.name,{'markersize'}]
     optvalue=[opt.value,{15}]
 else
-    optname={'markersize'}
-    optvalue={15}
+    optname={'markersize','linestyle'}
+    optvalue={15,'-'}
 end
 
 for i=1:length(P),
@@ -18,7 +18,7 @@ for i=1:length(P),
     %y=eval(strcat('[','P(i).p.',yl,']'));
     x=GetPparam(P(i).p,xl);
     y=GetPparam(P(i).p,yl);
-    h=plot(x,y,'.');hold on
+    h=plot(x,y,'.r');hold on
     set(h,optname,optvalue);
 end
 

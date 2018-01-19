@@ -22,6 +22,9 @@ if length(p)>1
     if (isfield(p,'M'))
         OP.M=ppval(spline([p.rp],real([p.M])),OP.r0);
     end
+    if (isfield(p,'Mph'))
+        OP.Mph=ppval(spline([p.rp],real([p.Mph])),OP.r0);
+    end
 else
     OP.ai=p.ai;
     OP.bi=p.bi;
