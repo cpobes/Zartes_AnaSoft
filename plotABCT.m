@@ -22,8 +22,13 @@ end
 for i=1:length(P)
     
 shc=subplot(2,2,1);
-[~,jj]=sort([P(i).p.rp]);
-hc(i)=plot([P(i).p(jj).rp],abs([P(i).p(jj).C])*1e15,'.-','color',color),grid on,hold on
+[rp,jj]=sort([P(i).p.rp]);
+C=abs([P(i).p(jj).C])*1e15;
+%%%Filtrado para visualización
+mC=median(C);
+indC=find(C<3*mC & C>0.3*mC);
+%hc(i)=plot([P(i).p(jj).rp],abs([P(i).p(jj).C])*1e15,'.-','color',color),grid on,hold on
+hc(i)=plot(rp(indC),C(indC),'.-','color',color),grid on,hold on
 if nargin>2
     plot(rpaux,CN*1e15*ones(1,length(rpaux)),'-','color','r','linewidth',2)
     plot(rpaux,2.43*CN*1e15*ones(1,length(rpaux)),'-','color','k','linewidth',2)
@@ -34,12 +39,18 @@ set(gca,'fontsize',11,'fontweight','bold','linewidth',2)
 sht=subplot(2,2,2);
 [~,jj]=sort([P(i).p.rp]);
 ht(i)=semilogy([P(i).p(jj).rp],[P(i).p(jj).taueff],'.-','color',color),grid on,hold on
+ylim([1e-6 1e-2])
 xlabel('Rtes(%Rn)','fontsize',11,'fontweight','bold');ylabel('\tau_{eff}(s)','fontsize',11,'fontweight','bold');
 set(gca,'fontsize',11,'fontweight','bold','linewidth',2)
 
 sha=subplot(2,2,3);
-[~,jj]=sort([P(i).p.rp]);
-ha(i)=plot([P(i).p(jj).rp],[P(i).p(jj).ai],'.-','color',color),grid on,hold on
+[rp,jj]=sort([P(i).p.rp]);
+ai=abs([P(i).p(jj).ai]);
+%%%Filtrado para visualización
+mai=median(ai);
+indai=find(ai<3*mai & ai>0.3*mai);
+%ha(i)=plot([P(i).p(jj).rp],[P(i).p(jj).ai],'.-','color',color),grid on,hold on
+ha(i)=plot(rp(indai),ai(indai),'.-','color',color),grid on,hold on
 xlabel('Rtes(%Rn)','fontsize',11,'fontweight','bold');ylabel('\alpha_i','fontsize',11,'fontweight','bold');
 set(gca,'fontsize',11,'fontweight','bold','linewidth',2)
 
@@ -47,6 +58,7 @@ shb=subplot(2,2,4);
 [~,jj]=sort([P(i).p.rp]);
 hb(i)=semilogy([P(i).p(jj).rp],[P(i).p(jj).bi],'.-','color',color),grid on,hold on
 semilogy(0.1:0.01:0.9,1./(0.1:0.01:0.9)-1,'r','linewidth',2)
+ylim([1e-2 1e1])
 xlabel('Rtes(%Rn)','fontsize',11,'fontweight','bold');ylabel('\beta_i','fontsize',11,'fontweight','bold');
 set(gca,'fontsize',11,'fontweight','bold','linewidth',2)
 
@@ -57,6 +69,7 @@ hl{i}=linkprop([hc(i) ht(i) ha(i) hb(i)],'brushdata');
 %brush off;
 linkaxes([shc sht sha shb],'x');
 end
+xlim([0.15 0.9])
 set(hc,'userdata',hl);
 set(ht,'userdata',hl);
 set(ha,'userdata',hl);
