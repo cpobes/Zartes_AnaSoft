@@ -59,7 +59,7 @@ for i=1:length(dirs)
     D=strcat(d,'\',dirs{i},'\HP*');
 %     [~,s2]=sort([D(:).datenum]',1,'descend');
 %     filesNoise={D(s2).name}%%%ficheros en orden de %Rn!!!
-    filesNoise=dir(D)
+    filesNoise=dir(D);
     if ~isempty(filesNoise) filesNoise=ListInBiasOrder(D);end
     
 %     [ii,jj]=size(files);
@@ -146,44 +146,44 @@ for i=1:length(dirs)
             P(i).ExRes(jj)=RES;
             P(i).ThRes(jj)=noiseIrwin.Res;
             
-%             %%%Excess noise trials.
-%             %%%Johnson Excess
-%             findx=find(noisedata{1}(:,1)>1e4 & noisedata{1}(:,1)<4.5e4);
-%             xdata=noisedata{1}(findx,1);
-%             %ydata=sqrt(V2I(noisedata{1}(findx,2),circuit.Rf).^2-noiseIrwin.squid.^2);
-%             ydata=medfilt1(NEP(findx)*1e18,20);
-%             %size(ydata)
-%             if sum(ydata==Inf) %%%1Z1_23A @70mK 1er punto da error.
-%                 P(i).M(jj)=0;
-%             else
-%                 P(i).M(jj)=lsqcurvefit(@(x,xdata) fitnoise(x,xdata,TES,OP,circuit),0,xdata,ydata);
-%             end
-%             %%%phonon Excess
-%             findx=find(noisedata{1}(:,1)>1e2&noisedata{1}(:,1)<1e3);
-%             ydata=median(NEP(findx)*1e18);
-%             if sum(ydata==inf)
-%                 P(i).Mph(jj)=0;
-%             else
-%                 ymod=median(ppval(spline(f,noiseIrwin.NEP*1e18),noisedata{1}(findx,1)));
-%                 P(i).Mph(jj)=sqrt(ydata/ymod-1);
-%             end
-            
-            %%%funciona igual fitnoise y fitjohnson.
-            %parameters.OP=OP;parameters.circuit=circuit;parameters.TES=TES;          
-            %P(i).M(jj)=lsqcurvefit(@(x,xdata) fitjohnson(x,xdata,parameters),[0 0],xdata,ydata);
-            findx=find(noisedata{1}(:,1)>1e2 & noisedata{1}(:,1)<4e4);
+            %%%Excess noise trials.
+            %%%Johnson Excess
+            findx=find(noisedata{1}(:,1)>1e4 & noisedata{1}(:,1)<4.5e4);
             xdata=noisedata{1}(findx,1);
+            %ydata=sqrt(V2I(noisedata{1}(findx,2),circuit.Rf).^2-noiseIrwin.squid.^2);
             ydata=medfilt1(NEP(findx)*1e18,20);
-             parameters.OP=OP;parameters.circuit=circuit;parameters.TES=TES;          
-             maux=lsqcurvefit(@(x,xdata) fitjohnson(x,xdata,parameters),[0 0],xdata,ydata);
-                P(i).M(jj)=maux(2);
-                P(i).Mph(jj)=maux(1);
-                
-            %%%Recalculo ExRes* incluyendo los M en el modelo para ver el impacto del fallo en la primera década del analizador!!
-            auxnoise=noisesim('irwin',TES,OP,circuit,P(i).M(jj));%P(i).M(jj)
-            nepaux=sqrt(auxnoise.max.^2+auxnoise.jo.^2+auxnoise.sh.^2)./auxnoise.sI;
-            findx=find(auxnoise.f>1e2);
-            P(i).ExRes(jj)=2.35/sqrt(trapz(auxnoise.f(findx),1./nepaux(findx).^2))/2/1.609e-19;
+            %size(ydata)
+            if sum(ydata==Inf) %%%1Z1_23A @70mK 1er punto da error.
+                P(i).M(jj)=0;
+            else
+                P(i).M(jj)=lsqcurvefit(@(x,xdata) fitnoise(x,xdata,TES,OP,circuit),0,xdata,ydata);
+            end
+            %%%phonon Excess
+            findx=find(noisedata{1}(:,1)>1e2&noisedata{1}(:,1)<1e3);
+            ydata=median(NEP(findx)*1e18);
+            if sum(ydata==inf)
+                P(i).Mph(jj)=0;
+            else
+                ymod=median(ppval(spline(f,noiseIrwin.NEP*1e18),noisedata{1}(findx,1)));
+                P(i).Mph(jj)=sqrt(ydata/ymod-1);
+            end
+            
+%             %%%funciona igual fitnoise y fitjohnson.
+%             %parameters.OP=OP;parameters.circuit=circuit;parameters.TES=TES;          
+%             %P(i).M(jj)=lsqcurvefit(@(x,xdata) fitjohnson(x,xdata,parameters),[0 0],xdata,ydata);
+%             findx=find(noisedata{1}(:,1)>2e2 & noisedata{1}(:,1)<4e4);
+%             xdata=noisedata{1}(findx,1);
+%             ydata=medfilt1(NEP(findx)*1e18,20);
+%              parameters.OP=OP;parameters.circuit=circuit;parameters.TES=TES;          
+%              maux=lsqcurvefit(@(x,xdata) fitjohnson(x,xdata,parameters),[0 0],xdata,ydata);
+%                 P(i).M(jj)=maux(2);
+%                 P(i).Mph(jj)=maux(1);
+%                 
+%             %%%Recalculo ExRes* incluyendo los M en el modelo para ver el impacto del fallo en la primera década del analizador!!
+%             auxnoise=noisesim('irwin',TES,OP,circuit,P(i).M(jj));%P(i).M(jj)
+%             nepaux=sqrt(auxnoise.max.^2+auxnoise.jo.^2+auxnoise.sh.^2)./auxnoise.sI;
+%             findx=find(auxnoise.f>1e2);
+%             P(i).ExRes(jj)=2.35/sqrt(trapz(auxnoise.f(findx),1./nepaux(findx).^2))/2/1.609e-19;
             
 % %         ns=ppval(spline(f,noiseIrwin.sum),noisedata{1}(:,1));
 % %         excess(:,1)=noisedata{1}(:,1);

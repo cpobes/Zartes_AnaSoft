@@ -123,7 +123,7 @@ if iscell(file)
         i
         
         Ib=sscanf(file{i},'HP_noise_%fuA*')*1e-6 %%%HP_noise para ZTES18.!!!
-        OP=setTESOPfromIb(Ib,IVstr,p)
+        OP=setTESOPfromIb(Ib,IVstr,p,circuit)
         %%OP.Tbath=1.5*OP.Tbath;%%%effect of Tbath error.Despreciable.
         nrows=4;
         ncols=max(ceil(N/nrows),1);
@@ -177,7 +177,7 @@ if iscell(file)
                 end
                 ylabel('pA/Hz^{0.5}','fontsize',12,'fontweight','bold')
                 
-            elseif (strcmp(lower(tipo),'nep'))
+            elseif (strcmpi(tipo,'nep'))
                 
                 sIaux=ppval(spline(f,auxnoise.sI),noise{i}(:,1));
                 NEP=sqrt((V2I(noise{i}(:,2),circuit).^2-auxnoise.squid.^2))./sIaux;
@@ -210,6 +210,7 @@ if iscell(file)
         set(gca,'linewidth',2)
         set(gca,'XMinorGrid','off','YMinorGrid','on','GridLineStyle','-')
         title(strcat(num2str(round(OP.r0*100)),'%Rn'),'fontsize',12);
+        OP.Z0,OP.Zinf%debug
         if abs(OP.Z0-OP.Zinf)<1.5e-3 set(get(findobj(gca,'type','axes'),'title'),'color','r');end
          
          %%%obsolet0.

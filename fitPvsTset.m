@@ -18,6 +18,7 @@ for jj=1:length(perc)
         %exec=strcat(txt,'(i)=','ppval(spline(IVTESset{i}.rtes,IVTESset{i}.ptes),jj)')
         %evalin('caller',exec);
         ind=find(IVTESset(i).rtes>0.25&IVTESset(i).rtes<0.85);%%%algunas IVs fallan.
+        if isempty(ind) continue;end
         Paux(end+1)=ppval(spline(IVTESset(i).rtes(ind),IVTESset(i).ptes(ind)),perc(jj));
         Iaux(end+1)=ppval(spline(IVTESset(i).rtes(ind),IVTESset(i).ites(ind)),perc(jj));%%%
         Tbath(end+1)=IVTESset(i).Tbath;
@@ -26,6 +27,7 @@ for jj=1:length(perc)
     %fitaux=fit(Tbath',Paux'*1e12,'a*x^b+c','startpoint',[0 3 0]);
     %Tbath
     %Paux
+    Tbath=0.9932*Tbath+0.006171; %%Curva de calibración del termómetro Kelvinox al calibrado. Ver Tcal.m en medidas/TES.
     plot(Tbath,Paux*1e12,'.'),hold on
     
     if model==1

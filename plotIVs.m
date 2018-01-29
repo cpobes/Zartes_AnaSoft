@@ -12,7 +12,7 @@ for i=1:length(IVstruct)
     
     if isfield(IVstruct,'good') good=IVstruct(i).good;else good=1;end
 if good,
-    %good
+    i,good
 ibias=IVstruct(i).ibias;
 vout=IVstruct(i).vout;%valor corregido de Vout.
 

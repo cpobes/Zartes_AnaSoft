@@ -7,9 +7,8 @@ function CompareIV_Z(IVset,P,Tbath)
     IVstr=IVset(Tind);
     [m2,Tind]=min(abs([P.Tbath]*1e3-Tbath));
     p=P(Tind).p;
-    
     thr=1;%%%umbral en 1mK de diferencia entre la Tbath pasada y la Tbath más cercana de los datos.
-    if (m1>=thr || m2>=thr) error('Tbath not in the measured data');end
+    if (m1>=thr || m2>=thr) error('Tbath not in the measured data. \n Remember to pass Tbath as a number in mK');end
     
     xiv=0.5*([IVstr.rtes(1:end-1)]+[IVstr.rtes(2:end)]);
     indx1=find(xiv>0.15);
@@ -33,11 +32,13 @@ function CompareIV_Z(IVset,P,Tbath)
     %ecY='(1-L0)./(bi+2*L0)'; %%%inverse beta_eff
     
     subplot(1,3,1)
-    plot(xiv(indx1),a_eff(indx1),'.-',xz(indx2),Za_eff(indx2),'.-',xz(indx2),Za_effAprox(indx2),'.-','linewidth',2,'markersize',15);
+    %plot(xiv(indx1),a_eff(indx1),'.-',xz(indx2),Za_eff(indx2),'.-',xz(indx2),Za_effAprox(indx2),'.-','linewidth',2,'markersize',15);
+    plot(xiv(indx1),a_eff(indx1),'.-',xz(indx2),Za_eff(indx2),'.-','linewidth',2,'markersize',15);
     grid on,xlim([0 1]),ylim([0 100]), ylabel('\alpha_{eff}','fontsize',12,'fontweight','bold')
     xlabel('%R_n','fontsize',12,'fontweight','bold')
     set(gca,'linewidth',2,'fontsize',12,'fontweight','bold')
-    legend('IV','Z','Z_{aprox}')
+    %legend('IV','Z','Z_{aprox}')
+    %legend('IV','Z')
     
     subplot(1,3,2)
     plot(xiv(indx1),b_eff(indx1),'.-',xz(indx2),Zb_eff(indx2),'.-','linewidth',2,'markersize',15)

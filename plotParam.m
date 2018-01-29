@@ -22,7 +22,8 @@ for i=1:length(P),
     set(h,optname,optvalue);
 end
 
-hold off,grid on
+%hold off,grid on
+grid on
 xlabel(xl,'fontsize',12);
 ylabel(yl,'fontsize',12);
 set(gca,'linewidth',2,'fontsize',12);
