@@ -18,21 +18,25 @@ vout=IVstruct(i).vout;%valor corregido de Vout.
 
 %curva Vout-Ibias
 subplot(2,2,1);plot(ibias*1e6,vout,'.--','DisplayName',num2str(IVstruct(i).Tbath)),grid on,hold on
+xlim([min(0,sign(ibias(1))*300) 300])
 xlabel('Ibias(\muA)','fontweight','bold');ylabel('Vout(V)','fontweight','bold');
 set(gca,'fontsize',12,'linewidth',2,'fontweight','bold')
 
 %Curva Ites-Vtes
 subplot(2,2,3);plot(IVstruct(i).vtes*1e6,IVstruct(i).ites*1e6,'.--','DisplayName',num2str(IVstruct(i).Tbath)),grid on,hold on
+xlim([min(0,sign(ibias(1))*.5) .5])
 xlabel('Vtes(\muV)','fontweight','bold');ylabel('Ites(\muA)','fontweight','bold');
 set(gca,'fontsize',12,'linewidth',2,'fontweight','bold')
 
 %Curva Ptes-Vtes
 subplot(2,2,2);plot(IVstruct(i).vtes*1e6,IVstruct(i).ptes*1e12,'.--','DisplayName',num2str(IVstruct(i).Tbath)),grid on,hold on
+xlim([min(0,sign(ibias(1))*.5) .500])
 xlabel('Vtes(\muV)','fontweight','bold');ylabel('Ptes(pW)','fontweight','bold');
 set(gca,'fontsize',12,'linewidth',2,'fontweight','bold')
 
 %Curva Ptes-rtes.
 subplot(2,2,4);plot(IVstruct(i).rtes,IVstruct(i).ptes*1e12,'.--','DisplayName',num2str(IVstruct(i).Tbath)),grid on,hold on
+xlim([0 1])
 xlabel('Rtes(%)','fontweight','bold');ylabel('Ptes(pW)','fontweight','bold');
 set(gca,'fontsize',12,'linewidth',2,'fontweight','bold')
 end
