@@ -27,7 +27,7 @@ for jj=1:length(perc)
     %fitaux=fit(Tbath',Paux'*1e12,'a*x^b+c','startpoint',[0 3 0]);
     %Tbath
     %Paux
-    Tbath=0.9932*Tbath+0.006171; %%Curva de calibración del termómetro Kelvinox al calibrado. Ver Tcal.m en medidas/TES.
+    %Tbath=0.9932*Tbath+0.006171; %%Curva de calibración del termómetro Kelvinox al calibrado. Ver Tcal.m en medidas/TES.
     plot(Tbath,Paux*1e12,'.'),hold on
     
     if model==1
