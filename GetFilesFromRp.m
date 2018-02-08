@@ -2,8 +2,8 @@ function FileList=GetFilesFromRp(IVset,Tbath,Rp)
 %%%Funcion para dar la lista de ficheros a una Tbath dada a los porcentajes
 %%%Rp. V0: hay que estar en el directorio raiz del TES a analizar.
 %%%Pasar Tbath como string numerico en milikelvin sin el mK: Tbath='50'.
-str=dir('*mK');
 
+str=dir('*mK');
 for i=1:length(str)
     if strfind(str(i).name,Tbath) & str(i).isdir, break;end%%%Para pintar automáticamente los ruido a una cierta temperatura.50mK.(tiene que funcionar con 50mK y 50.0mK, pero ojo con 50.2mK p.e.)
 end

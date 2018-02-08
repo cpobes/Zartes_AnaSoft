@@ -2,7 +2,8 @@ function plotABCT(P,varargin)
 
 warning off
 if nargin==1
-    color='b';
+    %color='b';
+    color=[0 0.4470 0.7410];%%%Nuevo color por defecto en matlab
 elseif nargin>2
     color=varargin{1};
     TES=varargin{2};
@@ -27,8 +28,12 @@ C=abs([P(i).p(jj).C])*1e15;
 %%%Filtrado para visualización
 mC=median(C);
 indC=find(C<3*mC & C>0.3*mC);
+
+MS=10;
+LW1=1;
+
 %hc(i)=plot([P(i).p(jj).rp],abs([P(i).p(jj).C])*1e15,'.-','color',color),grid on,hold on
-hc(i)=plot(rp(indC),C(indC),'.-','color',color),grid on,hold on
+hc(i)=plot(rp(indC),C(indC),'.-','color',color,'linewidth',LW1,'markersize',MS),grid on,hold on
 if nargin>2
     plot(rpaux,CN*1e15*ones(1,length(rpaux)),'-','color','r','linewidth',2)
     plot(rpaux,2.43*CN*1e15*ones(1,length(rpaux)),'-','color','k','linewidth',2)
@@ -38,7 +43,7 @@ set(gca,'fontsize',11,'fontweight','bold','linewidth',2)
 
 sht=subplot(2,2,2);
 [~,jj]=sort([P(i).p.rp]);
-ht(i)=semilogy([P(i).p(jj).rp],[P(i).p(jj).taueff],'.-','color',color),grid on,hold on
+ht(i)=semilogy([P(i).p(jj).rp],[P(i).p(jj).taueff],'.-','color',color,'linewidth',LW1,'markersize',MS),grid on,hold on
 ylim([1e-6 1e-2])
 xlabel('Rtes(%Rn)','fontsize',11,'fontweight','bold');ylabel('\tau_{eff}(s)','fontsize',11,'fontweight','bold');
 set(gca,'fontsize',11,'fontweight','bold','linewidth',2)
@@ -50,13 +55,13 @@ ai=abs([P(i).p(jj).ai]);
 mai=median(ai);
 indai=find(ai<3*mai & ai>0.3*mai);
 %ha(i)=plot([P(i).p(jj).rp],[P(i).p(jj).ai],'.-','color',color),grid on,hold on
-ha(i)=plot(rp(indai),ai(indai),'.-','color',color),grid on,hold on
+ha(i)=plot(rp(indai),ai(indai),'.-','color',color,'linewidth',LW1,'markersize',MS),grid on,hold on
 xlabel('Rtes(%Rn)','fontsize',11,'fontweight','bold');ylabel('\alpha_i','fontsize',11,'fontweight','bold');
 set(gca,'fontsize',11,'fontweight','bold','linewidth',2)
 
 shb=subplot(2,2,4);
 [~,jj]=sort([P(i).p.rp]);
-hb(i)=semilogy([P(i).p(jj).rp],[P(i).p(jj).bi],'.-','color',color),grid on,hold on
+hb(i)=semilogy([P(i).p(jj).rp],[P(i).p(jj).bi],'.-','color',color,'linewidth',LW1,'markersize',MS),grid on,hold on
 semilogy(0.1:0.01:0.9,1./(0.1:0.01:0.9)-1,'r','linewidth',2)
 ylim([1e-2 1e1])
 xlabel('Rtes(%Rn)','fontsize',11,'fontweight','bold');ylabel('\beta_i','fontsize',11,'fontweight','bold');

@@ -47,7 +47,7 @@ for i=1:length(T),
 %     figure(h(2)),semilogx(data{i}(:,1),real(ztes{i}(ind)),'.',data{i}(:,1),imag(ztes{i}(ind)),'.r'),hold on
     
     figure(h(1)),plot(1e3*ztes{i}(ind),'.','markerfacecolor','b','markersize',6),grid on,hold on;%%% Paso marker de 'o' a '.'
-    set(gca,'fontsize',12,'fontweight','bold');
+    set(gca,'linewidth',2,'fontsize',12,'fontweight','bold');
     xlabel('Re(mZ)','fontsize',12,'fontweight','bold');ylabel('Im(mZ)','fontsize',12,'fontweight','bold');%title('Ztes with fits (red)');
     figure(h(2)),semilogx(data{i}(ind,1),real(ztes{i}(ind)),'.',data{i}(ind,1),imag(ztes{i}(ind)),'.r'),hold on
 

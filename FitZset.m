@@ -35,7 +35,13 @@ if nargin==4
 
 elseif nargin==5
     t=varargin{1};
-    for i=1:length(t) dirs{i}=strcat(num2str(t(i)),'mK');end
+    for iii=1:length(t)
+        str=dir('*mK');
+        for jjj=1:length(str)
+            if strfind(str(jjj).name,num2str(t(iii))) & str(jjj).isdir, break;end%%%Para pintar automáticamente los ruido a una cierta temperatura.50mK.(tiene que funcionar con 50mK y 50.0mK, pero ojo con 50.2mK p.e.)
+        end
+        dirs{iii}=str(jjj).name;
+    end
 end
 
 dirs
@@ -83,7 +89,7 @@ for i=1:length(dirs)
     IV=IVset(Tind);
     
     %%%hacemos loop en cada fichero a analizar.
-
+    k=1;
     for jj=1:length(filesZ)
         thefile=strcat(d,'\',dirs{i},'\',filesZ{jj}); %%%quito '.txt' respecto a version anterior. 
         if ~isempty(filesNoise) thenoisefile=strcat(d,'\',dirs{i},'\',filesNoise{jj}); end%%%quito'.txt'
@@ -131,6 +137,32 @@ for i=1:length(dirs)
             resN=aux1;
             P(i).p(jj)=param;
             P(i).residuo(jj)=resN;
+        
+            
+            %%%%%%%%%%%%%%%%%%%%%%Pintamos Gráficas
+                boolShow=1;
+            if boolShow
+                ind=1:3:length(ztes);
+                %figure('name',strcat('Z',num2str(i)));
+                
+                if p(2)<0 && p(2)>-30*1e-3
+                    plot(1e3*ztes(ind),'.','markerfacecolor','b','markersize',6),grid on,hold on;%%% Paso marker de 'o' a '.'
+                    set(gca,'linewidth',2,'fontsize',12,'fontweight','bold');
+                    xlabel('Re(mZ)','fontsize',12,'fontweight','bold');
+                    ylabel('Im(mZ)','fontsize',12,'fontweight','bold');%title('Ztes with fits (red)');
+                    ylim([-20 6])
+                    fZ=fitZ(p,fS);plot(1e3*fZ(:,1),1e3*fZ(:,2),'r','linewidth',2);hold on
+                    if k==1 || jj==length(filesZ)
+                        aux_str=strcat(num2str(round(param.rp*100)),'% R_n');
+                        %annotation('textarrow',1e3*p(2)*[1 1],[5 0],aux_str,'fontweight','bold');
+                        text(p(2)*1e3,3,aux_str,'fontweight','bold');
+                    end
+                    k=k+1;
+                    %print(findobj('name',strcat('Z',num2str(i))),strcat('Z',num2str(i)),'-dpng','-r300')
+                    %close(findobj('name',strcat('Z',num2str(i))))
+                end
+            end
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
          %%%Analizamos el ruido
          if ~isempty(filesNoise)

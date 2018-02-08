@@ -31,16 +31,20 @@ function CompareIV_Z(IVset,P,Tbath)
     invZb_eff=1./Zb_eff;
     %ecY='(1-L0)./(bi+2*L0)'; %%%inverse beta_eff
     
-    subplot(1,2,1)
+    %%%Un poco de filtrado
+    indx11=find(xiv>0.15 &(xiv<0.8 & a_eff>0.5));
+    indx22=find(xz>0.15 &(xz<0.8 & Za_eff>0.5));
+    
+    subplot(2,1,1)
     %plot(xiv(indx1),a_eff(indx1),'.-',xz(indx2),Za_eff(indx2),'.-',xz(indx2),Za_effAprox(indx2),'.-','linewidth',2,'markersize',15);
-    plot(xiv(indx1),a_eff(indx1),'.-',xz(indx2),Za_eff(indx2),'.-','linewidth',2,'markersize',15);
-    grid on,xlim([0 1]),ylim([0 100]), ylabel('\alpha_{eff}','fontsize',12,'fontweight','bold')
+    plot(xiv(indx11),a_eff(indx11),'.-',xz(indx22),Za_eff(indx22),'.-','linewidth',2,'markersize',15);
+    grid on,xlim([0 1]),ylim([0 150]), ylabel('\alpha_{eff}','fontsize',12,'fontweight','bold')
     xlabel('%R_n','fontsize',12,'fontweight','bold')
     set(gca,'linewidth',2,'fontsize',12,'fontweight','bold')
     %legend('IV','Z','Z_{aprox}')
     legend('IV','Z')
     
-    subplot(1,2,2)
+    subplot(2,1,2)
     plot(xiv(indx1),b_eff(indx1),'.-',xz(indx2),Zb_eff(indx2),'.-','linewidth',2,'markersize',15)
     grid on,xlim([0 1]),ylim([-5 5]),ylabel('\beta_{eff}','fontsize',12,'fontweight','bold')
     xlabel('%R_n','fontsize',12,'fontweight','bold')
