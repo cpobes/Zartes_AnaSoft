@@ -2,7 +2,7 @@ function Gaux=fitPvsTset(IVTESset,perc)
 %funcion para ajustar automaticamente curvas P-Tbath a un valor o valores
 %de porcentaje de Rn. Ojo al uso de cells o arrays en IVset.
 
-model=3;
+model=1;
 
 %for i=1:length(IVTESset), Tbath(i)=IVTESset(i).Tbath;end
 
@@ -28,7 +28,7 @@ for jj=1:length(perc)
     %Tbath
     %Paux
     %Tbath=0.9932*Tbath+0.006171; %%Curva de calibración del termómetro Kelvinox al calibrado. Ver Tcal.m en medidas/TES.
-    plot(Tbath,Paux*1e12,'.'),hold on
+    plot(Tbath,Paux*1e12,'bo','markerfacecolor','b'),hold on
     
     if model==1
         X0=[-500 3 1];XDATA=Tbath;LB=[-Inf 2 0 ];%%%Uncomment for model1
@@ -46,17 +46,18 @@ for jj=1:length(perc)
         Gaux(jj).K=exp(fit2(1))/Gaux(jj).n;
         %figure(3),plot(log(auxtbath(2:end)),log(gbaux),'.-')
     end
-    %fit=lsqcurvefit(@fitP,X0,XDATA,Paux*1e12,LB);
-    %plot(Tbath,fitP(fit,XDATA),'-r')
+    fit=lsqcurvefit(@fitP,X0,XDATA,Paux*1e12,LB);
+    plot(Tbath,fitP(fit,XDATA),'-r','linewidth',1)
 %     fitaux.a=fit(1);
 %     fitaux.b=fit(2);
 %     fitaux.c=fit(3);
-    %Gaux(jj)=GetGfromFit(fit);%%antes se pasaba fitaux.
+    Gaux(jj)=GetGfromFit(fit);%%antes se pasaba fitaux.
 end
 for jj=1:length(perc) Gaux(jj).rp=perc(jj);end
 xlabel('T_{bath}(K)','fontsize',11,'fontweight','bold')
-ylabel('P_{tes}(pW)','fontsize',11,'fontweight','bold')
-title('P vs T fits','fontsize',11,'fontweight','bold')
+ylabel('P_{TES}(pW)','fontsize',11,'fontweight','bold')
+%title('P vs T fits','fontsize',11,'fontweight','bold')
+set(gca,'fontsize',12,'linewidth',2,'fontweight','bold')
 
 
 

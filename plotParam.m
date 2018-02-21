@@ -24,6 +24,6 @@ end
 
 %hold off,grid on
 grid on
-xlabel(xl,'fontsize',12);
-ylabel(yl,'fontsize',12);
-set(gca,'linewidth',2,'fontsize',12);
+xlabel(xl,'fontsize',12,'fontweight','bold');
+ylabel(yl,'fontsize',12,'fontweight','bold');
+set(gca,'linewidth',2,'fontsize',12,'fontweight','bold');

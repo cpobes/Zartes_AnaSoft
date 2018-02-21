@@ -125,8 +125,9 @@ if iscell(file)
         Ib=sscanf(file{i},'HP_noise_%fuA*')*1e-6 %%%HP_noise para ZTES18.!!!
         OP=setTESOPfromIb(Ib,IVstr,p,circuit)
         %%OP.Tbath=1.5*OP.Tbath;%%%effect of Tbath error.Despreciable.
-        nrows=4;
-        ncols=max(ceil(N/nrows),1);
+        [ncols,nrows]=SmartSplit(N);
+%         nrows=4;
+%         ncols=max(ceil(N/nrows),1);
         subplot(ceil(N/ncols),ncols,i);
         %hold off;%figure
         
@@ -206,9 +207,10 @@ if iscell(file)
         axis([1e1 1e5 1 1e4])
         %h=get(gca,'children')
         set(h(1),'linewidth',3);
-        set(gca,'fontsize',11);
+        set(gca,'fontsize',11,'fontweight','bold');
         set(gca,'linewidth',2)
         set(gca,'XMinorGrid','off','YMinorGrid','on','GridLineStyle','-')
+        set(gca,'xtick',[10 100 1000 1e4 1e5],'xticklabel',{'10' '10^2' '10^3' '10^4' '10^5'})
         title(strcat(num2str(round(OP.r0*100)),'%Rn'),'fontsize',12);
         OP.Z0,OP.Zinf%debug
         if abs(OP.Z0-OP.Zinf)<1.5e-3 set(get(findobj(gca,'type','axes'),'title'),'color','r');end

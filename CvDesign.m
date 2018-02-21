@@ -8,6 +8,13 @@ oro.Ef=5.53;oro.Tf=6.42e4;oro.TD=165;oro.densidad=19.32e6;oro.masa_molar=196.967
 oro.conductivity=5e-9;
 %%%Bismuto
 bismuto.Ef=9.9;bismuto.Tf=11.5e4;bismuto.TD=119;bismuto.densidad=9.7e6;bismuto.masa_molar=208.98;bismuto.att_length6K=2.091e-6;
+%%%valores tomados de: http://hyperphysics.phy-astr.gsu.edu/hbase/Tables/fermi.html
+%%% Esto da un valor para gamma de 356.6 microJ/molK^2 mientras que el
+%%% valor tabulado por Irwin es de 8uJ/molK^2. Esta diferencia hace que
+%%% según el cálculo de Irwin la contribución del Bi sea despreciable
+%%% mientras que según este cálculo sí sería apreciable. En cualquier caso
+%%% la contribución electronica domina la phononica.
+
 %%%COBRE
 cobre.Ef=7;cobre.Tf=8.16e4;cobre.TD=315;cobre.densidad=8.96e6;cobre.masa_molar=63.536;cobre.att_length6K=9.85e-6;
 %%%SILICIO
@@ -28,27 +35,32 @@ Si3N4.conductivity=0;
 %M=196.967; %masa molar en g/mol
 %cve=8.31*pi^2*(.5*(T/Tf))
 
-material=oro;%Si3N4;
+material=bismuto;%Si3N4;%oro
 Tf=material.Tf;TD=material.TD;d=material.densidad;M=material.masa_molar;L=material.att_length6K;
 %rho=material.conductivity;
 
-cv=8.31*pi^2*(.5*(T/Tf)+(12*pi^2/5)*(T/TD).^3); % J/K*mol
-
+cve=8.31*pi^2*(.5*(T/Tf))
+cvp=8.31*pi^2*((12*pi^2/5)*(T/TD).^3) % J/K*mol
+cv=cve+cvp;
 %definimos sensitivity as T/E (incremento de temperatura esperado para un
 %determinado depósito de energía). De Q=cv(g)*m*T=E -> S=1/cv(g)*M
 % m=d*A*h
 
 %geometria y parametros del TES.
 sizes=[50, 100, 150,200,250]*1e-6;
-sizes=120e-6;
+sizes=100e-6;%bismuto.
+%sizes=sqrt(100*140)*1e-6;
 A=sizes.^2; %area
-h=1.50e-6;   %altura.
+h=1.50e-6;   %altura.Au del 1Z10_45A
 h=340e-9;
+h=6e-6; %bismuto
 
 % sizes=[1]*1e-3%%%membrana
 % h=500e-9
 % A=sizes.^2; %area
-
+Cve=cve*d*A*h/M
+Cvp=cvp*d*A*h/M
+A*h*d/M
 Cv=cv*d*A*h/M;
 
 disp(Cv)

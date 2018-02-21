@@ -12,7 +12,7 @@ for i=1:length(IVmeasure)
         end
 
     plot(IVstruct.ttes,IVstruct.Rtes*1e3,'.-','DisplayName',strcat(num2str(1000*IVstruct.Tbath),'mK'));
-    xlabel('T_{tes}(K)','fontsize',12,'fontweight','bold');ylabel('R_{tes}(m\Omega)','fontsize',12,'fontweight','bold');grid on,hold on
+    xlabel('T_{TES}(K)','fontsize',12,'fontweight','bold');ylabel('R_{TES}(m\Omega)','fontsize',12,'fontweight','bold');grid on,hold on
     
     legend('-DynamicLegend')
     legend('off')%%%for report

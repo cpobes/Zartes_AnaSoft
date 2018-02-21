@@ -38,14 +38,14 @@ if nargin>2
     plot(rpaux,CN*1e15*ones(1,length(rpaux)),'-','color','r','linewidth',2)
     plot(rpaux,2.43*CN*1e15*ones(1,length(rpaux)),'-','color','k','linewidth',2)
 end
-xlabel('Rtes(%Rn)','fontsize',11,'fontweight','bold');ylabel('C(fJ/K)','fontsize',11,'fontweight','bold');
+xlabel('R_{TES}/R_n','fontsize',11,'fontweight','bold');ylabel('C(fJ/K)','fontsize',11,'fontweight','bold');
 set(gca,'fontsize',11,'fontweight','bold','linewidth',2)
 
 sht=subplot(2,2,2);
 [~,jj]=sort([P(i).p.rp]);
-ht(i)=semilogy([P(i).p(jj).rp],[P(i).p(jj).taueff],'.-','color',color,'linewidth',LW1,'markersize',MS),grid on,hold on
-ylim([1e-6 1e-2])
-xlabel('Rtes(%Rn)','fontsize',11,'fontweight','bold');ylabel('\tau_{eff}(s)','fontsize',11,'fontweight','bold');
+ht(i)=semilogy([P(i).p(jj).rp],[P(i).p(jj).taueff]*1e6,'.-','color',color,'linewidth',LW1,'markersize',MS),grid on,hold on
+ylim([1 1e4])
+xlabel('R_{TES}/R_n','fontsize',11,'fontweight','bold');ylabel('\tau_{eff}(\mus)','fontsize',11,'fontweight','bold');
 set(gca,'fontsize',11,'fontweight','bold','linewidth',2)
 
 sha=subplot(2,2,3);
@@ -56,7 +56,7 @@ mai=median(ai);
 indai=find(ai<3*mai & ai>0.3*mai);
 %ha(i)=plot([P(i).p(jj).rp],[P(i).p(jj).ai],'.-','color',color),grid on,hold on
 ha(i)=plot(rp(indai),ai(indai),'.-','color',color,'linewidth',LW1,'markersize',MS),grid on,hold on
-xlabel('Rtes(%Rn)','fontsize',11,'fontweight','bold');ylabel('\alpha_i','fontsize',11,'fontweight','bold');
+xlabel('R_{TES}/R_n','fontsize',11,'fontweight','bold');ylabel('\alpha_i','fontsize',11,'fontweight','bold');
 set(gca,'fontsize',11,'fontweight','bold','linewidth',2)
 
 shb=subplot(2,2,4);
@@ -64,7 +64,7 @@ shb=subplot(2,2,4);
 hb(i)=semilogy([P(i).p(jj).rp],[P(i).p(jj).bi],'.-','color',color,'linewidth',LW1,'markersize',MS),grid on,hold on
 semilogy(0.1:0.01:0.9,1./(0.1:0.01:0.9)-1,'r','linewidth',2)
 ylim([1e-2 1e1])
-xlabel('Rtes(%Rn)','fontsize',11,'fontweight','bold');ylabel('\beta_i','fontsize',11,'fontweight','bold');
+xlabel('R_{TES}/R_n','fontsize',11,'fontweight','bold');ylabel('\beta_i','fontsize',11,'fontweight','bold');
 set(gca,'fontsize',11,'fontweight','bold','linewidth',2)
 
 % [hc(i) ht(i) ha(i) hb(i)]

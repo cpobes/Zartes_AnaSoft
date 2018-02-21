@@ -38,7 +38,7 @@ function CompareIV_Z(IVset,P,Tbath)
     subplot(2,1,1)
     %plot(xiv(indx1),a_eff(indx1),'.-',xz(indx2),Za_eff(indx2),'.-',xz(indx2),Za_effAprox(indx2),'.-','linewidth',2,'markersize',15);
     plot(xiv(indx11),a_eff(indx11),'.-',xz(indx22),Za_eff(indx22),'.-','linewidth',2,'markersize',15);
-    grid on,xlim([0 1]),ylim([0 150]), ylabel('\alpha_{eff}','fontsize',12,'fontweight','bold')
+    grid on,xlim([0.2 0.95]),ylim([0 150]), ylabel('\alpha_{eff}','fontsize',12,'fontweight','bold')
     xlabel('%R_n','fontsize',12,'fontweight','bold')
     set(gca,'linewidth',2,'fontsize',12,'fontweight','bold')
     %legend('IV','Z','Z_{aprox}')
@@ -46,7 +46,7 @@ function CompareIV_Z(IVset,P,Tbath)
     
     subplot(2,1,2)
     plot(xiv(indx1),b_eff(indx1),'.-',xz(indx2),Zb_eff(indx2),'.-','linewidth',2,'markersize',15)
-    grid on,xlim([0 1]),ylim([-5 5]),ylabel('\beta_{eff}','fontsize',12,'fontweight','bold')
+    grid on,xlim([0.2 0.95]),ylim([-5 5]),ylabel('\beta_{eff}','fontsize',12,'fontweight','bold')
     xlabel('%R_n','fontsize',12,'fontweight','bold')
     set(gca,'linewidth',2,'fontsize',12,'fontweight','bold')
     legend('IV','Z')

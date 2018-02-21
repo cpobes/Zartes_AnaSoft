@@ -146,16 +146,17 @@ for i=1:length(dirs)
                 %figure('name',strcat('Z',num2str(i)));
                 
                 if p(2)<0 && p(2)>-30*1e-3
-                    plot(1e3*ztes(ind),'.','markerfacecolor','b','markersize',6),grid on,hold on;%%% Paso marker de 'o' a '.'
+                    plot(1e3*ztes(ind),'.','color',[0 0.447 0.741],'markerfacecolor',[0 0.447 0.741],'markersize',15),grid on,hold on;%%% Paso marker de 'o' a '.'
                     set(gca,'linewidth',2,'fontsize',12,'fontweight','bold');
                     xlabel('Re(mZ)','fontsize',12,'fontweight','bold');
                     ylabel('Im(mZ)','fontsize',12,'fontweight','bold');%title('Ztes with fits (red)');
-                    ylim([-20 6])
+                    ImZmin(jj)=min(imag(1e3*ztes));
+                    ylim([min(-15,min(ImZmin)-1) 1])
                     fZ=fitZ(p,fS);plot(1e3*fZ(:,1),1e3*fZ(:,2),'r','linewidth',2);hold on
                     if k==1 || jj==length(filesZ)
                         aux_str=strcat(num2str(round(param.rp*100)),'% R_n');
-                        %annotation('textarrow',1e3*p(2)*[1 1],[5 0],aux_str,'fontweight','bold');
-                        text(p(2)*1e3,3,aux_str,'fontweight','bold');
+                        %%%annotation('textarrow',1e3*p(2)*[1 1],[5 0],aux_str,'fontweight','bold');
+                        %text(p(2)*1e3,3,aux_str,'fontweight','bold');
                     end
                     k=k+1;
                     %print(findobj('name',strcat('Z',num2str(i))),strcat('Z',num2str(i)),'-dpng','-r300')
