@@ -9,10 +9,12 @@ else
 end
 
 f=dir(D);
+f=f(~[f.isdir]);
 %length(f)
+f.name
 for i=1:length(f)
-    str=regexp(f(i).name,'-?\d+.?\d+uA','match');
-    Ibs(i)=sscanf(char(str),'%fuA');
+    str=regexp(f(i).name,'-?\d+.?\d*uA','match')
+    Ibs(i)=sscanf(char(str),'%fuA')
 end
 
 [ii,jj]=sort(abs(Ibs),order);
