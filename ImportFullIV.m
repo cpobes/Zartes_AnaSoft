@@ -7,11 +7,13 @@ if nargin==0
 end
 
 %podemos pasar los ficheros a analizar como un cellarray.
-if nargin==1
+if nargin>0
     file=varargin{1};
     path=pwd;
     path=strcat(path,'\');
+    if nargin==2 circuit=varargin{2};end
 end
+
 T=strcat(path,file)
 if ~iscell(T)
     [ii,jj]=size(T);
@@ -35,3 +37,4 @@ for i=1:length(T)
     auxS.Tbath=sscanf(char(regexp(file{i},'\d+.?\d+mK*','match')),'%fmK')*1e-3; %%%ojo al %d o %0.1f
     IVset(i)=auxS;
 end
+if nargin==2 IVset=GetIVTES(circuit,IVset);end
