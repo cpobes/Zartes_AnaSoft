@@ -14,7 +14,7 @@ P0=OP.P0;
 T0=OP.T0;
 
 G=OP.G0;
-C=OP.C0;
+C=OP.C;
 ai=OP.ai;
 bi=OP.bi;
 L0=OP.L0;

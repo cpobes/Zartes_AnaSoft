@@ -8,19 +8,22 @@ raux=IV.rtes(ii);
 itaux=IV.ites(ii);
 vtaux=IV.vtes(ii);
 paux=IV.ptes(ii);
+if (isfield(IV,'ttes')) taux=IV.ttes(ii);end
 [m,i3]=min(diff(vaux)./diff(iaux));
 %[m,i3]=min(diff(IV.vout)./diff(IV.ibias));%%%Calculamos el índice del salto de estado N->S.
 
 OP.vout=ppval(spline(iaux(1:i3),vaux(1:i3)),Ib);
 OP.ibias=Ib;
 OP.Tbath=IV.Tbath;
-if nargin==4 Circuit=varargin{1};
+if nargin==4 
+    Circuit=varargin{1};
     IVstruct=GetIVTES(Circuit,OP);
     OP.r0=IVstruct.rtes;
     OP.V0=IVstruct.vtes;
     OP.I0=IVstruct.ites;
     OP.R0=IVstruct.Rtes;
     OP.P0=IVstruct.ptes;
+    %if (isfield(IVstruct,'ttes')) OP.T0=IVstruct.ttes;end
 else
     %OP.r0=ppval(spline(IV.ibias(ii(1:i3+1)),IV.rtes(ii(1:i3+1))),Ib);
     OP.r0=ppval(spline(iaux((1:i3)),raux((1:i3))),Ib);
@@ -31,6 +34,7 @@ else
     OP.R0=OP.V0/OP.I0;
     %OP.P0=ppval(spline(iaux,IV.ptes(ii)),Ib);
     OP.P0=ppval(spline(iaux(1:i3),paux(1:i3)),Ib);
+    if (isfield(IV,'ttes')) OP.T0=ppval(spline(iaux(1:i3),taux(1:i3)),Ib);end
 end
 
 
@@ -48,6 +52,8 @@ if length(p)>1
     if (isfield(p,'Mph'))
         OP.Mph=ppval(spline([p.rp],real([p.Mph])),OP.r0);
     end
+    %OP.G0=OP.P0*OP.ai./(OP.L0*OP.T0);
+    OP.G0=OP.C./OP.tau0;
 else
     OP.ai=p.ai;
     OP.bi=p.bi;
@@ -56,4 +62,6 @@ else
     OP.tau0=p.tau0;
     OP.Z0=p.Z0;
     OP.Zinf=p.Zinf;
+    %OP.G0=OP.P0*OP.ai./(OP.L0*OP.T0);
+    OP.G0=OP.C./OP.tau0;
 end
