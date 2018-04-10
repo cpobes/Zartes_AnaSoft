@@ -22,7 +22,8 @@ for jj=1:length(perc)
         %txt=strcat('P',num2str(100*perc(jj)));
         %exec=strcat(txt,'(i)=','ppval(spline(IVTESset{i}.rtes,IVTESset{i}.ptes),jj)')
         %evalin('caller',exec);
-        ind=find(IVTESset(i).rtes>0.25&IVTESset(i).rtes<0.85);%%%algunas IVs fallan.
+        %ind=find(IVTESset(i).rtes>0.25&IVTESset(i).rtes<0.85);%%%algunas IVs fallan.
+         ind=find(IVTESset(i).rtes>0.05&IVTESset(i).rtes<0.9);%%%algunas IVs fallan.
         if isempty(ind) continue;end
         Paux(end+1)=ppval(spline(IVTESset(i).rtes(ind),IVTESset(i).ptes(ind)),perc(jj));
         Iaux(end+1)=ppval(spline(IVTESset(i).rtes(ind),IVTESset(i).ites(ind)),perc(jj));%%%

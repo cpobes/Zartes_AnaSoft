@@ -243,16 +243,21 @@ if iscell(file)
         name=strcat('figs\Noise',num2str(Tbath),'mK');
         print(fi,name,'-dpng','-r0');
          
-        figure
-        %RESJ=sqrt(2*log(2)./trapz(f,1./medfilt1(totNEP,1).^2));%%%x=noisedata{1}(:,1);
-        RESJ=sqrt(2*log(2)./trapz(f,1./totNEP.^2))
-        %semilogx(f(1:end-1),((RESJ./totNEP(1:end-1)).^2/(2*log(2)).*diff(f))),hold on
-        semilogx(f(1:end-1),sqrt((2*log(2)./cumsum((1./totNEP(1:end-1).^2).*diff(f))))/1.609e-19),hold on
-        fx=noise{i}(:,1);
-        RESJ2=sqrt(2*log(2)./trapz(fx,1./NEP.^2))
-        %semilogx(fx(1:end-1),((RESJ2./NEP(1:end-1)).^2/(2*log(2)).*diff(fx)),'r')
-        semilogx(fx(1:end-1),sqrt((2*log(2)./cumsum(1./NEP(1:end-1).^2.*diff(fx))))/1.609e-19,'r') 
-        %semilogx(fx(1:end-1),((RESJ2./medfilt1(NEP(1:end-1),20)).^2/(2*log(2)).*diff(fx)),'k')
+        
+        %%%%Pruebas sobre la cotribución de cada frecuencia a la
+        %%%%Resolucion.
+        if strcmpi(tipo,'nep')
+            figure
+            %RESJ=sqrt(2*log(2)./trapz(f,1./medfilt1(totNEP,1).^2));%%%x=noisedata{1}(:,1);
+            RESJ=sqrt(2*log(2)./trapz(f,1./totNEP.^2))
+            %semilogx(f(1:end-1),((RESJ./totNEP(1:end-1)).^2/(2*log(2)).*diff(f))),hold on
+            semilogx(f(1:end-1),sqrt((2*log(2)./cumsum((1./totNEP(1:end-1).^2).*diff(f))))/1.609e-19),hold on
+            fx=noise{i}(:,1);
+            RESJ2=sqrt(2*log(2)./trapz(fx,1./NEP.^2))
+            %semilogx(fx(1:end-1),((RESJ2./NEP(1:end-1)).^2/(2*log(2)).*diff(fx)),'r')
+            semilogx(fx(1:end-1),sqrt((2*log(2)./cumsum(1./NEP(1:end-1).^2.*diff(fx))))/1.609e-19,'r')
+            %semilogx(fx(1:end-1),((RESJ2./medfilt1(NEP(1:end-1),20)).^2/(2*log(2)).*diff(fx)),'k')
+        end
     end
 else
     Ib=sscanf(file,'HP_noise_%duA*')*1e-6;

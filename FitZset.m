@@ -91,10 +91,12 @@ for i=1:length(dirs)
     %%%hacemos loop en cada fichero a analizar.
     k=1;
     for jj=1:length(filesZ)
-        thefile=strcat(d,'\',dirs{i},'\',filesZ{jj}); %%%quito '.txt' respecto a version anterior. 
+        %thefile=strcat(d,'\',dirs{i},'\',filesZ{jj}); %%%quito '.txt' respecto a version anterior. 
+        thefile=strcat(dirs{i},'\',filesZ{jj})
         if ~isempty(filesNoise) thenoisefile=strcat(d,'\',dirs{i},'\',filesNoise{jj}); end%%%quito'.txt'
         offset=0;%-9e-6;
-        Ib=sscanf(char(regexp(thefile,'-?\d+.?\d+uA','match')),'%fuA')*1e-6+offset
+        Ib=sscanf(char(regexp(thefile,'-?\d+.?\d+uA','match')),'%fuA')*1e-6
+        %pause(1)%%debug
         
         %%%importamos la TF
             data=importdata(thefile);%size(data)
