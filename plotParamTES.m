@@ -1,5 +1,7 @@
-function plotParam(P,xl,yl,varargin)
+function plotParamTES(P,xl,yl,varargin)
 %%%Función para pintar y formatear parámetros a partir de una estructura P.
+%%%% Pinta parametro x frente a y a todas las temperaturas para un TES
+%%%% dado.
 
 %xl='ai';
 %yl='M';
