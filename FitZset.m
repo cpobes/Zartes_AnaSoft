@@ -6,6 +6,7 @@ Rsh=circuit.Rsh;
 Rpar=circuit.Rpar;
 L=circuit.L;
 fS=TFS.f;
+Rn=TES.Rn;
 
 %%%si no pasamos files busca todos los directorios del tipo xxxmK
 if nargin==4
@@ -33,7 +34,7 @@ if nargin==4
     %for i=1:length(aux) dirs{i}=strcat(num2str(aux(i)),'mK'),end
     dirs=dirs(jj)
 
-elseif nargin==5
+elseif nargin>4
     t=varargin{1};
     for iii=1:length(t)
         str=dir('*mK');
@@ -44,6 +45,10 @@ elseif nargin==5
     end
 end
 
+if nargin==6
+    TFN=varargin{2};
+    tfsn=TFS.tf./TFN.tf;
+end
 dirs
 pause(1)
 
@@ -103,6 +108,9 @@ for i=1:length(dirs)
             tf=data(:,2)+1i*data(:,3);
             Rth=Rsh+Rpar+2*pi*L*data(:,1)*1i;
             ztes=(TFS.tf./tf-1).*Rth;
+            if nargin==6
+                ztes=(TFS.tf./tf-1).*Rn./(tfsn-1);
+            end
             
 %             Cp=100e-12;
 %             Zth=Rsh./(1+2*pi*Cp*data(:,1)*1i*Rsh)+Rpar+2*pi*L*data(:,1)*1i;
@@ -147,7 +155,7 @@ for i=1:length(dirs)
                 ind=1:3:length(ztes);
                 %figure('name',strcat('Z',num2str(i)));
                 
-                if p(2)<0 && p(2)>-30*1e-3
+                %if p(2)<0 && p(2)>-30*1e-3
                     plot(1e3*ztes(ind),'.','color',[0 0.447 0.741],'markerfacecolor',[0 0.447 0.741],'markersize',15),grid on,hold on;%%% Paso marker de 'o' a '.'
                     set(gca,'linewidth',2,'fontsize',12,'fontweight','bold');
                     xlabel('Re(mZ)','fontsize',12,'fontweight','bold');
@@ -163,7 +171,7 @@ for i=1:length(dirs)
                     k=k+1;
                     %print(findobj('name',strcat('Z',num2str(i))),strcat('Z',num2str(i)),'-dpng','-r300')
                     %close(findobj('name',strcat('Z',num2str(i))))
-                end
+                %end
             end
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             

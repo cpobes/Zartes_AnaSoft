@@ -20,7 +20,7 @@ for i=1:length(P),
     %y=eval(strcat('[','P(i).p.',yl,']'));
     x=GetPparam(P(i).p,xl);
     y=GetPparam(P(i).p,yl);
-    h=plot(x,y,'.r');hold on
+    h=plot(x,y,'.');hold on
     set(h,optname,optvalue);
 end
 
