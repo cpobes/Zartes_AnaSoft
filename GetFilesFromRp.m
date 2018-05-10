@@ -14,6 +14,7 @@ files=ls(strcat(str(i).name,'\HP_Noise*'));
 for i=1:ii
 Iaux(i)=sscanf(char(regexp(files(i,:),'\d+(\.\d*)?','match')),'%f');
 end
+
 Iaux;
 Ibs=BuildIbiasFromRp(IVset,Rp);
 

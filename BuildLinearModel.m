@@ -1,4 +1,4 @@
-function TF=BuildLinearModel(Circuit,OP)
+function [TF,p]=BuildLinearModel(Circuit,OP)
 %%%creamos un modelo matlab con las ecuaciones linealizadas de los TES.
 %%set1:G=1.7e-12;C=2.3e-15;I0=1e-6;L=400e-9;R0=80e-3;T0=.150;alfa=100;bi=0.96;
 
@@ -36,6 +36,17 @@ A(2,2)=1/tau_i;
 tauetc=sqrt(abs(A(1,2)*A(2,1)))^-1;
 %tau_el,tau_i,
 %sqrt(tau_el*tau_i),1/(1/tau_el+1/tau_i)
+
+%%%Parameters for time response:
+dA=det(A);
+trA=trace(A);
+i_inf=-A(2,2)/dA;
+splus=(trA+sqrt(trA^2-4*dA))/2;
+sminus=(trA-sqrt(trA^2-4*dA))/2;
+a0=trA-1/i_inf+splus;
+s_dif=splus-sminus;
+
+p=[i_inf a0/s_dif 1/splus 1/sminus];
 
 %%%system definition.%%% 3 equivalent methods.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
