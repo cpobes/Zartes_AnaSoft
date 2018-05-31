@@ -33,7 +33,8 @@ for i=indx%length(P),
     %ecX='Tb';
     
     x=eval(ecX);
-    ecY='ExRes./ThRes';%%%Ecuacion para la Y
+    %ecY='ExRes./ThRes';%%%Ecuacion para la Y
+    
     %ecY='abs(tau0)';
     %ecY='ai./L0-1';
     %ecY='ai./(1+bi)';%%alfa_eff_Aprox
@@ -52,6 +53,9 @@ for i=indx%length(P),
     %ecY='taueff';
     %ecY='ai.*(RL-rp*Rn).*(1-n.*L0./ai)./(L0.*(rp*Rn-RL)+RL+rp*Rn.*(1+bi))';%factor conversión Tbath->Ptes
     %ecY='ai.*(RL-rp*Rn).*((Tb/Tc).^n)./(L0.*(rp*Rn-RL)+RL+rp*Rn.*(1+bi))';%factor conversión Tbath->Ptes v2.sale distinto?
+    
+    ecY='sqrt((0.5*(1+(Tb./Tc).^(n+2))).^-1-1)*ones(1,length(rp))';%%%M factor for F=1?
+    ecY='sqrt(ExRes.^2-ThRes.^2)';
     y=eval(ecY);
     h=plot(x,y,'.-');hold on
     set(h,optname,optvalue);

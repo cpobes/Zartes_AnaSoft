@@ -188,7 +188,7 @@ if iscell(file)
                     if Mph==0
                         totNEP=auxnoise.NEP;
                     else
-                        totNEP=sqrt(auxnoise.max.^2+auxnoise.jo.^2+auxnoise.sh.^2)./auxnoise.sI;
+                        totNEP=sqrt(auxnoise.max.^2+auxnoise.jo.^2+auxnoise.sh.^2)./auxnoise.sI;%%%Ojo, estamos asumiendo Mph tal que F=1, no tiene porqué.
                     end
                 if ~boolcomponents
                     loglog(f,totNEP*1e18,'b');hold on;grid on;
@@ -204,12 +204,13 @@ if iscell(file)
             xlabel('\nu (Hz)','fontsize',12,'fontweight','bold')
             
             
-        axis([1e1 1e5 1 1e4])
+        axis([1e1 1e5 1 1e2])%% axis([1e1 1e5 1 1e4])
+
         %h=get(gca,'children')
         set(h(1),'linewidth',3);
         set(gca,'fontsize',11,'fontweight','bold');
         set(gca,'linewidth',2)
-        set(gca,'XMinorGrid','off','YMinorGrid','on','GridLineStyle','-')
+        set(gca,'XMinorGrid','off','YMinorGrid','off','GridLineStyle','-')
         set(gca,'xtick',[10 100 1000 1e4 1e5],'xticklabel',{'10' '10^2' '10^3' '10^4' '10^5'})
         title(strcat(num2str(round(OP.r0*100)),'%Rn'),'fontsize',12);
         OP.Z0,OP.Zinf%debug
@@ -246,7 +247,7 @@ if iscell(file)
         
         %%%%Pruebas sobre la cotribución de cada frecuencia a la
         %%%%Resolucion.
-        if strcmpi(tipo,'nep')
+        if strcmpi(tipo,'nep')&0
             figure
             %RESJ=sqrt(2*log(2)./trapz(f,1./medfilt1(totNEP,1).^2));%%%x=noisedata{1}(:,1);
             RESJ=sqrt(2*log(2)./trapz(f,1./totNEP.^2))

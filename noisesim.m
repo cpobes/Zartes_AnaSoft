@@ -115,6 +115,16 @@ smax=4*Kb*T0^2*G.*abs(sI).^2;
 sfaser=0;%21/(2*pi^2)*((6.626e-34)^2/(1.602e-19)^2)*(10e-9)*P0/R0^2/(2.25e-8)/(1.38e-23*T0);%%%eq22 faser
 sext=(18.5e-12*abs(sI)).^2;
 
+NEP_tfn=sqrt(stfn)./abs(sI);
+NEP_ssh=sqrt(ssh)./abs(sI);
+NEP_tes=sqrt(stes)./abs(sI);
+Res_tfn=2.35/sqrt(trapz(f,1./NEP_tfn.^2))/2/1.609e-19;
+Res_ssh=2.35/sqrt(trapz(f,1./NEP_ssh.^2))/2/1.609e-19;
+Res_tes=2.35/sqrt(trapz(f,1./NEP_tes.^2))/2/1.609e-19;
+Res_tfn_tes=2.35/sqrt(trapz(f,1./(NEP_tes.*NEP_tfn)))/2/1.609e-19;
+Res_tfn_ssh=2.35/sqrt(trapz(f,1./(NEP_ssh.*NEP_tfn)))/2/1.609e-19;
+Res_ssh_tes=2.35/sqrt(trapz(f,1./(NEP_tes.*NEP_ssh)))/2/1.609e-19;
+
 NEP=sqrt(stfn+ssh+stes)./abs(sI);
 Res=2.35/sqrt(trapz(f,1./NEP.^2))/2/1.609e-19;%resolución en eV. Tesis Wouter (2.37).
 
@@ -129,7 +139,10 @@ i_sh=sqrt(ssh);
 noise.f=f;
 noise.ph=i_ph;noise.jo=i_jo;noise.sh=i_sh;noise.sum=sqrt(stfn+stes+ssh);%noise.sum=i_ph+i_jo+i_sh;
 noise.sI=abs(sI);noise.NEP=NEP;noise.max=sqrt(smax);noise.Res=Res;%noise.tbath=i_temp;
+noise.Res_tfn=Res_tfn; noise.Res_ssh=Res_ssh; noise.Res_tes=Res_tes;
+noise.Res_tfn_tes=Res_tfn_tes;noise.Res_tfn_ssh=Res_tfn_ssh;noise.Res_ssh_tes=Res_ssh_tes;
 noise.squid=Nsquid;noise.squidarray=Nsquid*ones(1,length(f));
+
 else
     error('no valid model')
 end
