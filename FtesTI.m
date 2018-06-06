@@ -21,7 +21,7 @@ r=(ttes+ites.^(2/3)).^1; %i=(1-t)^(3/2) -> i^(2/3)+t=1 -> (i^(2/3)+t)^n=r.
 %Se puede hacer n=1.
 
 %%%available models:'power', 'erf', 'recta', 'ere', 'TFM', 'tanh'
-model='ere';%'erf';%'recta';
+model='BKT1';%'erf';%'recta';
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 global RTI %%%intento de crear modelo spline de la superficie.
@@ -125,6 +125,13 @@ elseif strcmp(model,'tanh')
     ftes=0.5*(1+tanh((ttes-1+ites.^(2/3))/delta));
     varargout{1}=sech(ttes-1+ites.^(2/3)).^2./(ftes).*ttes/delta;
     varargout{2}=sech(ttes-1+ites.^(2/3)).^2./(ftes).*(ites).^(2/3)/delta/1.5;
+    
+elseif strcmp(model,'BKT1')
+    b=2;t0=0.98;
+    lr=-b*sqrt((1-ttes)./(ttes-t0*(1-ites)));
+    ftes=exp(lr);
+    varargout{1}=(b/2)*(1-t0*(1-ites)).*ttes./((1-ttes).*(ttes-t0*(1-ites)));
+    varargout{2}=(b/2)*sqrt(1-ttes)*t0.*ites./(ttes-t0*(1-ites)).^1.5;
 end
 
 

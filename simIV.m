@@ -46,7 +46,7 @@ ttes=zeros(1,length(Ib));
 %out(2)=(((Ic*ites(1)).^2*Rn/K+Tb^n).^(1/n))/Tc;
  
 out(1)=K*(Tc^n-Tb^n)/(Ib(end)*Rsh*Rn/(Rsh+Rpar+Rn))/Ic;
-out(2)=1.2;
+out(2)=1.1;%%%1.2
 
 for i=length(Ib):-1:1
      y0up=[crs*ib(i) tb];%%%!!!ub<->tb.
@@ -88,11 +88,13 @@ Mq=invMf/invMin;%cociente de inductancias mutuas 66/22.
 
 Vout=Ites*Rf*Mq;%
 
+if(0)
 showIVsims(Ttes,Ites,Tb,Ib,TESparam,Circuitparam);
+end
 IV.ites=Ites;IV.ttes=Ttes;
 IV.Tbath=Tb;
 IVsim=BuildIVsimStruct(IV,TESparam);
-IVsim.Ibias=Ib;
+IVsim.ibias=Ib;
 IVsim.vout=Vout;
 
 
