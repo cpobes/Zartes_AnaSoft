@@ -27,6 +27,9 @@ function si0=plotnoiseFile(IVset,P,circuit,ZTES,varargin)
     option.boolcomponents=0;
     option.Mph=0;
     option.Mjo=0;
+
+    %NoiseBaseName='HP_noise';
+    NoiseBaseName='PXI_noise';
     
 if nargin==4
     [noise,file,path]=loadnoise();
@@ -57,7 +60,7 @@ if nargin==5
 %     D=dir(strcat(d,'\',wdir,'\HP*'));
 %     [~,s2]=sort([D(:).datenum]',1,'descend');
 %     filesNoise={D(s2).name}%%%ficheros en orden de %Rn!!!
-    filesNoise=ListInBiasOrder(strcat(wdir,'\HP*'),'ascend')
+    filesNoise=ListInBiasOrder(strcat(wdir,'\',NoiseBaseName,'*'),'ascend')
     [noise,file]=loadnoise(0,wdir,filesNoise);
     Tbath=sscanf(wdir,'%dmK');
     [~,Tind]=min(abs([IVset.Tbath]*1e3-Tbath));%%%En general Tbath de la IVsest tiene que ser exactamente la misma que la del directorio, pero en algun run he puesto el valor 'real'.(ZTES20)
@@ -75,7 +78,7 @@ if nargin==6
         %     [~,s2]=sort([D(:).datenum]',1,'descend');
         %     filesNoise={D(s2).name}%%%ficheros en orden de %Rn!!!
         %strcat(wdir,'\HP*')
-        filesNoise=ListInBiasOrder(strcat(wdir,'\HP*'),'ascend')
+        filesNoise=ListInBiasOrder(strcat(wdir,'\',NoiseBaseName,'*'),'ascend')
         [noise,file]=loadnoise(0,wdir,filesNoise);
         Tbath=sscanf(wdir,'%dmK');
         [~,Tind]=min(abs([IVset.Tbath]*1e3-Tbath));%%%En general Tbath de la IVsest tiene que ser exactamente la misma que la del directorio, pero en algun run he puesto el valor 'real'.(ZTES20)
@@ -115,14 +118,17 @@ boolcomponents=option.boolcomponents;%%%%para pintar o no las componentes
 Mph=option.Mph;
 Mjo=option.Mjo;
 
+figure
+
 if ~iscell(file) file={file};end
 if iscell(file)
     N=length(file)
     
     for i=1:N        
         i
-        
-        Ib=sscanf(file{i},'HP_noise_%fuA*')*1e-6 %%%HP_noise para ZTES18.!!!
+        file{i}
+        strcat(NoiseBaseName,'_%fuA*')
+        Ib=sscanf(file{i},strcat(NoiseBaseName,'_%fuA*'))*1e-6 %%%HP_noise para ZTES18.!!!
         OP=setTESOPfromIb(Ib,IVstr,p,circuit)
         %%OP.Tbath=1.5*OP.Tbath;%%%effect of Tbath error.Despreciable.
         [ncols,nrows]=SmartSplit(N);
@@ -204,7 +210,7 @@ if iscell(file)
             xlabel('\nu (Hz)','fontsize',12,'fontweight','bold')
             
             
-        axis([1e1 1e5 1 1e2])%% axis([1e1 1e5 1 1e4])
+        axis([1e1 1e5 2 1e3])%% axis([1e1 1e5 1 1e4])
 
         %h=get(gca,'children')
         set(h(1),'linewidth',3);
@@ -261,7 +267,8 @@ if iscell(file)
         end
     end
 else
-    Ib=sscanf(file,'HP_noise_%duA*')*1e-6;
+    
+    Ib=sscanf(file,strcat(NoiseBaseName,'_%duA*'))*1e-6;
     OP=setTESOPfromIb(Ib,IVstr,p);
 
     hold off;%figure

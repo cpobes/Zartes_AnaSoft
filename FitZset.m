@@ -67,7 +67,8 @@ for i=1:length(dirs)
 %     filesZ={D(s2).name}%%%ficheros en orden de %Rn!!!
     filesZ=ListInBiasOrder(D);
     %D=dir(strcat(d,'\',dirs{i},'\HP*'));
-    D=strcat(d,'\',dirs{i},'\HP*');
+    NoiseBaseName='\PXI*';%%%'\HP*'
+    D=strcat(d,'\',dirs{i},NoiseBaseName);
 %     [~,s2]=sort([D(:).datenum]',1,'descend');
 %     filesNoise={D(s2).name}%%%ficheros en orden de %Rn!!!
     filesNoise=dir(D);
@@ -185,7 +186,10 @@ for i=1:length(dirs)
             f=logspace(0,6,1000);
             sIaux=ppval(spline(f,noiseIrwin.sI),noisedata{1}(:,1));
             NEP=sqrt(V2I(noisedata{1}(:,2),circuit).^2-noiseIrwin.squid.^2)./sIaux;
-            RES=2.35/sqrt(trapz(noisedata{1}(:,1),1./medfilt1(NEP,20).^2))/2/1.609e-19;
+            %[~,nep_index]=find(~isnan(NEP))
+            %pause(2)
+            NEP=NEP(~isnan(NEP));%%%Los ruidos con la PXI tienen el ultimo bin en NAN.
+            RES=2.35/sqrt(trapz(noisedata{1}(1:end-1,1),1./medfilt1(NEP,20).^2))/2/1.609e-19
             P(i).ExRes(jj)=RES;
             P(i).ThRes(jj)=noiseIrwin.Res;
             
