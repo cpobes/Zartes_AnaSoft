@@ -10,15 +10,17 @@ function CompareIV_Z(IVset,P,Tbath)
     thr=1;%%%umbral en 1mK de diferencia entre la Tbath pasada y la Tbath más cercana de los datos.
     if (m1>=thr || m2>=thr) error('Tbath not in the measured data. \n Remember to pass Tbath as a number in mK');end
     
+    xiv_min=0.05;
     xiv=0.5*([IVstr.rtes(1:end-1)]+[IVstr.rtes(2:end)]);
-    indx1=find(xiv>0.15);
+    indx1=find(xiv>xiv_min);
     
     a_eff=diff(log(IVstr.Rtes))./diff(log([IVstr.ttes]));
     b_eff=diff(log(IVstr.Rtes))./diff(log([IVstr.ites]));
     invb_eff=diff(log(IVstr.ites))./diff(log([IVstr.Rtes]));
     
     xz=[p.rp];
-    indx2=find(xz>0.15);
+    xz_min=0.05
+    indx2=find(xz>xz_min);
     
     Za_effAprox=[p.ai]./(1+[p.bi]);
     %ecY='ai./(1+bi)';%%alfa_eff_Aprox
@@ -32,8 +34,8 @@ function CompareIV_Z(IVset,P,Tbath)
     %ecY='(1-L0)./(bi+2*L0)'; %%%inverse beta_eff
     
     %%%Un poco de filtrado
-    indx11=find(xiv>0.15 &(xiv<0.8 & a_eff>0.5));
-    indx22=find(xz>0.15 &(xz<0.8 & Za_eff>0.5));
+    indx11=find(xiv>xiv_min &(xiv<0.8 & a_eff>0.5));
+    indx22=find(xz>xz_min&(xz<0.8 & Za_eff>0.5));
     
     subplot(2,1,1)
     %plot(xiv(indx1),a_eff(indx1),'.-',xz(indx2),Za_eff(indx2),'.-',xz(indx2),Za_effAprox(indx2),'.-','linewidth',2,'markersize',15);
