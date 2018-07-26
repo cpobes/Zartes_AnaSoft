@@ -6,7 +6,7 @@ bdir=pwd;
 
 dir=ZTESDATA.datadir;
 cd(dir);
-ssn=ZTESDATA.sesion;
+ssn=ZTESDATA.session; %%%%!!!!Ojo, a la definición de 'sesion' o 'session'.
 aux=load(ssn,'TFS');
 
 

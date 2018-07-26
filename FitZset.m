@@ -34,6 +34,7 @@ if nargin==4
     %for i=1:length(aux) dirs{i}=strcat(num2str(aux(i)),'mK'),end
     dirs=dirs(jj)
 
+    %return;
 elseif nargin>4
     t=varargin{1};
     for iii=1:length(t)
@@ -66,8 +67,10 @@ for i=1:length(dirs)
 %     [~,s2]=sort([D(:).datenum]',1,'descend');
 %     filesZ={D(s2).name}%%%ficheros en orden de %Rn!!!
     filesZ=ListInBiasOrder(D);
+    
     %D=dir(strcat(d,'\',dirs{i},'\HP*'));
-    NoiseBaseName='\PXI*';%%%'\HP*'
+    NoiseBaseName='\HP_noise*';
+    %NoiseBaseName='\PXI_noise*';%%%'\PXI*';%%%'\HP*'
     D=strcat(d,'\',dirs{i},NoiseBaseName);
 %     [~,s2]=sort([D(:).datenum]',1,'descend');
 %     filesNoise={D(s2).name}%%%ficheros en orden de %Rn!!!
@@ -130,12 +133,16 @@ for i=1:length(dirs)
             d2=0.1;
             feff0=1e2;
             
+            %%%%condicion
+            %ind_z=find(imag(ztes)<-1.5e-3);
+            ind_z=1:length(ztes);
          %%%Hacemos el ajuste a Z(w)
             p0=[Zinf Z0 tau0];
             %p0=[Zinf Z0 tau0 1e-1 1e-6];%%%p0 for 2 block model.
             %p0=[Zinf Z0 tau0 tau1 tau2 d1 d2];%%%p0 for 3 block model.
             pinv0=[Zinf 1/Y0 tau0];
-            [p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,p0,fS,[real(ztes) imag(ztes)]);%%%uncomment for real parameters.
+            [p,aux1,aux2,aux3,out,aux4,auxJ]=lsqcurvefit(@fitZ,p0,fS(ind_z),[real(ztes(ind_z)) imag(ztes(ind_z))]);%%%uncomment for real parameters.
+            ci = nlparci(p,aux2,'jacobian',auxJ);
                 %[p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,pinv0,fS,[real(1./zt{i}) imag(1./zt{i})]);%%%uncomment for inverse Ztes fit.
             %[p,aux1,aux2,aux3,out]=lsqcurvefit(@fitReZ,p0,fS,[real(ztes)],[0 -Inf 0],[1 Inf 1]);%%%uncomment for real part only.
                 %[p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,p0,fS,zt{i});%%%uncommetn for complex parameters
@@ -147,8 +154,8 @@ for i=1:length(dirs)
             param=GetModelParameters(p,IV,Ib,TES,circuit);
             resN=aux1;
             P(i).p(jj)=param;
-            P(i).residuo(jj)=resN;
-        
+            P(i).residuo(jj).resN=resN;
+            P(i).residuo(jj).ci=ci;
             
             %%%%%%%%%%%%%%%%%%%%%%Pintamos Gráficas
                 boolShow=1;
@@ -183,13 +190,14 @@ for i=1:length(dirs)
             noiseIrwin=noisesim('irwin',TES,OP,circuit);
             %noiseIrwin.squid=3e-12;
             %size(noisedata),size(noiseIrwin.sum)
-            f=logspace(0,6,1000);
+            f=logspace(0,6,1000);%%%Ojo, la definición de 'f' debe coincidir con la que hay dentro de noisesim!!!
             sIaux=ppval(spline(f,noiseIrwin.sI),noisedata{1}(:,1));
             NEP=sqrt(V2I(noisedata{1}(:,2),circuit).^2-noiseIrwin.squid.^2)./sIaux;
             %[~,nep_index]=find(~isnan(NEP))
             %pause(2)
             NEP=NEP(~isnan(NEP));%%%Los ruidos con la PXI tienen el ultimo bin en NAN.
-            RES=2.35/sqrt(trapz(noisedata{1}(1:end-1,1),1./medfilt1(NEP,20).^2))/2/1.609e-19
+            
+            RES=2.35/sqrt(trapz(noisedata{1}(1:length(NEP),1),1./medfilt1(NEP,20).^2))/2/1.609e-19
             P(i).ExRes(jj)=RES;
             P(i).ThRes(jj)=noiseIrwin.Res;
             

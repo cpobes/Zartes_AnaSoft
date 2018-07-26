@@ -13,7 +13,7 @@ if nargin>1
     file=varargin{3};
     %iscell(file)
 else
-    [file,path]=uigetfile('HP_*','*','Multiselect','on');
+    [file,path]=uigetfile('*noise*','*','Multiselect','on');%%%HP_noise*
     %%%C:\Users\Carlos\Desktop\ATHENA\medidas\TES\2016\*
     %iscell(file)
 end

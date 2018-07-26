@@ -13,7 +13,8 @@ elseif nargin==3
     rhoAs=[0.107 0.0983]; %valores de Rho/A para Mo y Au
     %sides=[200 150 100]*1e-6 %lados de los TES
     sides=TES.sides;%sides=100e-6;
-    hMo=55e-9; hAu=340e-9; %hAu=1.5e-6;
+    %hMo=55e-9; hAu=340e-9; %hAu=1.5e-6;
+    hMo=45e-9; hAu=270e-9; %hAu=1.5e-6;%%%1Z11.
     %CN=(gammas.*rhoAs)*([hMo ;hAu]*sides.^2).*TES.Tc; %%%Calculo directo
     CN=(gammas.*rhoAs).*([hMo hAu]*sides.^2).*TES.Tc %%%calculo de cada contribucion por separado.
     CN=sum(CN)

@@ -27,9 +27,10 @@ function si0=plotnoiseFile(IVset,P,circuit,ZTES,varargin)
     option.boolcomponents=0;
     option.Mph=0;
     option.Mjo=0;
+    option.NoiseBaseName='HP_noise';
 
-    %NoiseBaseName='HP_noise';
-    NoiseBaseName='PXI_noise';
+    NoiseBaseName=option.NoiseBaseName;%%%%Añadimos campo a option para elegir si pintar ruidos del HP o de la PXI.
+    %NoiseBaseName='PXI_noise';
     
 if nargin==4
     [noise,file,path]=loadnoise();
@@ -43,7 +44,7 @@ if nargin==4
     p=P(Tind).p;
 end
 if nargin==5
-    if isstruct(varargin{1})
+    if isstruct(varargin{1}) %%%si el primer parametro extra es estrtuctura, se interpreta como la 'option'.
         option=varargin{1};
             [noise,file,path]=loadnoise();
             %%%buscamos la IV y P correspondientes a la Tbath dada
@@ -54,7 +55,7 @@ if nargin==5
             IVstr=IVset(Tind);
             [~,Tind]=min(abs([P.Tbath]*1e3-Tbath));
             p=P(Tind).p;
-    else
+    else  %%%% si no es estructura, se interpreta como el directorio a analizar.
     wdir=varargin{1};
     d=pwd;
 %     D=dir(strcat(d,'\',wdir,'\HP*'));
@@ -70,7 +71,7 @@ if nargin==5
     end
 end
 if nargin==6     
-    if isstruct(varargin{2})
+    if isstruct(varargin{2})%%%%Si hay dos parámetros extra el primero es el wdir, y el segundo si es estructura es la 'option' y si no, son los files a pintar.
         option=varargin{2};
         wdir=varargin{1};
         d=pwd;
@@ -96,7 +97,7 @@ if nargin==6
     p=P(Tind).p;
     end
 end 
-if nargin==7
+if nargin==7 %%%%Se puede pasar también tanto el directorio, como los ficheros, como la option, en ese orden.
     wdir=varargin{1};
     wfiles=varargin{2};
     option=varargin{3};
@@ -117,6 +118,8 @@ tipo=option.tipo;
 boolcomponents=option.boolcomponents;%%%%para pintar o no las componentes
 Mph=option.Mph;
 Mjo=option.Mjo;
+NoiseBaseName=regexp(option.NoiseBaseName,'(PXI|HP)_noise','match');%%%%%!!!!!El patrón en option es: '\(PXI|HP)_noise*', pero para sacar el Ibias se necesita '(PXI|HP)_noise' !!!! 
+NoiseBaseName=NoiseBaseName{1};%%%%convert cell 2 string.
 
 figure
 

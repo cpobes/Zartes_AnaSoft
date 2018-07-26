@@ -6,12 +6,19 @@ function PlotParamListTES(param,varargin)
 %%%%Se puede introducir un segundo parámetro y operar con el. Para ello
 %%%%basta comentar la línea y2=1;
 
-
-if nargin==2
-    list=varargin{1};
-else
+Tbase=[];
+list={};
+if nargin>1
+    for i=1:nargin-1
+        if iscell(varargin{i}) list=varargin{i};end
+        if isnumeric(varargin{i}) Tbase=varargin{i};end
+    end
+    if isempty(list) list=evalin('base','who(''ZTES*'')');end
+    if isempty(Tbase) Tbase=0.05;end
+else 
 %evalin('base','tes_list=who(''ZTES*'')')
-list=evalin('base','who(''ZTES*'')')
+list=evalin('base','who(''ZTES*'')');
+Tbase=0.05;
 %list=who('ZTES*');
 end
 
@@ -30,7 +37,7 @@ end
 
 %%%Finalmente implementación para poner automáticamente el índice
 %%%correspondiente a una Tbase dada.
-Tbase=0.05;
+
 for i=1:length(list)
     Ts=evalin('base',strcat('[',list{i},'.P.Tbath]'))
     find(Ts==Tbase);
@@ -50,6 +57,15 @@ listb={};
 Rp=0.4;%0.375
 
 for i=1:length(list)
+    
+    %%%%Definición de residuo del fit para filtrar datos.
+    if evalin('base',strcat('isstruct(',list{i},'.P(',num2str(ind(i)),').residuo)')) 
+        residuo=evalin('base',strcat('[',list{i},'.P(',num2str(ind(i)),').residuo.resN]'));
+    else
+        residuo=evalin('base',strcat('[',list{i},'.P(',num2str(ind(i)),').residuo]'));
+    end
+    resTHR=0.001;
+    resTHR=1;
     
     if strcmp(param,'RT')
         if evalin('base',strcat('isfield(',list{i},',''RT'')'))
@@ -88,7 +104,10 @@ if ~strcmp(param,'G') && ~strcmp(param,'n') && ~strcmp(param,'RT')
     y_str=strcat('[',list{i},'.P(',num2str(ind(i)),').p.',param,']');
     y=evalin('base',y_str);
 end
-listb{end+1}=list{i}
+
+%listb{end+1}=list{i}
+listb=list;
+
 % y2_str=strcat('[',list{i},'.P(ind(',num2str(i),')).p.',param2,']');
 % y2=eval(y2_str);
 %y2=1;
@@ -106,15 +125,15 @@ listb{end+1}=list{i}
 % %M=4;
 
     %%%%%%%%%%%%%%%%%%%%%%%Para pintar en función de Tbath
-%    TbathArray=evalin('base',strcat('[',list{i},'.P.Tbath]'))
-%     yT=[];yT2=[];
-%     for j=1:length(TbathArray)
-%         xaux=evalin('base',strcat('[',list{i},'.P(',num2str(j),').p.rp]'));
-%         yaux=evalin('base',strcat('[',list{i},'.P(',num2str(j),').p.',param,']'));
-%         %yaux2=eval(strcat('[',list{i},'.P(',num2str(j),').p.',param2,']'));
-%         yT(j)=spline(xaux,yaux,Rp);
-%         %yT2(j)=spline(xaux,yaux2,Rp);
-%     end
+   TbathArray=evalin('base',strcat('[',list{i},'.P.Tbath]'))
+    yT=[];yT2=[];
+    for j=1:length(TbathArray)
+        xaux=evalin('base',strcat('[',list{i},'.P(',num2str(j),').p.rp]'));
+        yaux=evalin('base',strcat('[',list{i},'.P(',num2str(j),').p.',param,']'));
+        %yaux2=eval(strcat('[',list{i},'.P(',num2str(j),').p.',param2,']'));
+        yT(j)=spline(xaux,yaux,Rp);
+        %yT2(j)=spline(xaux,yaux2,Rp);
+    end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 [ii,jj]=sort(x);
 %%ff=y(jj).*(2.5e-3+y2(jj));%%%Llimite.Irwin book ec(53).
@@ -122,11 +141,13 @@ listb{end+1}=list{i}
 %ff=y./y2;
 
 %x_plot=x2;
+%x_plot=TbathArray
+%y_plot=yT
 x_plot=x;
 y_plot=y;
 ymin=0.3*median(y_plot);
 y_range='auto';
-x_range=[0.15 0.9];
+x_range=[0.1 0.9];
 x_label='R_{TES}/R_n';
 
 switch param
@@ -172,6 +193,7 @@ switch param
         label=param;
 end
 indplot=find(y_plot<3*median(y_plot) & y_plot>ymin);%%%Para filtrar
+if length(x_plot)==length(residuo) indplot=find(residuo<resTHR);end
 indplot=1:length(y_plot);%%%Para no filtrar
 
 %y_plot=ones(1,length(x_plot))*K*Tc^n;%3*yg/100;

@@ -11,6 +11,7 @@ end
 
 %for i=1:length(IVTESset), Tbath(i)=IVTESset(i).Tbath;end
 
+hold off;
 
 for jj=1:length(perc)
     Paux=[];
