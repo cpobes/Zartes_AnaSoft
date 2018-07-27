@@ -63,7 +63,7 @@ for i=1:length(dirs)
 %%%info. Creo ListInBiasOrder para que se listen siempre en orden de
 %%%corriente.
     %D=dir(strcat(d,'\',dirs{i},'\TF*'));
-    D=strcat(d,'\',dirs{i},'\TF*');
+    D=strcat(d,'\',dirs{i},'\TF*')
 %     [~,s2]=sort([D(:).datenum]',1,'descend');
 %     filesZ={D(s2).name}%%%ficheros en orden de %Rn!!!
     filesZ=ListInBiasOrder(D);
@@ -135,7 +135,8 @@ for i=1:length(dirs)
             
             %%%%condicion
             %ind_z=find(imag(ztes)<-1.5e-3);
-            ind_z=1:length(ztes);
+            ind_z=find(fS<0.5e4);%%%%filtro en frecuencias
+            %ind_z=1:length(ztes);
          %%%Hacemos el ajuste a Z(w)
             p0=[Zinf Z0 tau0];
             %p0=[Zinf Z0 tau0 1e-1 1e-6];%%%p0 for 2 block model.

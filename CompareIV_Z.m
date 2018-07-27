@@ -15,11 +15,12 @@ function CompareIV_Z(IVset,P,Tbath)
     indx1=find(xiv>xiv_min);
     
     a_eff=diff(log(IVstr.Rtes))./diff(log([IVstr.ttes]));
+    a_eff=diff(log(medfilt1(IVstr.Rtes,20)))./diff(log([IVstr.ttes]));
     b_eff=diff(log(IVstr.Rtes))./diff(log([IVstr.ites]));
     invb_eff=diff(log(IVstr.ites))./diff(log([IVstr.Rtes]));
     
     xz=[p.rp];
-    xz_min=0.05
+    xz_min=0.05;
     indx2=find(xz>xz_min);
     
     Za_effAprox=[p.ai]./(1+[p.bi]);
@@ -34,13 +35,13 @@ function CompareIV_Z(IVset,P,Tbath)
     %ecY='(1-L0)./(bi+2*L0)'; %%%inverse beta_eff
     
     %%%Un poco de filtrado
-    indx11=find(xiv>xiv_min &(xiv<0.8 & a_eff>0.5));
-    indx22=find(xz>xz_min&(xz<0.8 & Za_eff>0.5));
+    indx11=find(xiv>xiv_min & 1); %%%(xiv<0.8 & a_eff>0.5)
+    indx22=find(xz>xz_min & 1); %%%(xz<0.8 & Za_eff>0.5)
     
     subplot(2,1,1)
     %plot(xiv(indx1),a_eff(indx1),'.-',xz(indx2),Za_eff(indx2),'.-',xz(indx2),Za_effAprox(indx2),'.-','linewidth',2,'markersize',15);
     plot(xiv(indx11),a_eff(indx11),'.-',xz(indx22),Za_eff(indx22),'.-','linewidth',2,'markersize',15);
-    grid on,xlim([0.2 0.95]),ylim([0 150]), ylabel('\alpha_{eff}','fontsize',12,'fontweight','bold')
+    grid on,xlim([xiv_min 0.95]),ylim([0 150]), ylabel('\alpha_{eff}','fontsize',12,'fontweight','bold')
     xlabel('R_{TES}/R_n','fontsize',12,'fontweight','bold')
     set(gca,'linewidth',2,'fontsize',12,'fontweight','bold')
     %legend('IV','Z','Z_{aprox}')
@@ -48,7 +49,7 @@ function CompareIV_Z(IVset,P,Tbath)
     
     subplot(2,1,2)
     plot(xiv(indx1),b_eff(indx1),'.-',xz(indx2),Zb_eff(indx2),'.-','linewidth',2,'markersize',15)
-    grid on,xlim([0.2 0.95]),ylim([-5 5]),ylabel('\beta_{eff}','fontsize',12,'fontweight','bold')
+    grid on,xlim([xiv_min 0.95]),ylim([-5 5]),ylabel('\beta_{eff}','fontsize',12,'fontweight','bold')
     xlabel('R_{TES}/R_n','fontsize',12,'fontweight','bold')
     set(gca,'linewidth',2,'fontsize',12,'fontweight','bold')
     legend('IV','Z')

@@ -48,7 +48,7 @@ if strcmp(yl,'zinf')
     return;
 end
 
-resTHR=0.1;
+resTHR=Inf;
 
 for i=1:length(P),
     %x=eval(strcat('[','P(i).p.',xl,']'));
