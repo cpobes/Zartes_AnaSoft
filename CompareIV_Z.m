@@ -15,7 +15,7 @@ function CompareIV_Z(IVset,P,Tbath)
     indx1=find(xiv>xiv_min);
     
     a_eff=diff(log(IVstr.Rtes))./diff(log([IVstr.ttes]));
-    a_eff=diff(log(medfilt1(IVstr.Rtes,20)))./diff(log([IVstr.ttes]));
+    a_eff=diff(log(medfilt1([IVstr.Rtes],200)))./diff(log(medfilt1([IVstr.ttes],200)));
     b_eff=diff(log(IVstr.Rtes))./diff(log([IVstr.ites]));
     invb_eff=diff(log(IVstr.ites))./diff(log([IVstr.Rtes]));
     
