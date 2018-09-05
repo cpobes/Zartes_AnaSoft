@@ -64,8 +64,8 @@ for i=1:length(list)
     else
         residuo=evalin('base',strcat('[',list{i},'.P(',num2str(ind(i)),').residuo]'));
     end
-    resTHR=0.001;
-    resTHR=1;
+    resTHR=0.01;%%0.001
+    %resTHR=1;
     
     if strcmp(param,'RT')
         if evalin('base',strcat('isfield(',list{i},',''RT'')'))
@@ -194,7 +194,7 @@ switch param
 end
 indplot=find(y_plot<3*median(y_plot) & y_plot>ymin);%%%Para filtrar
 if length(x_plot)==length(residuo) indplot=find(residuo<resTHR);end
-indplot=1:length(y_plot);%%%Para no filtrar
+%indplot=1:length(y_plot);%%%Para no filtrar
 
 %y_plot=ones(1,length(x_plot))*K*Tc^n;%3*yg/100;
 %plot(x_plot(ind),y_plot(ind),opt{i-1},'linewidth',2),hold on

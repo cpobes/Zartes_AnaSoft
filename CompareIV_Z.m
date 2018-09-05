@@ -15,7 +15,7 @@ function CompareIV_Z(IVset,P,Tbath)
     indx1=find(xiv>xiv_min);
     
     a_eff=diff(log(IVstr.Rtes))./diff(log([IVstr.ttes]));
-    a_eff=diff(log(medfilt1([IVstr.Rtes],200)))./diff(log(medfilt1([IVstr.ttes],200)));
+    %a_eff=diff(log(medfilt1([IVstr.Rtes],200)))./diff(log(medfilt1([IVstr.ttes],200)));
     b_eff=diff(log(IVstr.Rtes))./diff(log([IVstr.ites]));
     invb_eff=diff(log(IVstr.ites))./diff(log([IVstr.Rtes]));
     
@@ -37,6 +37,7 @@ function CompareIV_Z(IVset,P,Tbath)
     %%%Un poco de filtrado
     indx11=find(xiv>xiv_min & 1); %%%(xiv<0.8 & a_eff>0.5)
     indx22=find(xz>xz_min & 1); %%%(xz<0.8 & Za_eff>0.5)
+    
     
     subplot(2,1,1)
     %plot(xiv(indx1),a_eff(indx1),'.-',xz(indx2),Za_eff(indx2),'.-',xz(indx2),Za_effAprox(indx2),'.-','linewidth',2,'markersize',15);

@@ -57,7 +57,20 @@ if(length(p)==3)
         param.C=param.tau0*G0;        
         param.Zinf=rp(1);
         param.Z0=rp(2);
-        
+        %%%%fixed C=1.2pJ/K.
+        if (1)
+            %C=1.2e-12;%%%%1.2e-12
+            C=0.75e-12;
+            param.rp=R0/Rn;            
+            param.Zinf=rp(1);
+            param.Z0=rp(2);
+            param.taueff=rp(3);
+            param.tau0=C/G0;
+            param.L0=C/(G0*param.taueff)-1;%%%OJO AL SIGNO
+            param.ai=param.L0*G0*T0/P0;
+            param.bi=(rp(1)/R0)-1;
+            param.C=C;
+        end
     elseif(length(p)==5)
         %derived parameters for 2 block model case A
         param.rp=R0/Rn;

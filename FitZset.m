@@ -137,6 +137,7 @@ for i=1:length(dirs)
             %ind_z=find(imag(ztes)<-1.5e-3);
             ind_z=find(fS<0.5e4);%%%%filtro en frecuencias
             %ind_z=1:length(ztes);
+            
          %%%Hacemos el ajuste a Z(w)
             p0=[Zinf Z0 tau0];
             %p0=[Zinf Z0 tau0 1e-1 1e-6];%%%p0 for 2 block model.
@@ -161,6 +162,7 @@ for i=1:length(dirs)
             %%%%%%%%%%%%%%%%%%%%%%Pintamos Gráficas
                 boolShow=1;
             if boolShow
+                %if param.rp> 0.5 continue;end %%%%ojo!!!
                 ind=1:3:length(ztes);
                 %figure('name',strcat('Z',num2str(i)));
                 
@@ -223,6 +225,10 @@ for i=1:length(dirs)
                 ymod=median(ppval(spline(f,noiseIrwin.NEP*1e18),noisedata{1}(findx,1)));
                 P(i).Mph(jj)=sqrt(ydata/ymod-1);
             end
+            
+            %%%debug.
+            noiseIrwin=noisesim('irwin',TES,OP,circuit,P(i).M(jj));%%%recalculo el ThRes.
+            P(i).ThRes(jj)=noiseIrwin.Res;%%%Resolucion teorica con el Mjo incluido.
             
 %             %%%funciona igual fitnoise y fitjohnson.
 %             %parameters.OP=OP;parameters.circuit=circuit;parameters.TES=TES;          
