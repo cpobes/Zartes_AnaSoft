@@ -48,7 +48,7 @@ for i=1:length(IVmeasure)
     end
     IVstruct(i).ptes=ptes;
     
-    if isfield(IVmeasure,'good') IVstruct(i).good=IVmeasure(i).good; end %%%%Para no machacarlo si ya existe.
+    if isfield(IVmeasure,'good') IVstruct(i).good=IVmeasure(i).good; else IVstruct(i).good=1; end %%%%Para no machacarlo si ya existe. y si no, lo creo.
     
     IVstruct(i).Tbath=Tbath;
 end

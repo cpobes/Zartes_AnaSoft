@@ -56,7 +56,8 @@ sha=subplot(2,2,3);
 ai=abs([P(i).p(jj).ai]);
 %%%Filtrado para visualización
 mai=median(ai);
-indai=find(ai<3*mai & ai>0.3*mai);
+%indai=find(ai<3*mai & ai>0.3*mai);
+indai=1:length(ai);
 %ha(i)=plot([P(i).p(jj).rp],[P(i).p(jj).ai],'.-','color',color),grid on,hold on
 ha(i)=plot(rp(indai),ai(indai),'.-','color',colors,'linewidth',LW1,'markersize',MS),grid on,hold on
 xlabel('R_{TES}/R_n','fontsize',11,'fontweight','bold');ylabel('\alpha_i','fontsize',11,'fontweight','bold');
