@@ -14,7 +14,7 @@ hBi=6e-6;
 sides^2*hBi*rhoAs(3)
 if length(hAu)==1 hAu=hAu*ones(1,length(TES.Tc));end
 for i=1:length(hAu)    
-    (gammas.*rhoAs).*(([hMo ;hAu(i);hBi]*sides.^2)').*TES.Tc %%%show each
+    %(gammas.*rhoAs).*(([hMo ;hAu(i);hBi]*sides.^2)').*TES.Tc %%%show each
     %contribution.
 CN(i)=(gammas.*rhoAs)*([hMo ;hAu(i);hBi]*sides.^2).*TES.Tc(i)
 %[hAu(i)*1e9 TES.Tc(i) CN(i)*1e15]

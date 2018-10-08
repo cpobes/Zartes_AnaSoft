@@ -28,7 +28,7 @@ C=CthCalc(par);
 n=par.n;%3.2;
 M=0;
 
-Ts=0.5*Tc;
+Ts=0.7*Tc;
 if isfield(par,'Tbath') Ts=par.Tbath;end
 
 t=Ts./Tc;
