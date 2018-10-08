@@ -60,7 +60,8 @@ if(length(p)==3)
         %%%%fixed C=1.2pJ/K.
         if (1)
             %C=1.2e-12;%%%%1.2e-12
-            C=0.75e-12;
+            %C=0.75e-12;
+            C=10e-15;%2Z4_65.
             param.rp=R0/Rn;            
             param.Zinf=rp(1);
             param.Z0=rp(2);
