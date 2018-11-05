@@ -60,6 +60,11 @@ for i=1:length(P),
         ind=find([P(i).residuo]<resTHR);
     end
     
+    %%%condicion extra
+    %rr=[0.14 0.2];%%%rango 
+    rr=[0 1];
+    ind=find([P(i).p.rp]>rr(1)&[P(i).p.rp]<rr(2));
+    
     x=GetPparam(P(i).p,xl);
     y=GetPparam(P(i).p,yl);
 %    ind=1:length(x);

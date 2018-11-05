@@ -15,7 +15,7 @@ if sum(~cellfun('isempty',strfind(who,'GsetN')))
     datastruct.GsetN=evalin('base','GsetN');
 end
 datastruct.P=evalin('base','P');
-if sum(~cellfun('isempty',strfind(who,'PN')))
+if sum(~cellfun('isempty',strfind(who,'PN ')))
     datastruct.PN=evalin('base','PN');
 end
 datastruct.datadir=pwd;

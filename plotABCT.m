@@ -32,8 +32,8 @@ C=abs([P(i).p(jj).C])*1e15;
 mC=median(C);
 indC=find(C<3*mC & C>0.3*mC);
 
-MS=10;
-LW1=1;
+MS=10;%MarkerSize
+LW1=1;%Linewidth
 
 %hc(i)=plot([P(i).p(jj).rp],abs([P(i).p(jj).C])*1e15,'.-','color',color),grid on,hold on
 hc(i)=plot(rp(indC),C(indC),'.-','color',colors,'linewidth',LW1,'markersize',MS),grid on,hold on

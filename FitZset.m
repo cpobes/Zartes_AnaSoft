@@ -63,7 +63,8 @@ for i=1:length(dirs)
 %%%info. Creo ListInBiasOrder para que se listen siempre en orden de
 %%%corriente.
     %D=dir(strcat(d,'\',dirs{i},'\TF*'));
-    D=strcat(d,'\',dirs{i},'\PXI_TF*')
+    D=strcat(d,'\',dirs{i},'\TF*')
+    %D=strcat(d,'\',dirs{i},'\PXI_TF*')
 %     [~,s2]=sort([D(:).datenum]',1,'descend');
 %     filesZ={D(s2).name}%%%ficheros en orden de %Rn!!!
     filesZ=ListInBiasOrder(D);
@@ -141,10 +142,10 @@ for i=1:length(dirs)
             ind_z=1:length(ztes);
             
          %%%Hacemos el ajuste a Z(w)
-            p0=[Zinf Z0 tau0];
-            %p0=[Zinf Z0 tau0 1e-1 1e-6];%%%p0 for 2 block model.
+            %p0=[Zinf Z0 tau0];
+            p0=[Zinf Z0 tau0 1e-1 1e-6];%%%p0 for 2 block model.
             %p0=[Zinf Z0 tau0 tau1 tau2 d1 d2];%%%p0 for 3 block model.
-            pinv0=[Zinf 1/Y0 tau0];
+            %pinv0=[Zinf 1/Y0 tau0];
             [p,aux1,aux2,aux3,out,aux4,auxJ]=lsqcurvefit(@fitZ,p0,fS(ind_z),[real(ztes(ind_z)) imag(ztes(ind_z))]);%%%uncomment for real parameters.
             ci = nlparci(p,aux2,'jacobian',auxJ);
                 %[p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,pinv0,fS,[real(1./zt{i}) imag(1./zt{i})]);%%%uncomment for inverse Ztes fit.

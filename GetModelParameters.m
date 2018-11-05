@@ -61,7 +61,8 @@ if(length(p)==3)
         if (1)
             %C=1.2e-12;%%%%1.2e-12
             %C=0.75e-12;
-            C=10e-15;%2Z4_65.
+            C=6.7e-15;%2Z4_64.
+            %C=15e-15;%%%1Z11_46A
             param.rp=R0/Rn;            
             param.Zinf=rp(1);
             param.Z0=rp(2);

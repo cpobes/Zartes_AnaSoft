@@ -121,7 +121,7 @@ Mjo=option.Mjo;
 NoiseBaseName=regexp(option.NoiseBaseName,'(PXI|HP)_noise','match');%%%%%!!!!!El patrón en option es: '\(PXI|HP)_noise*', pero para sacar el Ibias se necesita '(PXI|HP)_noise' !!!! 
 NoiseBaseName=NoiseBaseName{1};%%%%convert cell 2 string.
 
-figure
+%figure
 
 if ~iscell(file) file={file};end
 if iscell(file)
@@ -156,8 +156,9 @@ if iscell(file)
         
             if(strcmp(tipo,'current'))
                 
-                loglog(noise{i}(:,1),V2I(noise{i}(:,2)*1e12,circuit),'.-r'),hold on,grid on,%%%for noise in Current.  Multiplico 1e12 para pA/sqrt(Hz)!Ojo, tb en plotnoise!
-                loglog(noise{i}(:,1),medfilt1(V2I(noise{i}(:,2)*1e12,circuit),20),'.-k'),hold on,grid on,%%%for noise in Current.  Multiplico 1e12 para pA/sqrt(Hz)!Ojo, tb en plotnoise!
+                %! loglog(noise{i}(:,1),V2I(noise{i}(:,2)*1e12,circuit),'.-r'),hold on,grid on,%%%for noise in Current.  Multiplico 1e12 para pA/sqrt(Hz)!Ojo, tb en plotnoise!
+                %! loglog(noise{i}(:,1),medfilt1(V2I(noise{i}(:,2)*1e12,circuit),20),'.-k'),hold on,grid on,%%%for noise in Current.  Multiplico 1e12 para pA/sqrt(Hz)!Ojo, tb en plotnoise!
+                
                 %loglog(noise{i}(:,1),sgolayfilt(V2I(noise{i}(:,2)*1e12,circuit),3,41),'.-k'),hold on,grid on,%%%for noise in Current.  Multiplico 1e12 para pA/sqrt(Hz)!Ojo, tb en plotnoise!
                 if Mph==0
                     totnoise=sqrt(auxnoise.sum.^2+auxnoise.squidarray.^2);
