@@ -58,7 +58,7 @@ if(length(p)==3)
         param.Zinf=rp(1);
         param.Z0=rp(2);
         %%%%fixed C=1.2pJ/K.
-        if (1)
+        if (0)
             %C=1.2e-12;%%%%1.2e-12
             %C=0.75e-12;
             C=6.7e-15;%2Z4_64.

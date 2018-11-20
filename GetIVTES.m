@@ -11,13 +11,21 @@ for i=1:length(IVmeasure)
     %!
     %IVmeasure(i).voutc=IVmeasure.vout;
     %IVmeasure(i).ibias=IVmeasure.ib;
-    
-    invMf=Circuit.invMf;
-    invMin=Circuit.invMin;
-    Rpar=Circuit.Rpar;
-    Rsh=Circuit.Rsh;
-    Rf=Circuit.Rf;
-    Rn=Circuit.Rn; %Sólo 
+    if isa(Circuit.invMf,'PhysicalMeasurement')
+        invMf=Circuit.invMf.Value;
+        invMin=Circuit.invMin.Value;
+        Rpar=Circuit.Rpar.Value;
+        Rsh=Circuit.Rsh.Value;
+        Rf=Circuit.Rf.Value;
+        Rn=Circuit.Rn.Value; %Sól
+    else
+        invMf=Circuit.invMf;
+        invMin=Circuit.invMin;
+        Rpar=Circuit.Rpar;
+        Rsh=Circuit.Rsh;
+        Rf=Circuit.Rf;
+        Rn=Circuit.Rn; %Sólo
+    end
 
     if nargin==3
         TES=varargin{1};
