@@ -2,7 +2,7 @@ function P=fitP(p,T)
 %expression used to automatically fit P(Tbath) data.
 
 [ii,jj]=size(T);
-model=0;%%%ii;
+model=1;%%%ii;
 if model==0 %%%ojo, esto es enrevesado
     P=p(1)*(p(3)^2-T.^2)+p(2)*(p(3)^4-T.^4);%%%modelo de Wang AIP 1219 75 (2010).
 elseif model==1

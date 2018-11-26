@@ -15,7 +15,7 @@ end
 param.G=param.n*param.K*param.Tc^(param.n-1);
 param.G100=param.n*param.K*0.1^(param.n-1);%%%Añadimos la G a una temperatura concreta, 100mK para poder comparar distintos TES.
 
-if(1) %%%solo para modelo a T^2+T^4.
+if(0) %%%solo para modelo a T^2+T^4.
     param.A=fit(1);
     param.B=fit(2);
     param.Tc2=fit(3);

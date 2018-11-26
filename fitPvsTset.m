@@ -38,8 +38,8 @@ for jj=1:length(perc)
     plot(Tbath,Paux*1e12,'bo','markerfacecolor','b'),hold on
     
     if model==1
-        X0=[-500 3 1];XDATA=Tbath;LB=[-Inf 2 0 ];%%%Uncomment for model1
-        X0=[65 9500 0.09]; %%%[A, B, Tc] en modelo a T^2+T^4
+        X0=[-50 3 1];XDATA=Tbath;LB=[-Inf 2 0 ];%%%Uncomment for model1
+        %X0=[65 9500 0.09]; %%%[A, B, Tc] en modelo a T^2+T^4
     elseif model==2
         %%%p(1)=-K, p(2)=n, p(3)=P0=K*Tc^n, p(4)=Ic0.
         %X0=[-5000 3.0 10 1e4 0]; XDATA=[Tbath;Iaux*1e6];LB=[-1e5 2 0 0 0];%%%Uncoment for model2

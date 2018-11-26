@@ -9,5 +9,11 @@ IVset=ImportFullIV(filesP);
 IVsetN=ImportFullIV(filesN);
 
 cd ..
-%IVset=GetIVTES(circuit,IVset,TES);
-%IVsetN=GetIVTES(circuit,IVsetN,TES);
+
+vars=evalin('caller','who')
+
+if sum(strcmp(vars,'circuit'))
+    circuit=evalin('caller','circuit')
+    IVset=GetIVTES(circuit,IVset);
+    IVsetN=GetIVTES(circuit,IVsetN);
+end

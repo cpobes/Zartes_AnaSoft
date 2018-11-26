@@ -156,8 +156,8 @@ if iscell(file)
         
             if(strcmp(tipo,'current'))
                 
-                %! loglog(noise{i}(:,1),V2I(noise{i}(:,2)*1e12,circuit),'.-r'),hold on,grid on,%%%for noise in Current.  Multiplico 1e12 para pA/sqrt(Hz)!Ojo, tb en plotnoise!
-                %! loglog(noise{i}(:,1),medfilt1(V2I(noise{i}(:,2)*1e12,circuit),20),'.-k'),hold on,grid on,%%%for noise in Current.  Multiplico 1e12 para pA/sqrt(Hz)!Ojo, tb en plotnoise!
+                 loglog(noise{i}(:,1),V2I(noise{i}(:,2)*1e12,circuit),'.-r'),hold on,grid on,%%%for noise in Current.  Multiplico 1e12 para pA/sqrt(Hz)!Ojo, tb en plotnoise!
+                 loglog(noise{i}(:,1),medfilt1(V2I(noise{i}(:,2)*1e12,circuit),20),'.-k'),hold on,grid on,%%%for noise in Current.  Multiplico 1e12 para pA/sqrt(Hz)!Ojo, tb en plotnoise!
                 
                 %loglog(noise{i}(:,1),sgolayfilt(V2I(noise{i}(:,2)*1e12,circuit),3,41),'.-k'),hold on,grid on,%%%for noise in Current.  Multiplico 1e12 para pA/sqrt(Hz)!Ojo, tb en plotnoise!
                 if Mph==0
@@ -272,13 +272,13 @@ if iscell(file)
     end
 else
     
-    Ib=sscanf(file,strcat(NoiseBaseName,'_%duA*'))*1e-6;
-    OP=setTESOPfromIb(Ib,IVstr,p);
-
-    hold off;%figure
-    %loglog(noise(:,1),V2I(noise(:,2),circuit.Rf),'r'),hold on,grid on,%%%for noise in Current
-    loglog(noise(:,1),V2I(noise(:,2),circuit).*OP.V0,'r'),hold on,grid on,%%%for noise in Power
-    plotnoise('irwin',ZTES,OP,circuit)
+% %     Ib=sscanf(file,strcat(NoiseBaseName,'_%duA*'))*1e-6;
+% %     OP=setTESOPfromIb(Ib,IVstr,p);
+% % 
+% %     hold off;%figure
+% %     loglog(noise(:,1),V2I(noise(:,2),circuit),'r'),hold on,grid on,%%%for noise in Current
+% %     %loglog(noise(:,1),V2I(noise(:,2),circuit).*OP.V0,'r'),hold on,grid on,%%%for noise in Power
+% %     plotnoise('irwin',ZTES,OP,circuit)
 end
 
 
