@@ -51,9 +51,10 @@ elseif length(p)==5
 %     imz=p(4)-(p(1)-p(2))*w*p(3)./D-(p(4)-p(5))./D;%%%modelos de 2 bloques.
     
 %     %p=[Zinf Z0 tau_I d1 tau1]; *tau_I=Ctes/(Gtes+G)(LH-1),  *d=Gtes/(Gtes+G)(LH-1), tau1=CA/Gtes
-     %fz=p(1)+(p(2)-p(1)).*(1+p(4)).*(1-1i*w*p(3)+p(4)./(1+1i*w*p(5))).^-1;%%%Maasilta
+     %fz=p(1)+(p(2)-p(1)).*(1-p(4)).*(1-1i*w*p(3)-p(4)./(1+1i*w*p(5))).^-1;%%%Maasilta
+     fz=p(1)+p(2).*(1-1i*w*p(3)-p(4)./(1+1i*w*p(5))).^-1;%%%Maasilta simplified parameter definition.
      %p=[Zinf Z0 tau_eff c tau_A]; c=CA/C0, tauA=CA/Gtes.
-     fz=p(1)+(p(1)-p(2)).*(-1+1i*w*p(3).*(1-p(4)*1i*w*p(5)./(1+1i*w*p(5)))).^-1;%%%SRON
+     %fz=p(1)+(p(1)-p(2)).*(-1+1i*w*p(3).*(1-p(4)*1i*w*p(5)./(1+1i*w*p(5)))).^-1;%%%SRON
      %fz=p(1)+(p(2)-p(1)).*(1-1i*w*p(3)+p(4)./(1+1i*w*p(5))).^-1;%%%TFG_Marc
      rfz=real(fz);
      imz=-abs(imag(fz));

@@ -7,11 +7,13 @@ rhoAs=[0.107 0.0983 0.0468]*1e6;%valores de Rho/A para Mo y Au. Multiplcado por 
 sides=TES.sides;
 
 hMo=55e-9; hAu=340e-9;
+hMo=45e-9; hAu=300e-9;
 if isfield(TES,'hMo') hMo=TES.hMo;end
 if isfield(TES,'hAu') hAu=TES.hAu;end
 %hAu
-hBi=6e-6;
+hBi=0;%6e-6;
 sides^2*hBi*rhoAs(3)
+%hAu=1.1e-6;
 if length(hAu)==1 hAu=hAu*ones(1,length(TES.Tc));end
 for i=1:length(hAu)    
     %(gammas.*rhoAs).*(([hMo ;hAu(i);hBi]*sides.^2)').*TES.Tc %%%show each

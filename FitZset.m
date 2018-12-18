@@ -139,11 +139,11 @@ for i=1:length(dirs)
             %%%%condicion
             %ind_z=find(imag(ztes)<-1.5e-3);
             %ind_z=find(fS<0.5e4);%%%%filtro en frecuencias
-            ind_z=1:length(ztes);
+            ind_z=200:length(ztes);
             
          %%%Hacemos el ajuste a Z(w)
-            %p0=[Zinf Z0 tau0];
-            p0=[Zinf Z0 tau0 1e-1 1e-6];%%%p0 for 2 block model.
+            p0=[Zinf Z0 tau0];
+            p0=[Zinf Z0-Zinf tau0 1e-1 1e-6];%%%p0 for 2 block model.
             %p0=[Zinf Z0 tau0 tau1 tau2 d1 d2];%%%p0 for 3 block model.
             %pinv0=[Zinf 1/Y0 tau0];
             [p,aux1,aux2,aux3,out,aux4,auxJ]=lsqcurvefit(@fitZ,p0,fS(ind_z),[real(ztes(ind_z)) imag(ztes(ind_z))]);%%%uncomment for real parameters.
