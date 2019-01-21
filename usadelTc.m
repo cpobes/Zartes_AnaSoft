@@ -38,8 +38,12 @@ tauS=2*pi*ds./(t*vs);
 %resolucion numerica ec(30)Tc(t) a campo cero.
 T=0:1e-3:2;
 f1=-1.9635+log(sqrt(1+((tauN+tauS)./(tauN*tauS*ED)).^2));%psi(1/2)=-1.9635
-f2=psi(1/2+(tauN+tauS)./(2*pi*T*Kb*(tauN.*tauS)))-(1+tauS./tauN).*log(Tc0./T);
-Tc=T(find((abs(f1-f2))==min(abs(f1-f2))));
+%f2=psi(1/2+(tauN+tauS)./(2*pi*T*Kb*(tauN.*tauS)))-(1+tauS./tauN).*log(Tc0./T);
+length(tauS)
+for i=1:length(tauS)%%%%!!!!!La version original no funciona con dMo vector y da error en fitUsadel. Hay que vectorizarla! esto es chapucero!
+    f2(i,:)=psi(1/2+(tauN+tauS(i))./(2*pi*T*Kb*(tauN.*tauS(i))))-(1+tauS(i)./tauN).*log(Tc0./T);
+    Tc(i)=T(find((abs(f1(i)-f2(i,:)))==min(abs(f1(i)-f2(i,:)))));
+end
 % 
 % %resolucion numerica ec(79) Hc2(T)
 % Hmax=500/1e4;%definir el valor del campo maximo. unidades?gauss=1e4*Tesla.
