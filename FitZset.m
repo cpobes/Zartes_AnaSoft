@@ -101,6 +101,7 @@ for i=1:length(dirs)
     %%%hacemos loop en cada fichero a analizar.
     k=1;
     for jj=1:length(filesZ)
+        if mod(jj,4) continue;end
         %thefile=strcat(d,'\',dirs{i},'\',filesZ{jj}); %%%quito '.txt' respecto a version anterior. 
         thefile=strcat(dirs{i},'\',filesZ{jj})
         if ~isempty(filesNoise) thenoisefile=strcat(d,'\',dirs{i},'\',filesNoise{jj}); end%%%quito'.txt'
@@ -139,10 +140,11 @@ for i=1:length(dirs)
             %%%%condicion
             %ind_z=find(imag(ztes)<-1.5e-3);
             %ind_z=find(fS<0.5e4);%%%%filtro en frecuencias
-            ind_z=200:length(ztes);
+            ind_z=1:length(ztes);
             
          %%%Hacemos el ajuste a Z(w)
             p0=[Zinf Z0 tau0];
+            p04=0.01;%1/(0.7-IV.rtes(jj));
             p0=[Zinf Z0 tau0 1e-1 1e-6];%%%p0 for 2 block model.
             %p0=[Zinf Z0 tau0 tau1 tau2 d1 d2];%%%p0 for 3 block model.
             %pinv0=[Zinf 1/Y0 tau0];
@@ -259,7 +261,7 @@ for i=1:length(dirs)
     end
         %%%Pasamos ExRes y ThRes dentro de P.p
         if ~isempty(filesNoise)
-        for jj=1:length(filesZ) 
+        for jj=1:length(P(i).ExRes) %%%(filesZ) 
             P(i).p(jj).ExRes=P(i).ExRes(jj);
             P(i).p(jj).ThRes=P(i).ThRes(jj);
             P(i).p(jj).M=real(P(i).M(jj));
