@@ -101,7 +101,8 @@ for i=1:length(dirs)
     %%%hacemos loop en cada fichero a analizar.
     k=1;
     for jj=1:length(filesZ)
-        if mod(jj,4) continue;end
+        %if mod(jj,4) continue;end %%%Para mostrar sólo una parte de los OPs.
+        
         %thefile=strcat(d,'\',dirs{i},'\',filesZ{jj}); %%%quito '.txt' respecto a version anterior. 
         thefile=strcat(dirs{i},'\',filesZ{jj})
         if ~isempty(filesNoise) thenoisefile=strcat(d,'\',dirs{i},'\',filesNoise{jj}); end%%%quito'.txt'
@@ -143,12 +144,14 @@ for i=1:length(dirs)
             ind_z=1:length(ztes);
             
          %%%Hacemos el ajuste a Z(w)
-            p0=[Zinf Z0 tau0];
+            p0=[Zinf Z0 tau0];%%%1TB
+            Lt=1e-9;
+            %p0=[Zinf Z0 tau0 Lt];%%%1TB+reactancia.
             p04=0.01;%1/(0.7-IV.rtes(jj));
-            p0=[Zinf Z0 tau0 1e-1 1e-6];%%%p0 for 2 block model.
+            %p0=[Zinf Z0 tau0 p04 1e-6];%%%p0 for 2 block model.
             %p0=[Zinf Z0 tau0 tau1 tau2 d1 d2];%%%p0 for 3 block model.
             %pinv0=[Zinf 1/Y0 tau0];
-            [p,aux1,aux2,aux3,out,aux4,auxJ]=lsqcurvefit(@fitZ,p0,fS(ind_z),[real(ztes(ind_z)) imag(ztes(ind_z))]);%%%uncomment for real parameters.
+            [p,aux1,aux2,aux3,out,aux4,auxJ]=lsqcurvefit(@fitZ,p0,fS(ind_z),[real(ztes(ind_z)) imag(ztes(ind_z))],[-Inf -Inf 0 0 0]);%%%uncomment for real parameters.
             ci = nlparci(p,aux2,'jacobian',auxJ);
                 %[p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,pinv0,fS,[real(1./zt{i}) imag(1./zt{i})]);%%%uncomment for inverse Ztes fit.
             %[p,aux1,aux2,aux3,out]=lsqcurvefit(@fitReZ,p0,fS,[real(ztes)],[0 -Inf 0],[1 Inf 1]);%%%uncomment for real part only.
@@ -211,6 +214,7 @@ for i=1:length(dirs)
             
             %%%Excess noise trials.
             %%%Johnson Excess
+            if(0) %%% calculo de Mjo y Mph por separado.
             findx=find(noisedata{1}(:,1)>1e4 & noisedata{1}(:,1)<4.5e4);
             xdata=noisedata{1}(findx,1);
             %ydata=sqrt(V2I(noisedata{1}(findx,2),circuit.Rf).^2-noiseIrwin.squid.^2);
@@ -228,24 +232,34 @@ for i=1:length(dirs)
                 P(i).Mph(jj)=0;
             else
                 ymod=median(ppval(spline(f,noiseIrwin.NEP*1e18),noisedata{1}(findx,1)));
-                P(i).Mph(jj)=sqrt(ydata/ymod-1);
+                P(i).Mph(jj)=sqrt((ydata/ymod).^2-1);%%%%12feb19. antes estaba mal!
+            end
             end
             
-            %%%debug.
-            noiseIrwin=noisesim('irwin',TES,OP,circuit,P(i).M(jj));%%%recalculo el ThRes.
-            P(i).ThRes(jj)=noiseIrwin.Res;%%%Resolucion teorica con el Mjo incluido.
+            %%%%%Calculo Mjo y Mph conjuntamente.
+%             findx=find(noisedata{1}(:,1)>5e2 & noisedata{1}(:,1)<1e5);
+%             xdata=noisedata{1}(findx,1);
+%             ydata=medfilt1(NEP(findx)*1e18,40);
+%             mxx=lsqcurvefit(@(x,xdata) fitnoise(x,xdata,TES,OP,circuit),[0 0],xdata,ydata);
+%             P(i).M(jj)=mxx(1);
+%             P(i).Mph(jj)=mxx(2);
+            
+            %%%debug. Recalculo ThRes incluyendo Mjo.
+            %noiseIrwin=noisesim('irwin',TES,OP,circuit,P(i).M(jj));%%%recalculo el ThRes.
+            %P(i).ThRes(jj)=noiseIrwin.Res;%%%Resolucion teorica con el Mjo incluido.
             
 %             %%%funciona igual fitnoise y fitjohnson.
-%             %parameters.OP=OP;parameters.circuit=circuit;parameters.TES=TES;          
+%             %parameters.TES=TES;parameters.OP=OP;parameters.circuit=circuit;         
 %             %P(i).M(jj)=lsqcurvefit(@(x,xdata) fitjohnson(x,xdata,parameters),[0 0],xdata,ydata);
-%             findx=find(noisedata{1}(:,1)>2e2 & noisedata{1}(:,1)<4e4);
-%             xdata=noisedata{1}(findx,1);
-%             ydata=medfilt1(NEP(findx)*1e18,20);
-%              parameters.OP=OP;parameters.circuit=circuit;parameters.TES=TES;          
-%              maux=lsqcurvefit(@(x,xdata) fitjohnson(x,xdata,parameters),[0 0],xdata,ydata);
-%                 P(i).M(jj)=maux(2);
-%                 P(i).Mph(jj)=maux(1);
-%                 
+            findx=find(noisedata{1}(:,1)>2e2 & noisedata{1}(:,1)<10e4);
+            xdata=noisedata{1}(findx,1);
+            ydata=medfilt1(NEP(findx)*1e18,20);
+            parameters.TES=TES;parameters.OP=OP;parameters.circuit=circuit;        
+            maux=lsqcurvefit(@(x,xdata) fitjohnson(x,xdata,parameters),[0 0],xdata,ydata);
+            P(i).M(jj)=maux(2);
+            P(i).Mph(jj)=maux(1);
+                 
+
 %             %%%Recalculo ExRes* incluyendo los M en el modelo para ver el impacto del fallo en la primera década del analizador!!
 %             auxnoise=noisesim('irwin',TES,OP,circuit,P(i).M(jj));%P(i).M(jj)
 %             nepaux=sqrt(auxnoise.max.^2+auxnoise.jo.^2+auxnoise.sh.^2)./auxnoise.sI;

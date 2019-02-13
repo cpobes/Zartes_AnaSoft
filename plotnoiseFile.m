@@ -156,16 +156,16 @@ if iscell(file)
         
             if(strcmp(tipo,'current'))
                 
-                 loglog(noise{i}(:,1),V2I(noise{i}(:,2)*1e12,circuit),'.-r'),hold on,grid on,%%%for noise in Current.  Multiplico 1e12 para pA/sqrt(Hz)!Ojo, tb en plotnoise!
-                 loglog(noise{i}(:,1),medfilt1(V2I(noise{i}(:,2)*1e12,circuit),20),'.-k'),hold on,grid on,%%%for noise in Current.  Multiplico 1e12 para pA/sqrt(Hz)!Ojo, tb en plotnoise!
+                 loglog(noise{i}(:,1),V2I(noise{i}(:,2),circuit)*1e12,'.-r'),hold on,grid on,%%%for noise in Current.  Multiplico 1e12 para pA/sqrt(Hz)!Ojo, tb en plotnoise!
+                 loglog(noise{i}(:,1),medfilt1(V2I(noise{i}(:,2),circuit)*1e12,20),'.-k'),hold on,grid on,%%%for noise in Current.  Multiplico 1e12 para pA/sqrt(Hz)!Ojo, tb en plotnoise!
                 
                 %loglog(noise{i}(:,1),sgolayfilt(V2I(noise{i}(:,2)*1e12,circuit),3,41),'.-k'),hold on,grid on,%%%for noise in Current.  Multiplico 1e12 para pA/sqrt(Hz)!Ojo, tb en plotnoise!
                 if Mph==0
                     totnoise=sqrt(auxnoise.sum.^2+auxnoise.squidarray.^2);
                 else
-                    totnoise=sqrt(auxnoise.max.^2+auxnoise.jo.^2+auxnoise.sh.^2+auxnoise.squidarray.^2);
+                    %totnoise=sqrt(auxnoise.max.^2+auxnoise.jo.^2+auxnoise.sh.^2+auxnoise.squidarray.^2);
                     Mexph=OP.Mph;
-                    totnoise=sqrt((auxnoise.ph*(1+Mexph^2)).^2+auxnoise.jo.^2+auxnoise.sh.^2+auxnoise.squidarray.^2);
+                    totnoise=sqrt((auxnoise.ph.^2)*(1+Mexph^2)+auxnoise.jo.^2+auxnoise.sh.^2+auxnoise.squidarray.^2);
                 end
                 %%%normalization test
                 %ind=find(noise{i}(:,1)>100&noise{i}(:,1)<1000);
@@ -198,7 +198,9 @@ if iscell(file)
                     if Mph==0
                         totNEP=auxnoise.NEP;
                     else
-                        totNEP=sqrt(auxnoise.max.^2+auxnoise.jo.^2+auxnoise.sh.^2)./auxnoise.sI;%%%Ojo, estamos asumiendo Mph tal que F=1, no tiene porqué.
+                        %totNEP=sqrt(auxnoise.max.^2+auxnoise.jo.^2+auxnoise.sh.^2)./auxnoise.sI;%%%Ojo, estamos asumiendo Mph tal que F=1, no tiene porqué.
+                        Mexph=OP.Mph;
+                        totNEP=sqrt((auxnoise.ph.^2)*(1+Mexph^2)+auxnoise.jo.^2+auxnoise.sh.^2)./auxnoise.sI;    
                     end
                 if ~boolcomponents
                     loglog(f,totNEP*1e18,'b');hold on;grid on;

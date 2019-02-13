@@ -5,8 +5,8 @@ Kb=1.38e-23;
 OP=PARAMETERS.OP;
 Circuit=PARAMETERS.circuit;
 TES=PARAMETERS.TES;
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
     G=TES.G;
     T0=TES.Tc;
     Rn=TES.Rn;
@@ -29,6 +29,7 @@ TES=PARAMETERS.TES;
     L0=P0*alfa/(G*T0);
     C=OP.C;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 tau=C/G;
 taueff=tau/(1+beta*L0);
 tauI=tau/(1-L0);

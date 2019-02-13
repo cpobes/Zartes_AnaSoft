@@ -45,6 +45,14 @@ if length(p)==3
     imz=-(p(1)-p(2))*w*p(3)./D;%%% modelo de 1 bloque.
     imz=-abs(imz);
 %elseif strcmp(modelo,'2b')
+
+elseif length(p)==4 %%%1TB mas reactancia Ztes_tot=ZTES//iwLt
+    %%%p=[Zinf Z0 tau Lt];
+    fz=p(1)-(p(1)-p(2))./(1-1i*w*p(3));
+    fz=(fz.^-1+(1i*w*p(4)).^-1).^-1;
+    %fz=fz+(1i*w*p(4));%%%Lj en serie.
+    rfz=real(fz);
+    imz=-abs(imag(fz));
 elseif length(p)==5
     %p=[Zinf Z0 tau_eff c tau_A]; c=CA/C0, tauA=CA/Gtes.
 %     rfz=p(1)-(p(1)-p(2))./D+(p(4)-p(5))*w*p(3)./D;%%%modelo de 2bloques.
