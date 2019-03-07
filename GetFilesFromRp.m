@@ -27,7 +27,7 @@ end
 Ibs=BuildIbiasFromRp(IVset,Rp);
 
 for i=1:length(Rp)
-    [~,jj]=min(abs(Iaux-Ibs(i)))
+    [~,jj]=min(abs(Iaux-Ibs(i)));
     FileList{i}=files(jj,:);
 end
 

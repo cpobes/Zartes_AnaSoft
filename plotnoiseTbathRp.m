@@ -13,5 +13,5 @@ else
 end
 
 Tbath=sscanf(Tbathstring,'%f');
-files=GetFilesFromRp(IVset(GetTbathIndex(Tbath,IVset,P)),Tbath,Rps,option.NoiseBaseName);
+files=GetFilesFromRp(IVset(GetTbathIndex(Tbath,IVset,P)),Tbath,Rps,option.NoiseBaseName)
 plotnoiseFile(IVset,P,circuit,TES,Tbathstring,files,option);

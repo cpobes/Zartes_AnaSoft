@@ -251,14 +251,15 @@ for i=1:length(dirs)
 %             %%%funciona igual fitnoise y fitjohnson.
 %             %parameters.TES=TES;parameters.OP=OP;parameters.circuit=circuit;         
 %             %P(i).M(jj)=lsqcurvefit(@(x,xdata) fitjohnson(x,xdata,parameters),[0 0],xdata,ydata);
+if(1)
             findx=find(noisedata{1}(:,1)>2e2 & noisedata{1}(:,1)<10e4);
             xdata=noisedata{1}(findx,1);
-            ydata=medfilt1(NEP(findx)*1e18,20);
+            ydata=medfilt1(NEP(findx)*1e18,40);
             parameters.TES=TES;parameters.OP=OP;parameters.circuit=circuit;        
             maux=lsqcurvefit(@(x,xdata) fitjohnson(x,xdata,parameters),[0 0],xdata,ydata);
             P(i).M(jj)=maux(2);
             P(i).Mph(jj)=maux(1);
-                 
+end
 
 %             %%%Recalculo ExRes* incluyendo los M en el modelo para ver el impacto del fallo en la primera década del analizador!!
 %             auxnoise=noisesim('irwin',TES,OP,circuit,P(i).M(jj));%P(i).M(jj)

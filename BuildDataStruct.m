@@ -20,5 +20,5 @@ if sum(~cellfun('isempty',strfind(who,'PN ')))
 end
 datastruct.datadir=pwd;
 if sum(~cellfun('isempty',strfind(who,'session')))
-    datastruct.session=evalin('base','session');
+    datastruct.session=evalin('base','session');%%%Ojo aquí al nombre.
 end

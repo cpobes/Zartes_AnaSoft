@@ -17,6 +17,7 @@ for i=1:length(f)
     Ibs(i)=sscanf(char(str),'%fuA');
 end
 
-[ii,jj]=sort(abs(Ibs),order);
+%[ii,jj]=sort(abs(Ibs),order);
+[~,jj]=sort(Ibs,order);
 f=f(jj);
 files={f(:).name};
