@@ -4,7 +4,8 @@ function Gaux=fitPvsTset(IVTESset,perc,varargin)
 % varargin{1}=modelo [1, 2 o 3].
 
 if nargin==2
-    model=1;
+    %model=1; %%%old default model
+    model=BuildPTbModel();%%%default model aTb^n+P0;
 else
     model=varargin{1};
 end
@@ -37,8 +38,11 @@ for jj=1:length(perc)
     %Tbath=0.9932*Tbath+0.006171; %%Curva de calibración del termómetro Kelvinox al calibrado. Ver Tcal.m en medidas/TES.
     plot(Tbath,Paux*1e12,'bo','markerfacecolor','b'),hold on
     
+    if isnumeric(model)%%%old model definition
     if model==1
         X0=[-50 3 1];XDATA=Tbath;LB=[-Inf 2 0 ];%%%Uncomment for model1
+        
+        %X0=[50 3 0.1];XDATA=Tbath;LB=[0 2 0 ];%%%Conditions for p=[K n Tc].
         %X0=[65 9500 0.09]; %%%[A, B, Tc] en modelo a T^2+T^4
     elseif model==2
         %%%p(1)=-K, p(2)=n, p(3)=P0=K*Tc^n, p(4)=Ic0.
@@ -53,18 +57,38 @@ for jj=1:length(perc)
         Gaux(jj).n=(fit2(2)+1);
         Gaux(jj).K=exp(fit2(1))/Gaux(jj).n;
         figure(3),plot(log(auxtbath(2:end)),log(gbaux),'.-')
+    end   
+    if model~=3
+        %model=1;
+        fitfun=@(x,y)fitP(x,y,model);
+        [fit,~,aux2,~,~,~,auxJ]=lsqcurvefit(fitfun,X0,XDATA,Paux*1e12,LB);
+        %[fit,~,aux2,~,~,~,auxJ]=lsqcurvefit(@fitP,X0,XDATA,Paux*1e12,LB);
+        ci = nlparci(fit,aux2,'jacobian',auxJ); %%%confidence intervals.
+        plot(Tbath,fitP(fit,XDATA,model),'-r','linewidth',1)
+        Gaux(jj)=GetGfromFit(fit);%%antes se pasaba fitaux.
+        auxxx(jj).ci=ci;
     end
     
-    if model~=3
-        fit=lsqcurvefit(@fitP,X0,XDATA,Paux*1e12,LB);
-        plot(Tbath,fitP(fit,XDATA),'-r','linewidth',1)
-        %     fitaux.a=fit(1);
-        %     fitaux.b=fit(2);
-        %     fitaux.c=fit(3);
-        Gaux(jj)=GetGfromFit(fit);%%antes se pasaba fitaux.
-    end
+    elseif isstruct(model)
+        X0=model.X0;
+        LB=model.LB;
+        XDATA=Tbath;if strcmp(model.nombre,'Ic0') XDATA=[Tbath;Iaux*1e6];end
+        fitfun=@(x,y)fitP(x,y,model);
+        [fit,~,aux2,~,~,~,auxJ]=lsqcurvefit(fitfun,X0,XDATA,Paux*1e12,LB);
+        ci = nlparci(fit,aux2,'jacobian',auxJ); %%%confidence intervals.
+        plot(Tbath,fitP(fit,XDATA,model),'-r','linewidth',1)
+        model.ci=ci;
+        Gaux(jj)=GetGfromFit(fit,model);%%antes se pasaba fitaux.
+        auxxx(jj).ci=ci;
+        for ii=1:length(ci) auxxx(jj).err(ii)=ci(ii,2)-ci(ii,1);end
+    end 
 end
-for jj=1:length(perc) Gaux(jj).rp=perc(jj);Gaux(jj).model=model;end
+for jj=1:length(perc) 
+    Gaux(jj).rp=perc(jj);
+    Gaux(jj).ci=auxxx(jj).ci;
+    Gaux(jj).model=model;
+end
+
 
 xlabel('T_{bath}(K)','fontsize',11,'fontweight','bold')
 ylabel('P_{TES}(pW)','fontsize',11,'fontweight','bold')

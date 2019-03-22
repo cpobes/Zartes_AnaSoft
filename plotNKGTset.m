@@ -11,25 +11,41 @@ MS=10;
 LS=1;
 
 subplot(2,2,1)
-plot([Gset.rp],[Gset.n],'.-','color',color,'linewidth',LS,'markersize',MS),grid on,hold on
+if isfield(Gset,'Errn')
+    errorbar([Gset.rp],[Gset.n],[Gset.Errn]),grid on;
+else
+    plot([Gset.rp],[Gset.n],'.-','color',color,'linewidth',LS,'markersize',MS),grid on,hold on
+end
 xlim([0.15 0.9])
 xlabel('R_{TES}/R_n','fontsize',11,'fontweight','bold');ylabel('n','fontsize',11,'fontweight','bold');
 set(gca,'linewidth',2,'fontsize',11,'fontweight','bold')
 
 subplot(2,2,2)
-plot([Gset.rp],[Gset.Tc],'.-','color',color,'linewidth',LS,'markersize',MS),grid on,hold on
+if isfield(Gset,'ErrTc')
+    errorbar([Gset.rp],[Gset.Tc],[Gset.ErrTc]),grid on;
+else
+    plot([Gset.rp],[Gset.Tc],'.-','color',color,'linewidth',LS,'markersize',MS),grid on,hold on
+end
 xlim([0.15 0.9])
 xlabel('R_{TES}/R_n','fontsize',11,'fontweight','bold');ylabel('Tc(K)','fontsize',11,'fontweight','bold');
 set(gca,'linewidth',2,'fontsize',11,'fontweight','bold')
 
 subplot(2,2,3)
-plot([Gset.rp],[Gset.K]*1e-3,'.-','color',color,'linewidth',LS,'markersize',MS),grid on,hold on
+if isfield(Gset,'ErrK')
+    errorbar([Gset.rp],[Gset.K],[Gset.ErrK]),grid on;
+else
+    plot([Gset.rp],[Gset.K]*1e-3,'.-','color',color,'linewidth',LS,'markersize',MS),grid on,hold on
+end
 xlim([0.15 0.9])
 xlabel('R_{TES}/R_n','fontsize',11,'fontweight','bold');ylabel('K(nW/K^n)','fontsize',11,'fontweight','bold');
 set(gca,'linewidth',2,'fontsize',11,'fontweight','bold')
 
 subplot(2,2,4)
-plot([Gset.rp],[Gset.G],'.-','color',color,'linewidth',LS,'markersize',MS),grid on,hold on
+if isfield(Gset,'Errn')
+    errorbar([Gset.rp],[Gset.G],[Gset.ErrG]),grid on;
+else
+    plot([Gset.rp],[Gset.G],'.-','color',color,'linewidth',LS,'markersize',MS),grid on,hold on
+end
 xlim([0.15 0.9])
 xlabel('R_{TES}/R_n','fontsize',11,'fontweight','bold');ylabel('G(pW/K)','fontsize',11,'fontweight','bold');
 set(gca,'linewidth',2,'fontsize',11,'fontweight','bold')

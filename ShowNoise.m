@@ -36,7 +36,7 @@ Tbath=str2num(Tstr);
 [~,Tind]=min(abs([ZTESDATA.IVset.Tbath]*1e3-Tbath));%%%En general Tbath de la IVsest tiene que ser exactamente la misma que la del directorio, pero en algun run he puesto el valor 'real'.(ZTES20)
     IVstr=ZTESDATA.IVset(Tind);
 %rps=[0.1:0.1:0.9]; %%% array 9x9
-rps=[0.1:0.05:0.5]; %%% array 4x4. 0.1:0.1:0.8.
+rps=[0.5:0.05:0.9]; %%% array 4x4. 0.1:0.1:0.8.
 files=GetFilesFromRp(IVstr,Tstr,rps,opt.NoiseBaseName);
 
 if numel(files)<= length(ls(strcat(str(i).name,NoiseBaseName))) 
