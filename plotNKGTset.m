@@ -41,7 +41,7 @@ xlabel('R_{TES}/R_n','fontsize',11,'fontweight','bold');ylabel('K(nW/K^n)','font
 set(gca,'linewidth',2,'fontsize',11,'fontweight','bold')
 
 subplot(2,2,4)
-if isfield(Gset,'Errn')
+if isfield(Gset,'ErrG')
     errorbar([Gset.rp],[Gset.G],[Gset.ErrG]),grid on;
 else
     plot([Gset.rp],[Gset.G],'.-','color',color,'linewidth',LS,'markersize',MS),grid on,hold on
