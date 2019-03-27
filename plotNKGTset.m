@@ -12,7 +12,7 @@ LS=1;
 
 subplot(2,2,1)
 if isfield(Gset,'Errn')
-    errorbar([Gset.rp],[Gset.n],[Gset.Errn]),grid on;
+    errorbar([Gset.rp],[Gset.n],[Gset.Errn]),grid on,hold on;
 else
     plot([Gset.rp],[Gset.n],'.-','color',color,'linewidth',LS,'markersize',MS),grid on,hold on
 end
@@ -22,7 +22,7 @@ set(gca,'linewidth',2,'fontsize',11,'fontweight','bold')
 
 subplot(2,2,2)
 if isfield(Gset,'ErrTc')
-    errorbar([Gset.rp],[Gset.Tc],[Gset.ErrTc]),grid on;
+    errorbar([Gset.rp],[Gset.Tc],[Gset.ErrTc]),grid on, hold on;
 else
     plot([Gset.rp],[Gset.Tc],'.-','color',color,'linewidth',LS,'markersize',MS),grid on,hold on
 end
@@ -32,7 +32,7 @@ set(gca,'linewidth',2,'fontsize',11,'fontweight','bold')
 
 subplot(2,2,3)
 if isfield(Gset,'ErrK')
-    errorbar([Gset.rp],[Gset.K],[Gset.ErrK]),grid on;
+    errorbar([Gset.rp],[Gset.K],[Gset.ErrK]),grid on, hold on;
 else
     plot([Gset.rp],[Gset.K]*1e-3,'.-','color',color,'linewidth',LS,'markersize',MS),grid on,hold on
 end
@@ -42,7 +42,7 @@ set(gca,'linewidth',2,'fontsize',11,'fontweight','bold')
 
 subplot(2,2,4)
 if isfield(Gset,'ErrG')
-    errorbar([Gset.rp],[Gset.G],[Gset.ErrG]),grid on;
+    errorbar([Gset.rp],[Gset.G],[Gset.ErrG]),grid on, hold on;
 else
     plot([Gset.rp],[Gset.G],'.-','color',color,'linewidth',LS,'markersize',MS),grid on,hold on
 end
