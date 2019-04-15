@@ -56,12 +56,20 @@ end
 else
     data=importdata(T);
     tf=data(:,2)+1i*data(:,3);%%%!!!ojo al menos.
-    Rth=Rsh+Rpar+2*pi*L*data(:,1);%*1i;
+    Rth=Rsh+Rpar+2*pi*L*data(:,1)*1i;%*1i;
     %tf{i}=conj(tf{i});
     %size(TFS),size(tf{i}),size(Rth)
-    ztes=(TFS.tf./tf-1).*Rth;
-    figure(h(1)),plot(ztes(ind),'.'),hold on,
-    figure(h(2)),semilogx(data(ind,1),real(ztes(ind)),'.',data(ind,1),imag(ztes(ind)),'.r'),hold on
+     ztes=(TFS.tf./tf-1).*Rth;
+%     figure(h(1)),plot(ztes(ind),'.'),hold on,
+%     figure(h(2)),semilogx(data(ind,1),real(ztes(ind)),'.',data(ind,1),imag(ztes(ind)),'.r'),hold on
+    
+        figure(h(1)),plot(1e3*ztes(ind),'.-','markerfacecolor','b','markersize',6),grid on,hold on;%%% Paso marker de 'o' a '.'
+    set(gca,'linewidth',2,'fontsize',12,'fontweight','bold');
+    xlabel('Re(mZ)','fontsize',12,'fontweight','bold');ylabel('Im(mZ)','fontsize',12,'fontweight','bold');%title('Ztes with fits (red)');
+    figure(h(2)),semilogx(data(ind,1),real(ztes(ind)),'.-',data(ind,1),imag(ztes(ind)),'.-r'),hold on
+
+    xlabel('Freq(Hz)(Z)');title('Real (blue) and Imaginary (red) parts of Ztes with fits (black)');
+    
 end
 grid on
 zs=ztes;

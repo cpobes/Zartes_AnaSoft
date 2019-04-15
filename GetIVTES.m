@@ -29,7 +29,7 @@ for i=1:length(IVmeasure)
 
     if nargin==3
         TES=varargin{1};
-        Rn=TES.Rn; %Si no cargamos la estructura TES, la Rn podemos pasarla a través de la estructura Circuit. Pasar TES tiene sentido para usar la 'K' y 'n' para deducir la Ttes.
+        %Rn=TES.Rn; %Si no cargamos la estructura TES, la Rn podemos pasarla a través de la estructura Circuit. Pasar TES tiene sentido para usar la 'K' y 'n' para deducir la Ttes.
     end
 
     F=invMin/(invMf*Rf);%36.51e-6;

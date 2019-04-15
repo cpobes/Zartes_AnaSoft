@@ -6,7 +6,7 @@ Rsh=circuit.Rsh;
 Rpar=circuit.Rpar;
 L=circuit.L;
 fS=TFS.f;
-Rn=TES.Rn;
+Rn=circuit.Rn;
 
 %%%si no pasamos files busca todos los directorios del tipo xxxmK
 if nargin==4
@@ -115,6 +115,7 @@ for i=1:length(dirs)
             tf=data(:,2)+1i*data(:,3);
             Rth=Rsh+Rpar+2*pi*L*data(:,1)*1i;
             ztes=(TFS.tf./tf-1).*Rth;
+            ztes=ztes(~isinf(ztes));%%%%En datos mar19 RUN013 a 80mK e Ib=30uA hay puntos con tf=0 que da error.
             if nargin==6
                 ztes=(TFS.tf./tf-1).*Rn./(tfsn-1);
             end
@@ -256,9 +257,14 @@ if(1)
             xdata=noisedata{1}(findx,1);
             ydata=medfilt1(NEP(findx)*1e18,40);
             parameters.TES=TES;parameters.OP=OP;parameters.circuit=circuit;        
-            maux=lsqcurvefit(@(x,xdata) fitjohnson(x,xdata,parameters),[0 0],xdata,ydata);
-            P(i).M(jj)=maux(2);
-            P(i).Mph(jj)=maux(1);
+            if sum(isinf(ydata))==0  %%%Algunos OP dan NEP Inf.pq?
+                maux=lsqcurvefit(@(x,xdata) fitjohnson(x,xdata,parameters),[0 0],xdata,ydata);
+                P(i).M(jj)=maux(2);
+                P(i).Mph(jj)=maux(1);
+            else
+                P(i).M(jj)=0;
+                P(i).Mph(jj)=0;
+            end
 end
 
 %             %%%Recalculo ExRes* incluyendo los M en el modelo para ver el impacto del fallo en la primera década del analizador!!

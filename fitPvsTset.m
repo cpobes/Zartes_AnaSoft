@@ -26,7 +26,8 @@ for jj=1:length(perc)
         %evalin('caller',exec);
         %ind=find(IVTESset(i).rtes>0.25&IVTESset(i).rtes<0.85);%%%algunas IVs fallan.
          ind=find(IVTESset(i).rtes>0.05&IVTESset(i).rtes<0.9);%%%algunas IVs fallan.
-        if isempty(ind) continue;end
+         minIV=min(abs([IVTESset(i).rtes]));
+        if isempty(ind)||minIV>perc(jj)||minIV>0.5 continue;end
         Paux(end+1)=ppval(spline(IVTESset(i).rtes(ind),IVTESset(i).ptes(ind)),perc(jj));
         Iaux(end+1)=ppval(spline(IVTESset(i).rtes(ind),IVTESset(i).ites(ind)),perc(jj));%%%
         Tbath(end+1)=IVTESset(i).Tbath;
