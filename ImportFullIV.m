@@ -32,8 +32,11 @@ for i=1:length(T)
     data=importdata(T{i});
     if isstruct(data) data=data.data;end
     %corregir el vout.
-    %auxS=corregir4ramas(data);%%para importar ficheros con 4 ramas (sin header)
+    auxS.ibias=data(:,2)*1e-6;%%%%raw data.
+    auxS.vout=data(:,4);%%%raw data.
     auxS=corregir1rama(data);%% para importar ficheros con 1 rama.
+    %%%auxS=corregir4ramas(data);%%para importar ficheros con 4 ramas (sin header)
+    
     auxS.Tbath=sscanf(char(regexp(file{i},'\d+.?\d+mK*','match')),'%fmK')*1e-3; %%%ojo al %d o %0.1f
     IVset(i)=auxS;
 end

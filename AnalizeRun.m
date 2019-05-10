@@ -3,7 +3,7 @@ function AnalizedData=AnalizeRun(circuit,TFS,varargin)
 olddir=pwd;
 if nargin>2
     dir=varargin{1};
-    cd dir;
+    cd(dir);
 end
 
 faux=figure('visible','off');
@@ -12,13 +12,13 @@ modelG=BuildPTbModel('GTcdirect'); %%%Definimos el modelo para el fit.
 Gset=fitPvsTset(IVset,[0.05:0.01:0.9],modelG);
 GsetN=fitPvsTset(IVsetN,[0.05:0.01:0.9],modelG);%%%Ajusto los datos P-Tbath.
 
-RpTES=0.7;%%%Defino el %Rn al que fijar los datos del TES.
+RpTES=0.75;%%%Defino el %Rn al que fijar los datos del TES.
 TES=BuildTESStructFromRp(RpTES,Gset);
 TESN=BuildTESStructFromRp(RpTES,GsetN);
 
 TES.Rn=circuit.Rn; %TES.sides=(lado). Actualizo la estructura TES para incluir Rn.
 TESN.Rn=66.9e-3;%%%<-%%%%%%
-%TFS=importTF;%%%Necesitamos la TF en estado 'S'!
+TFS=importTF('TFS.txt');%%%Necesitamos la TF en estado 'S'!
 
 P=FitZset(IVset,circuit,TES,TFS);%%%Ajustamos las Z positivas.
 cd 'Negative Bias'

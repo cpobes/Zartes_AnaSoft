@@ -7,6 +7,7 @@ Rpar=circuit.Rpar;
 L=circuit.L;
 fS=TFS.f;
 Rn=circuit.Rn;
+Rn=TES.Rn;
 
 %%%si no pasamos files busca todos los directorios del tipo xxxmK
 if nargin==4
@@ -106,8 +107,8 @@ for i=1:length(dirs)
         %thefile=strcat(d,'\',dirs{i},'\',filesZ{jj}); %%%quito '.txt' respecto a version anterior. 
         thefile=strcat(dirs{i},'\',filesZ{jj})
         if ~isempty(filesNoise) thenoisefile=strcat(d,'\',dirs{i},'\',filesNoise{jj}); end%%%quito'.txt'
-        offset=0;%-9e-6;
-        Ib=sscanf(char(regexp(thefile,'-?\d+.?\d+uA','match')),'%fuA')*1e-6
+        offset=0.11e-6;%-9e-6;
+        Ib=sscanf(char(regexp(thefile,'-?\d+.?\d+uA','match')),'%fuA')*1e-6+offset
         %pause(1)%%debug
         
         %%%importamos la TF
@@ -152,7 +153,19 @@ for i=1:length(dirs)
             %p0=[Zinf Z0 tau0 p04 1e-6];%%%p0 for 2 block model.
             %p0=[Zinf Z0 tau0 tau1 tau2 d1 d2];%%%p0 for 3 block model.
             %pinv0=[Zinf 1/Y0 tau0];
-            [p,aux1,aux2,aux3,out,aux4,auxJ]=lsqcurvefit(@fitZ,p0,fS(ind_z),[real(ztes(ind_z)) imag(ztes(ind_z))],[-Inf -Inf 0 0 0]);%%%uncomment for real parameters.
+            %%%%%%%%%%%%%%%%%%%Thermal model definition.
+            model=BuildThermalModel();
+            p0=model.X0;
+            p0=[Zinf Z0 tau0];%%%
+            LB=model.LB;%%%[-Inf -Inf 0 0 0]
+            UB=model.UB;%%%[]
+            %UB=[0.035 0 1];
+            XDATA=fS(ind_z);
+            YDATA=[real(ztes(ind_z)) imag(ztes(ind_z))];
+            %YDATA=imag(ztes(ind_z));
+            fitfunc=model.function;%%%@fitZ
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            [p,aux1,aux2,aux3,out,aux4,auxJ]=lsqcurvefit(fitfunc,p0,XDATA,YDATA,LB,UB);%%%uncomment for real parameters.
             ci = nlparci(p,aux2,'jacobian',auxJ);
                 %[p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,pinv0,fS,[real(1./zt{i}) imag(1./zt{i})]);%%%uncomment for inverse Ztes fit.
             %[p,aux1,aux2,aux3,out]=lsqcurvefit(@fitReZ,p0,fS,[real(ztes)],[0 -Inf 0],[1 Inf 1]);%%%uncomment for real part only.

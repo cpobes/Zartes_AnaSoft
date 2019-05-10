@@ -1,8 +1,16 @@
-function TF=importTF()
+function TF=importTF(varargin)
 
-[file,path]=uigetfile('C:\Users\Carlos\Desktop\ATHENA\medidas\TES\2016\Mayo2016\Z(w)\*','','Multiselect','on');
-
-T=strcat(path,file);
+if nargin==0
+    x=dir('TFS.txt');
+    if length(x)
+        T='TFS.txt';
+    else
+        [file,path]=uigetfile('C:\Users\Carlos\Desktop\ATHENA\medidas\TES\2016\Mayo2016\Z(w)\*','','Multiselect','on');
+        T=strcat(path,file);
+    end
+else
+    T=varargin{1};
+end
 
 if (iscell(T))
     for i=1:length(T),
