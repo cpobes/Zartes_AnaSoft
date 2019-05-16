@@ -35,7 +35,40 @@ Si3N4.conductivity=0;
 %M=196.967; %masa molar en g/mol
 %cve=8.31*pi^2*(.5*(T/Tf))
 
-material=oro;%Si3N4;%oro
+
+if nargin==1
+    material_str='oro';
+    %geometria y parametros del TES.
+    sizes=[50, 100, 150,200,250]*1e-6;
+    %sizes=100e-6;%bismuto.
+    sizes=240e-6;%%%Oro 1Z1_62A
+    %sizes=150e-6;
+    %sizes=sqrt(100*140)*1e-6;
+    A=sizes.^2; %area
+    h=2.40e-6;   %altura.Au del 1Z10_45A:1.5e-6, 1Z10_62A:2.4e-6.
+    %h=265e-9;
+    %h=340e-9;
+    %h=6e-6; %bismuto
+else
+    material_str=option.material;
+    sizes=option.sizes;
+    A=option.A;
+    h=option.h;
+end
+
+switch material_str
+    case 'oro'
+        material=oro;
+    case 'bismuto'
+        material=bismuto;
+    case 'cobre'
+        material=cobre;
+    case 'silicio'
+        material=silicio;
+    case 'Si3N4'
+        material=Si3N4;
+end
+%material=oro;%Si3N4;%oro
 Tf=material.Tf;TD=material.TD;d=material.densidad;M=material.masa_molar;L=material.att_length6K;
 %rho=material.conductivity;
 
@@ -46,15 +79,6 @@ cv=cve+cvp;
 %determinado depósito de energía). De Q=cv(g)*m*T=E -> S=1/cv(g)*M
 % m=d*A*h
 
-%geometria y parametros del TES.
-sizes=[50, 100, 150,200,250]*1e-6;
-sizes=100e-6;%bismuto.
-sizes=240e-6;%%%Oro 1Z1_62A
-%sizes=sqrt(100*140)*1e-6;
-A=sizes.^2; %area
-h=2.40e-6;   %altura.Au del 1Z10_45A:1.5e-6, 1Z10_62A:2.4e-6.
-%h=340e-9;
-%h=6e-6; %bismuto
 
 % sizes=[1]*1e-3%%%membrana
 % h=500e-9
