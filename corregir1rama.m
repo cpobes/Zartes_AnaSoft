@@ -5,17 +5,21 @@ function IVset=corregir1rama(data)
 
 if j==4
     IVset.ibias=data(:,2)*1e-6;
-    if data(1,2)==0
-        IVset.vout=data(:,4)-data(1,4);
-    elseif data(1,2)>0%%%
-        ioffP=-0.140149074413429e-6;voffP=0.002882346043684;%%%
-        IVset.ibias=IVset.ibias-ioffP;%%%
-        IVset.vout=data(:,4)-voffP;%%%
-    elseif data(1,2)<0
-        ioffN=0.088523295135426e-6;voffN=-0.323833329133775;%%%
-        IVset.ibias=IVset.ibias+ioffN;%%%
-        IVset.vout=data(:,4)+voffN;%%%
-    end
+    ii=find(data(:,2)==0);
+    IVset.vout=data(:,4)-data(ii(1),4);
+%     if data(1,2)==0
+%         IVset.vout=data(:,4)-data(1,4);
+%     elseif data(1,2)>0%%%
+%         %ioffP=-0.140149074413429e-6;voffP=0.002882346043684;%%%
+%         ioffP=0;voffP=0;
+%         IVset.ibias=IVset.ibias-ioffP;%%%
+%         IVset.vout=data(:,4)-voffP;%%%
+%     elseif data(1,2)<0
+%         %ioffN=0.088523295135426e-6;voffN=-0.323833329133775;%%%
+%         ioffP=0;voffP=0;
+%         IVset.ibias=IVset.ibias+ioffN;%%%
+%         IVset.vout=data(:,4)+voffN;%%%
+%     end
 elseif j==2
         IVset.ibias=data(:,1)*1e-6;
     if data(1,1)==0

@@ -82,9 +82,18 @@ for i=1:length(zt)
     fZ=fitZ(p,fS);figure(h(1)),plot(1e3*fZ(:,1),1e3*fZ(:,2),'r','linewidth',2);hold on
     %fZ=fitZ(p,fS);figure(h(1)),plot(fZ(:,1),fZ(:,2),'r');hold on
     figure(h(2)),semilogx(fS,fZ(:,1),'k',fS,fZ(:,2),'k','linewidth',2),hold on
+    %fid=fopen(strcat('Z(w)_',num2str(i),'.txt'),'wt');
+    %[fS' real(zt{i})' imag(zt{i})']
+    %fwrite(fid,[fS; real(zt{i}); imag(zt{i})],'single');
+    dlmwrite(strcat('Z(w)_',num2str(i),'.txt'),[fS real(zt{i}) imag(zt{i})],'delimiter','\t');
+    %fclose(fid)
 end
 if ~isnan(param(1).rp) && isfield(TES,'sides')
 P.p=param;
+for i=1:length(P.p)
+    xxx(i,1)=P.p(i).rp*Circuit.Rn;xxx(i,2)=P.p(i).I0;xxx(i,3)=P.p(i).T0;
+end
+dlmwrite(strcat('Operating_Points','.txt'),xxx,'delimiter','\t');
 figure
 plotABCT(P,'b',TES)
 end

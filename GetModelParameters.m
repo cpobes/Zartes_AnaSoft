@@ -57,6 +57,9 @@ if(length(p)==3)
         param.C=param.tau0*G0;        
         param.Zinf=rp(1);
         param.Z0=rp(2);
+        param.R0=R0;
+        param.I0=I0;
+        param.T0=T0;
         %%%%fixed C=1.2pJ/K.
         if (0)
             %C=1.2e-12;%%%%1.2e-12
