@@ -65,14 +65,14 @@ for i=1:length(dirs)
 %%%corriente.
     %D=dir(strcat(d,'\',dirs{i},'\TF*'));
     D=strcat(d,'\',dirs{i},'\TF*')
-    %D=strcat(d,'\',dirs{i},'\PXI_TF*')
+    D=strcat(d,'\',dirs{i},'\PXI_TF*')
 %     [~,s2]=sort([D(:).datenum]',1,'descend');
 %     filesZ={D(s2).name}%%%ficheros en orden de %Rn!!!
     filesZ=ListInBiasOrder(D);
     
     %D=dir(strcat(d,'\',dirs{i},'\HP*'));
     NoiseBaseName='\HP_noise*';
-    %NoiseBaseName='\PXI_noise*';%%%'\PXI*';%%%'\HP*'
+    NoiseBaseName='\PXI_noise*';%%%'\PXI*';%%%'\HP*'
     D=strcat(d,'\',dirs{i},NoiseBaseName);
 %     [~,s2]=sort([D(:).datenum]',1,'descend');
 %     filesNoise={D(s2).name}%%%ficheros en orden de %Rn!!!
@@ -134,9 +134,15 @@ for i=1:length(dirs)
             
             %plot(ztes,'.'),hold on
             %size(ztes)
+            
+                        %%%%condicion
+            %ind_z=find(imag(ztes)<-1.5e-3);
+            ind_z=find(fS>250 & fS<94e3);%%%%filtro en frecuencias
+            %ind_z=30:length(ztes)-500;%1:length(ztes);
+            
         %%%valores iniciales del fit
-            Zinf=real(ztes(end));
-            Z0=real(ztes(1));
+            Zinf=real(ztes(ind_z(end)));
+            Z0=real(ztes(ind_z(1)));
             Y0=real(1./ztes(1));
             %tau0=1e-4;
             indY=find(imag(ztes)==min(imag(ztes)));
@@ -147,10 +153,6 @@ for i=1:length(dirs)
             d2=0.1;
             feff0=1e2;
             
-            %%%%condicion
-            %ind_z=find(imag(ztes)<-1.5e-3);
-            %ind_z=find(fS<0.5e4);%%%%filtro en frecuencias
-            ind_z=1:length(ztes);
             
          %%%Hacemos el ajuste a Z(w)
             p0=[Zinf Z0 tau0];%%%1TB
@@ -196,7 +198,7 @@ for i=1:length(dirs)
                 %figure('name',strcat('Z',num2str(i)));
                 
                 %if p(2)<0 && p(2)>-30*1e-3
-                    plot(1e3*ztes(ind),'.','color',[0 0.447 0.741],'markerfacecolor',[0 0.447 0.741],'markersize',15),grid on,hold on;%%% Paso marker de 'o' a '.'
+                    plot(1e3*ztes(ind_z),'.','color',[0 0.447 0.741],'markerfacecolor',[0 0.447 0.741],'markersize',15),grid on,hold on;%%% Paso marker de 'o' a '.'
                     set(gca,'linewidth',2,'fontsize',12,'fontweight','bold');
                     xlabel('Re(mZ)','fontsize',12,'fontweight','bold');
                     ylabel('Im(mZ)','fontsize',12,'fontweight','bold');%title('Ztes with fits (red)');

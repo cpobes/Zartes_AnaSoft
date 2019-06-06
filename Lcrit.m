@@ -4,9 +4,9 @@ function Lc=Lcrit(TES,param)
 
 RL=TES.Rsh+TES.Rpar;
 Rn=TES.Rn;
-R0=(param.rp*Rn);
-p1=(3+param.bi-RL./R0);
-p2=(1+param.bi+RL./R0);
-sqr=sqrt(param.L0*(2+param.bi)*(param.L0*(1-RL./R0)+p2));
+R0=([param.rp]*Rn);
+p1=(3+[param.bi]-RL./R0);
+p2=(1+[param.bi]+RL./R0);
+sqr=sqrt([param.L0].*(2+[param.bi]).*([param.L0].*(1-RL./R0)+p2));
 
-Lc=(param.L0.*p1+p2-2*sqr).*R0.*param.tau0./(param.L0-1).^2;
+Lc=([param.L0].*p1+p2-2*sqr).*R0.*[param.tau0]./([param.L0]-1).^2;

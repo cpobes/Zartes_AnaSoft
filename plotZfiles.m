@@ -1,4 +1,4 @@
-function [zs,file,path]=plotZfiles(TFS,circuit,varargin)
+function [ztes,file,path]=plotZfiles(TFS,circuit,varargin)
 %plot Ztes at different OP from files a partir de TFS y L.
 Rsh=circuit.Rsh;
 Rpar=circuit.Rpar;
@@ -21,6 +21,7 @@ if nargin>2,
     end
 else
     ind=1:length(TFS.f);
+    ind=50:length(TFS.f)-3000;
 
 h(1)=figure;
 h(2)=figure;
@@ -52,6 +53,7 @@ for i=1:length(T),
     figure(h(2)),semilogx(data{i}(ind,1),real(ztes{i}(ind)),'.-',data{i}(ind,1),imag(ztes{i}(ind)),'.-r'),hold on
 
     xlabel('Freq(Hz)(Z)');title('Real (blue) and Imaginary (red) parts of Ztes with fits (black)');
+    ztes{i}=ztes{i}(ind);
 end
 else
     data=importdata(T);
@@ -69,7 +71,6 @@ else
     figure(h(2)),semilogx(data(ind,1),real(ztes(ind)),'.-',data(ind,1),imag(ztes(ind)),'.-r'),hold on
 
     xlabel('Freq(Hz)(Z)');title('Real (blue) and Imaginary (red) parts of Ztes with fits (black)');
-    
+    ztes=ztes(ind);
 end
 grid on
-zs=ztes;
