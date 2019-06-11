@@ -18,7 +18,7 @@ Rf=Circuit.Rf;
 
 
 fS=TFS.f;
-fS=fS(50:length(TFS.f)-3000);
+%fS=fS(50:length(TFS.f)-3000);
 if nargin>4,%%
     ind=varargin{1};
     if nargin>5,

@@ -1,5 +1,9 @@
 function P=FitZset(IVset,circuit,TES,TFS,varargin)
-%%%Ajuste automático de Z(w) para varias temperaturas de baño
+%%%Ajuste automático de Z(w) para varias temperaturas de baño.
+%%%% V2.(11-Junio-2019). Incluyo condicion para poder pasar como 5º argumento una
+%%%% estructura seleccionando si se analizan datos de HP o PXI. El uso es
+%%%% backwards compatible, el quinto parámetro puede seguir siendo un
+%%%% vector de temperaturas.
 
 %%%definimos variables necesarias.
 Rsh=circuit.Rsh;
@@ -9,8 +13,17 @@ fS=TFS.f;
 Rn=circuit.Rn;
 Rn=TES.Rn;
 
+% 
+% nargin
+% isstruct(varargin{1})
+% nargin==5 && isstruct(varargin{1})
+% nargin==4 || (nargin==5 && isstruct(varargin{1}))
+
 %%%si no pasamos files busca todos los directorios del tipo xxxmK
-if nargin==4
+%%%Ahora podemos pasar como 5º argumento una estructura con los datos que
+%%%% se quieren analizar (HP o PXI) y también si se quieren todas las temps
+%%%% por defecto o solo algunas.
+if nargin==4 || (nargin==5 && isstruct(varargin{1}))
 %     f=ls;
 %     [i,j]=size(f);
 %     fc=mat2cell(f,ones(1,i),j)
@@ -22,21 +35,41 @@ if nargin==4
 %     for i=1:length(dirs),aux(i)=sscanf(dirs{i},'%f');end
 %     aux=sort(aux);
 %     for i=1:length(aux) dirs{i}=strcat(num2str(aux(i)),'mK'),end
-    f=dir;
-    f=f([f.isdir]);
-    dirs={};
-    for i=1:length(f)
-            dirs{end+1}=regexp(f(i).name,'^\d+.?\d*mK$','match');
+    if(nargin==5)
+            options=varargin{1};
+    elseif nargin==4
+            options.TFdata='HP';
+            options.Noisedata='HP';
     end
-    dirs=dirs(~cellfun('isempty',dirs))
-    for i=1:length(dirs) dirs{i}=char(dirs{i}), end
-    for i=1:length(dirs),aux(i)=sscanf(dirs{i},'%f');end
-    [ii,jj]=sort(aux)
-    %for i=1:length(aux) dirs{i}=strcat(num2str(aux(i)),'mK'),end
-    dirs=dirs(jj)
+    
+    options
+    
+    if ~isfield(options,'Temps')
+        f=dir;
+        f=f([f.isdir]);
+        dirs={};
+        for i=1:length(f)
+            dirs{end+1}=regexp(f(i).name,'^\d+.?\d*mK$','match');
+        end
+        dirs=dirs(~cellfun('isempty',dirs))
+        for i=1:length(dirs) dirs{i}=char(dirs{i}), end
+        for i=1:length(dirs),aux(i)=sscanf(dirs{i},'%f');end
+        [ii,jj]=sort(aux)
+        %for i=1:length(aux) dirs{i}=strcat(num2str(aux(i)),'mK'),end
+        dirs=dirs(jj)
+    else
+            t=options.Temps;
+            for iii=1:length(t)
+                str=dir('*mK');
+                for jjj=1:length(str)
+                    if strfind(str(jjj).name,num2str(t(iii))) & str(jjj).isdir, break;end%%%Para pintar automáticamente los ruido a una cierta temperatura.50mK.(tiene que funcionar con 50mK y 50.0mK, pero ojo con 50.2mK p.e.)
+                end
+                dirs{iii}=str(jjj).name;
+            end
+    end
 
     %return;
-elseif nargin>4
+elseif nargin>4 && isnumeric(varargin{1})
     t=varargin{1};
     for iii=1:length(t)
         str=dir('*mK');
@@ -63,17 +96,25 @@ for i=1:length(dirs)
 %%%devolvemos los ficheros en orden de fecha. Pero ojo si se pierde esa
 %%%info. Creo ListInBiasOrder para que se listen siempre en orden de
 %%%corriente.
-    %D=dir(strcat(d,'\',dirs{i},'\TF*'));
-    D=strcat(d,'\',dirs{i},'\TF*')
-    D=strcat(d,'\',dirs{i},'\PXI_TF*')
+
+    if strcmp(options.TFdata,'HP')        
+        %D=dir(strcat(d,'\',dirs{i},'\TF*'));
+        D=strcat(d,'\',dirs{i},'\TF*')
+    elseif strcmp(options.TFdata,'PXI')
+        D=strcat(d,'\',dirs{i},'\PXI_TF*')
+    end
 %     [~,s2]=sort([D(:).datenum]',1,'descend');
 %     filesZ={D(s2).name}%%%ficheros en orden de %Rn!!!
     filesZ=ListInBiasOrder(D);
     
-    %D=dir(strcat(d,'\',dirs{i},'\HP*'));
-    NoiseBaseName='\HP_noise*';
-    NoiseBaseName='\PXI_noise*';%%%'\PXI*';%%%'\HP*'
-    D=strcat(d,'\',dirs{i},NoiseBaseName);
+    if strcmp(options.Noisedata,'HP')   
+        %D=dir(strcat(d,'\',dirs{i},'\HP*'));
+        NoiseBaseName='\HP_noise*';
+    elseif strcmp(options.Noisedata,'PXI')   
+        NoiseBaseName='\PXI_noise*';%%%'\PXI*';%%%'\HP*'
+    end
+            D=strcat(d,'\',dirs{i},NoiseBaseName);
+            
 %     [~,s2]=sort([D(:).datenum]',1,'descend');
 %     filesNoise={D(s2).name}%%%ficheros en orden de %Rn!!!
     filesNoise=dir(D);
@@ -137,8 +178,9 @@ for i=1:length(dirs)
             
                         %%%%condicion
             %ind_z=find(imag(ztes)<-1.5e-3);
-            ind_z=find(fS>250 & fS<94e3);%%%%filtro en frecuencias
-            %ind_z=30:length(ztes)-500;%1:length(ztes);
+            %ind_z=find(fS>250 & fS<94e3);%%%%filtro en frecuencias
+            %ind_z=30:length(ztes)-500;%
+            ind_z=1:length(ztes);
             
         %%%valores iniciales del fit
             Zinf=real(ztes(ind_z(end)));
