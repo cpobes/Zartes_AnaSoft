@@ -149,15 +149,28 @@ if iscell(file)
             M=0;
         end
         
-        auxnoise=noisesim('irwin',ZTES,OP,circuit,M);
+        if isfield(option,'model')
+            modelname=option.model;
+        else
+            modelname='irwin';
+        end
+        
+        if strcmp(modelname,'2TB_hanging')
+            OP.parray=[p.Zinf p.Z0 p.taueff p.geff p.t_1];
+        end
+        auxnoise=noisesim(modelname,ZTES,OP,circuit,M);
+        %auxnoise=noisesim('irwin',ZTES,OP,circuit,M);
+        
         f=logspace(0,6,1000);
         %si0(i)=auxnoise.sI(1);
         si0=auxnoise;%debug,para N=1 ver la SI.
-        
+        medfilt_w=20;
             if(strcmp(tipo,'current'))
-                
+                 %filtered_current_noise=medfilt1(V2I(noise{i}(:,2),circuit)*1e12,medfilt_w);
+                 filtered_current_noise=colfilt(V2I(noise{i}(:,2),circuit)*1e12,[10 1],'sliding',@min);
+                 filtered_current_noise=medfilt1(filtered_current_noise,40);
                  loglog(noise{i}(:,1),V2I(noise{i}(:,2),circuit)*1e12,'.-r'),hold on,grid on,%%%for noise in Current.  Multiplico 1e12 para pA/sqrt(Hz)!Ojo, tb en plotnoise!
-                 loglog(noise{i}(:,1),medfilt1(V2I(noise{i}(:,2),circuit)*1e12,20),'.-k'),hold on,grid on,%%%for noise in Current.  Multiplico 1e12 para pA/sqrt(Hz)!Ojo, tb en plotnoise!
+                 loglog(noise{i}(:,1),filtered_current_noise,'.-k'),hold on,grid on,%%%for noise in Current.  Multiplico 1e12 para pA/sqrt(Hz)!Ojo, tb en plotnoise!
                 
                 %loglog(noise{i}(:,1),sgolayfilt(V2I(noise{i}(:,2)*1e12,circuit),3,41),'.-k'),hold on,grid on,%%%for noise in Current.  Multiplico 1e12 para pA/sqrt(Hz)!Ojo, tb en plotnoise!
                 if Mph==0
@@ -192,8 +205,9 @@ if iscell(file)
                 
                 sIaux=ppval(spline(f,auxnoise.sI),noise{i}(:,1));
                 NEP=sqrt((V2I(noise{i}(:,2),circuit).^2-auxnoise.squid.^2))./sIaux;
+                filtered_power_noise=medfilt1(NEP*1e18,medfilt_w);
                 loglog(noise{i}(:,1),(NEP*1e18),'.-r'),hold on,grid on,
-                loglog(noise{i}(:,1),medfilt1(NEP*1e18,20),'.-k'),hold on,grid on,
+                loglog(noise{i}(:,1),filtered_power_noise,'.-k'),hold on,grid on,
                 %loglog(noise{i}(:,1),sgolayfilt(NEP*1e18,3,41),'.-k'),hold on,grid on,
                     if Mph==0
                         totNEP=auxnoise.NEP;

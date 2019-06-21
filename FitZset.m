@@ -40,6 +40,9 @@ if nargin==4 || (nargin==5 && isstruct(varargin{1}))
     elseif nargin==4
             options.TFdata='HP';
             options.Noisedata='HP';
+            options.ThermalModel='default';
+            options.NoiseFilterModel.model='default';
+            options.NoiseFilterModel.wmed=40;
     end
     
     options
@@ -51,12 +54,16 @@ if nargin==4 || (nargin==5 && isstruct(varargin{1}))
         for i=1:length(f)
             dirs{end+1}=regexp(f(i).name,'^\d+.?\d*mK$','match');
         end
-        dirs=dirs(~cellfun('isempty',dirs))
-        for i=1:length(dirs) dirs{i}=char(dirs{i}), end
-        for i=1:length(dirs),aux(i)=sscanf(dirs{i},'%f');end
+        %dirs=dirs(~cellfun('isempty',dirs))%%%NO HACE lo que deberia.
+        newdirs={};
+        for i=1:length(dirs) 
+            dirs{i}=char(dirs{i}); 
+            if length(ls(char(dirs{i})))>2 newdirs{end+1}=dirs{i};end
+        end
+        for i=1:length(newdirs),aux(i)=sscanf(newdirs{i},'%f');end
         [ii,jj]=sort(aux)
         %for i=1:length(aux) dirs{i}=strcat(num2str(aux(i)),'mK'),end
-        dirs=dirs(jj)
+        dirs=newdirs(jj)
     else
             t=options.Temps;
             for iii=1:length(t)
@@ -85,13 +92,19 @@ if nargin==6
     tfsn=TFS.tf./TFN.tf;
 end
 dirs
+
 pause(1)
 
 for i=1:length(dirs)
     %%%buscamos los ficheros a analizar en cada directorio.
     d=pwd;
     %dirs{i},pause(1)
-%    files=ls(strcat(d,'\',dirs{i}));
+    files=ls(strcat(d,'\',dirs{i}));
+%     if length(files)==2 %%%%Ya había condicion para evitar dirs vacios
+%     pero no estaba funcionando bien.
+%         P(i)=nan;
+%         continue;
+%     end %%%aunque esté vacío lista . y ..
     
 %%%devolvemos los ficheros en orden de fecha. Pero ojo si se pierde esa
 %%%info. Creo ListInBiasOrder para que se listen siempre en orden de
@@ -113,7 +126,7 @@ for i=1:length(dirs)
     elseif strcmp(options.Noisedata,'PXI')   
         NoiseBaseName='\PXI_noise*';%%%'\PXI*';%%%'\HP*'
     end
-            D=strcat(d,'\',dirs{i},NoiseBaseName);
+    D=strcat(d,'\',dirs{i},NoiseBaseName);
             
 %     [~,s2]=sort([D(:).datenum]',1,'descend');
 %     filesNoise={D(s2).name}%%%ficheros en orden de %Rn!!!
@@ -176,12 +189,14 @@ for i=1:length(dirs)
             %plot(ztes,'.'),hold on
             %size(ztes)
             
-                        %%%%condicion
+            %%%%condicion en frecuencias
             %ind_z=find(imag(ztes)<-1.5e-3);
-            %ind_z=find(fS>250 & fS<94e3);%%%%filtro en frecuencias
+            %ind_z=find(fS>500 & fS<100e3);%%%%filtro en frecuencias
             %ind_z=30:length(ztes)-500;%
             ind_z=1:length(ztes);
-            
+            if isfield(options,'f_ind')
+                ind_z=find(fS>options.f_ind(1) & fS<options.f_ind(2));
+            end
         %%%valores iniciales del fit
             Zinf=real(ztes(ind_z(end)));
             Z0=real(ztes(ind_z(1)));
@@ -205,15 +220,23 @@ for i=1:length(dirs)
             %p0=[Zinf Z0 tau0 tau1 tau2 d1 d2];%%%p0 for 3 block model.
             %pinv0=[Zinf 1/Y0 tau0];
             %%%%%%%%%%%%%%%%%%%Thermal model definition.
-            model=BuildThermalModel();
+            
+            model=BuildThermalModel(options.ThermalModel);
             p0=model.X0;
-            p0=[Zinf Z0 tau0];%%%
+            switch model.nombre
+                case 'default'
+                    p0=[Zinf Z0 tau0];%%%
+            end
             LB=model.LB;%%%[-Inf -Inf 0 0 0]
             UB=model.UB;%%%[]
             %UB=[0.035 0 1];
             XDATA=fS(ind_z);
-            YDATA=[real(ztes(ind_z)) imag(ztes(ind_z))];
-            %YDATA=imag(ztes(ind_z));
+            switch model.nombre
+                case {'default' '2TB_hanging'}
+                    YDATA=[real(ztes(ind_z)) imag(ztes(ind_z))];
+                case 'ImZ'
+                    YDATA=imag(ztes(ind_z));
+            end
             fitfunc=model.function;%%%@fitZ
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             [p,aux1,aux2,aux3,out,aux4,auxJ]=lsqcurvefit(fitfunc,p0,XDATA,YDATA,LB,UB);%%%uncomment for real parameters.
@@ -240,11 +263,12 @@ for i=1:length(dirs)
                 %figure('name',strcat('Z',num2str(i)));
                 
                 %if p(2)<0 && p(2)>-30*1e-3
+                    figure(2)%,hold off
                     plot(1e3*ztes(ind_z),'.','color',[0 0.447 0.741],'markerfacecolor',[0 0.447 0.741],'markersize',15),grid on,hold on;%%% Paso marker de 'o' a '.'
                     set(gca,'linewidth',2,'fontsize',12,'fontweight','bold');
                     xlabel('Re(mZ)','fontsize',12,'fontweight','bold');
                     ylabel('Im(mZ)','fontsize',12,'fontweight','bold');%title('Ztes with fits (red)');
-                    ImZmin(jj)=min(imag(1e3*ztes));
+                    ImZmin(jj)=min(imag(1e3*ztes(ind_z)));
                     ylim([min(-15,min(ImZmin)-1) 1])
                     fZ=fitZ(p,fS);plot(1e3*fZ(:,1),1e3*fZ(:,2),'r','linewidth',2);hold on
                     if k==1 || jj==length(filesZ)
@@ -252,6 +276,9 @@ for i=1:length(dirs)
                         %%%annotation('textarrow',1e3*p(2)*[1 1],[5 0],aux_str,'fontweight','bold');
                         %text(p(2)*1e3,3,aux_str,'fontweight','bold');
                     end
+                    figure(3)%,hold off
+                    semilogx(fS(ind_z),imag(1e3*ztes(ind_z)),'.','color',[0 0.447 0.741]);hold on
+                    semilogx(fS,1e3*fZ(:,2),'r','linewidth',2);
                     k=k+1;
                     %print(findobj('name',strcat('Z',num2str(i))),strcat('Z',num2str(i)),'-dpng','-r300')
                     %close(findobj('name',strcat('Z',num2str(i))))
@@ -260,9 +287,11 @@ for i=1:length(dirs)
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
          %%%Analizamos el ruido
+         %medfilt_w=40;
          if ~isempty(filesNoise)
             [noisedata,file]=loadnoise(0,dirs{i},filesNoise{jj});%%%quito '.txt'
             OP=setTESOPfromIb(Ib,IV,param);
+            OP.parray=p;%%%añadido para modelos a 2TB.
             noiseIrwin=noisesim('irwin',TES,OP,circuit);
             %noiseIrwin.squid=3e-12;
             %size(noisedata),size(noiseIrwin.sum)
@@ -272,36 +301,37 @@ for i=1:length(dirs)
             %[~,nep_index]=find(~isnan(NEP))
             %pause(2)
             NEP=NEP(~isnan(NEP));%%%Los ruidos con la PXI tienen el ultimo bin en NAN.
-            
-            RES=2.35/sqrt(trapz(noisedata{1}(1:length(NEP),1),1./medfilt1(NEP,20).^2))/2/1.609e-19
+            noise_filt_model=options.NoiseFilterModel;
+            filtNEP=filterNoise(NEP,noise_filt_model);
+            RES=2.35/sqrt(trapz(noisedata{1}(1:length(NEP),1),1./filtNEP.^2))/2/1.609e-19;
             P(i).ExRes(jj)=RES;
             P(i).ThRes(jj)=noiseIrwin.Res;
             
             %%%Excess noise trials.
             %%%Johnson Excess
-            if(0) %%% calculo de Mjo y Mph por separado.
-            findx=find(noisedata{1}(:,1)>1e4 & noisedata{1}(:,1)<4.5e4);
-            xdata=noisedata{1}(findx,1);
-            %ydata=sqrt(V2I(noisedata{1}(findx,2),circuit.Rf).^2-noiseIrwin.squid.^2);
-            ydata=medfilt1(NEP(findx)*1e18,20);
-            %size(ydata)
-            if sum(ydata==Inf) %%%1Z1_23A @70mK 1er punto da error.
-                P(i).M(jj)=0;
-            else
-                P(i).M(jj)=lsqcurvefit(@(x,xdata) fitnoise(x,xdata,TES,OP,circuit),0,xdata,ydata);
-            end
-            %%%phonon Excess
-            findx=find(noisedata{1}(:,1)>1e2&noisedata{1}(:,1)<1e3);
-            ydata=median(NEP(findx)*1e18);
-            if sum(ydata==inf)
-                P(i).Mph(jj)=0;
-            else
-                ymod=median(ppval(spline(f,noiseIrwin.NEP*1e18),noisedata{1}(findx,1)));
-                P(i).Mph(jj)=sqrt((ydata/ymod).^2-1);%%%%12feb19. antes estaba mal!
-            end
-            end
+%             if(0) %%% calculo de Mjo y Mph por separado.
+%                 findx=find(noisedata{1}(:,1)>1e4 & noisedata{1}(:,1)<4.5e4);
+%                 xdata=noisedata{1}(findx,1);
+%                 %ydata=sqrt(V2I(noisedata{1}(findx,2),circuit.Rf).^2-noiseIrwin.squid.^2);
+%                 ydata=medfilt1(NEP(findx)*1e18,20);
+%                 %size(ydata)
+%                 if sum(ydata==Inf) %%%1Z1_23A @70mK 1er punto da error.
+%                     P(i).M(jj)=0;
+%                 else
+%                     P(i).M(jj)=lsqcurvefit(@(x,xdata) fitnoise(x,xdata,TES,OP,circuit),0,xdata,ydata);
+%                 end
+%                 %%%phonon Excess
+%                 findx=find(noisedata{1}(:,1)>1e2&noisedata{1}(:,1)<1e3);
+%                 ydata=median(NEP(findx)*1e18);
+%                 if sum(ydata==inf)
+%                     P(i).Mph(jj)=0;
+%                 else
+%                     ymod=median(ppval(spline(f,noiseIrwin.NEP*1e18),noisedata{1}(findx,1)));
+%                     P(i).Mph(jj)=sqrt((ydata/ymod).^2-1);%%%%12feb19. antes estaba mal!
+%                 end
+%             end%%% end_if
             
-            %%%%%Calculo Mjo y Mph conjuntamente.
+            %%%%%Calculo Mjo y Mph conjuntamente.Version1.
 %             findx=find(noisedata{1}(:,1)>5e2 & noisedata{1}(:,1)<1e5);
 %             xdata=noisedata{1}(findx,1);
 %             ydata=medfilt1(NEP(findx)*1e18,40);
@@ -316,10 +346,18 @@ for i=1:length(dirs)
 %             %%%funciona igual fitnoise y fitjohnson.
 %             %parameters.TES=TES;parameters.OP=OP;parameters.circuit=circuit;         
 %             %P(i).M(jj)=lsqcurvefit(@(x,xdata) fitjohnson(x,xdata,parameters),[0 0],xdata,ydata);
-if(1)
-            findx=find(noisedata{1}(:,1)>2e2 & noisedata{1}(:,1)<10e4);
+
+
+        if(1)         
+            mphfrange=[2e2,1e3];
+            mjofrange=[5e3,1e5];
+            faux=noisedata{1}(:,1);
+            findx=find((faux>mphrange(1) & faux<mphrange(2)) | (faux>mjofrange(1) & faux<mjofrange(2)));
             xdata=noisedata{1}(findx,1);
-            ydata=medfilt1(NEP(findx)*1e18,40);
+            %ydata=medfilt1(NEP(findx)*1e18,medfilt_w);
+            %ydata=colfilt(NEP(findx)*1e18,[15 1],'sliding',@min);
+            %ydata=medfilt1(ydata,medfilt_w);
+            ydata=filterNoise(NEP(findx)*1e18,noise_filt_model);
             parameters.TES=TES;parameters.OP=OP;parameters.circuit=circuit;        
             if sum(isinf(ydata))==0  %%%Algunos OP dan NEP Inf.pq?
                 maux=lsqcurvefit(@(x,xdata) fitjohnson(x,xdata,parameters),[0 0],xdata,ydata);
@@ -355,5 +393,6 @@ end
         end
         P(i).Tbath=Tbath*1e-3;%%%se lee en mK
 end
-if ~isempty(filesNoise) P=rmfield(P,{'ExRes','ThRes','M','Mph'});end
+%if ~isempty(filesNoise) P=rmfield(P,{'ExRes','ThRes','M','Mph'});end
+try P=rmfield(P,{'ExRes','ThRes','M','Mph'});catch end;
     

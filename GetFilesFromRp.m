@@ -10,9 +10,10 @@ else
     pattern=varargin{1};%%%Pasamos la cadena de caracteres a buscar.(HP_noise o PXI_noise.)
 end
 
-str=dir('*mK');
+str=dir('*mK')
 Tbathstr=num2str(Tbath);
 for i=1:length(str)
+    str(i)
     if strfind(str(i).name,Tbathstr) & str(i).isdir, break;end%%%Para pintar automáticamente los ruido a una cierta temperatura.50mK.(tiene que funcionar con 50mK y 50.0mK, pero ojo con 50.2mK p.e.)
 end
 

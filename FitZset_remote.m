@@ -11,12 +11,17 @@ function P=FitZset_remote(TESDATA,varargin)
 IVset=TESDATA.IVset;
 circuit=TESDATA.circuit;
 TES=TESDATA.TES;
-TFS=TESDATA.TFS;
+%TFS=TESDATA.TFS;
 
 olddir=pwd;
 
 if isfield(TESDATA,'datadir')
     cd(TESDATA.datadir)
+    try
+        TFS=importTF('TFS.txt');%%%%Necesitamos crear TFS en el dir de analisis
+    catch
+    end
+    if isfield(TESDATA,'TFS') TFS=TESDATA.TFS;end %%%Podemos sobreescribir la TFS con otra.
     if nargin==2
         opt=varargin{1};
         P=FitZset(IVset,circuit,TES,TFS,opt);
@@ -25,8 +30,13 @@ if isfield(TESDATA,'datadir')
     end
     cd(olddir);
 else
-        if nargin==2
-            opt=varargin{1};
+    try
+        TFS=importTF('TFS.txt');%%%%Necesitamos crear TFS en el dir de analisis
+    catch
+    end
+    if isfield(TESDATA,'TFS') TFS=TESDATA.TFS;end
+    if nargin==2
+        opt=varargin{1};
         P=FitZset(IVset,circuit,TES,TFS,opt);
     else
         P=FitZset(IVset,circuit,TES,TFS);

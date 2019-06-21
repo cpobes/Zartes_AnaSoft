@@ -35,11 +35,19 @@ V0=IVstruct.vtes;
 P0=V0.*I0;
 %G=716e-12;
 R0=V0/I0;
+
 %%%%%test
 %G0=spline([TES.Gset.rp],[TES.Gset.G],R0/Rn)*1e-12
 %T0=spline([TES.Gset.rp],[TES.Gset.Tc],R0/Rn)
 %pause(1)
 %R0/Rn
+if isfield(TES,'Ttes')
+    T0=TES.Ttes(P0,IVaux.Tbath);
+end
+if isfield(TES,'Gtes')
+    G0=TES.Gtes(T0);
+end
+
 
 rp=p;
 %rp(3)=abs(rp(3));
@@ -64,7 +72,7 @@ if(length(p)==3)
         if (0)
             %C=1.2e-12;%%%%1.2e-12
             %C=0.75e-12;
-            C=6.7e-15;%2Z4_64.
+            C=10e-15;%2Z4_64.
             %C=15e-15;%%%1Z11_46A
             param.rp=R0/Rn;            
             param.Zinf=rp(1);

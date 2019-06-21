@@ -15,3 +15,6 @@ if sum(strcmp(vars,'circuit'))
     circuit=evalin('caller','circuit');
     TES.Rn=circuit.Rn;
 end
+
+TES.Ttes=@(P,Tbath)((P./TES.K+Tbath.^(TES.n)).^(1./(TES.n)));
+TES.Gtes=@(Ttes)(TES.n*TES.K*Ttes.^(TES.n-1));

@@ -4,7 +4,7 @@ function ztes= GetZfromTF( tf, TFS, circuit )
 
 if isstruct(tf)
     tfaux=tf.tf;
-    f=tf.f
+    f=tf.f;
 else
     tfaux=tf(:,2)+1i*tf(:,3);
     f=tf(:,1);
