@@ -147,7 +147,7 @@ for i=1:length(dirs)
 %     %filesc
     
     %%%buscamos la IV correspondiente a la Tmc dada
-    Tbath=sscanf(dirs{i},'%dmK')
+    Tbath=sscanf(dirs{i},'%dmK');
     pause(1)
     %Tind=[IVset.Tbath]*1e3==Tbath;
     [~,Tind]=min(abs([IVset.Tbath]*1e3-Tbath));%%%En general Tbath de la IVsest tiene que ser exactamente la misma que la del directorio, pero en algun run he puesto el valor 'real'.(ZTES20)
@@ -301,7 +301,7 @@ for i=1:length(dirs)
             %[~,nep_index]=find(~isnan(NEP))
             %pause(2)
             NEP=NEP(~isnan(NEP));%%%Los ruidos con la PXI tienen el ultimo bin en NAN.
-            noise_filt_model=options.NoiseFilterModel;
+            noise_filt_model=options.NoiseFilterModel
             filtNEP=filterNoise(NEP,noise_filt_model);
             RES=2.35/sqrt(trapz(noisedata{1}(1:length(NEP),1),1./filtNEP.^2))/2/1.609e-19;
             P(i).ExRes(jj)=RES;
@@ -352,7 +352,7 @@ for i=1:length(dirs)
             mphfrange=[2e2,1e3];
             mjofrange=[5e3,1e5];
             faux=noisedata{1}(:,1);
-            findx=find((faux>mphrange(1) & faux<mphrange(2)) | (faux>mjofrange(1) & faux<mjofrange(2)));
+            findx=find((faux>mphfrange(1) & faux<mphfrange(2)) | (faux>mjofrange(1) & faux<mjofrange(2)));
             xdata=noisedata{1}(findx,1);
             %ydata=medfilt1(NEP(findx)*1e18,medfilt_w);
             %ydata=colfilt(NEP(findx)*1e18,[15 1],'sliding',@min);

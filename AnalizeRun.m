@@ -54,6 +54,17 @@ close(faux);
 TES=BuildTESStructFromRp(RpTES,Gset);
 TESN=BuildTESStructFromRp(RpTES,GsetN);
 
+if isfield(analizeOptions,'TES_sides')
+    TES.sides=analizeOptions.TES_sides;
+    gammas=[2 0.729]*1e3; %valores de gama para Mo y Au
+    rhoAs=[0.107 0.0983]; %valores de Rho/A para Mo y Au
+    hMo=45e-9; hAu=270e-9; %hAu=1.5e-6;%%%1Z11.!!!!!!!!!!!!!
+    %CN=(gammas.*rhoAs)*([hMo ;hAu]*sides.^2).*TES.Tc; %%%Calculo directo
+    CN=(gammas.*rhoAs).*([hMo hAu]*TES.sides.^2).*TES.Tc; %%%calculo de cada contribucion por separado.
+    CN=sum(CN);
+    TES.CN=CN;
+end
+
 %TES.Rn=circuit.Rn; %TES.sides=(lado). Actualizo la estructura TES para incluir Rn.
 %TESN.Rn=TES.Rn;%66.9e-3;%%%<-%%%%%%
 %TFS=importTF('TFS.txt');%%%Necesitamos la TF en estado 'S'!

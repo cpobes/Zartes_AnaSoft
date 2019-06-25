@@ -47,7 +47,7 @@ cd ..
     if isempty(circuit)
         vars=evalin('caller','who')
         if sum(strcmp(vars,'circuit'))
-        circuit=evalin('caller','circuit');
+        circuit=evalin('caller','circuit');%%%%Ojo, primero coge el circuit del WS si existe.
         IVset=GetIVTES(circuit,IVset);
         IVsetN=GetIVTES(circuit,IVsetN);
         else

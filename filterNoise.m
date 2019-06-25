@@ -2,6 +2,7 @@ function filtNoise=filterNoise(noisedata,varargin)
 %%%función para filtrar los datos de ruido si es necesario.El input puede
 %%%ser en corriente o potencia. el varargin puede ser un option con modelo
 %%%o parametros.
+
 if nargin==1
     option.model='default'
     option.wmed=40;
@@ -15,8 +16,8 @@ switch option.model
     case 'nofilt'
         filtNoise=noisedata;
     case 'minfilt'
-        ydata=colfilt(noisedata,[option.wmin 1],'sliding',@min);
+        filtNoise=colfilt(noisedata,[option.wmin 1],'sliding',@min);
     case 'minfilt+medfilt'
         ydata=colfilt(noisedata,[option.wmin 1],'sliding',@min);
-        ydata=medfilt1(ydata,option.wmed);
+        filtNoise=medfilt1(ydata,option.wmed);
 end
