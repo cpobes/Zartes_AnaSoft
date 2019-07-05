@@ -13,8 +13,11 @@ else
 end
 
 olddir=pwd;
-if isfield(option,'datadir')
-    cd(option.datadir)
+% if isfield(option,'datadir')
+%     cd(option.datadir)
+% end
+if isfield(ZTESDATA,'analizeOptions')
+    cd(ZTESDATA.analizeOptions.datadir)
 end
 Tbath=sscanf(Tbathstring,'%f');
 files=GetFilesFromRp(IVset(GetTbathIndex(Tbath,IVset,P)),Tbath,Rps,option.NoiseBaseName)

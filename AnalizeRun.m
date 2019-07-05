@@ -54,6 +54,12 @@ close(faux);
 TES=BuildTESStructFromRp(RpTES,Gset);
 TESN=BuildTESStructFromRp(RpTES,GsetN);
 
+cd(datadir);
+evalin('caller','load(''circuit.mat'')');
+circuit=evalin('caller','circuit')
+IVset=GetIVTES(circuit,IVset,TES);
+IVsetN=GetIVTES(circuit,IVsetN,TESN);
+
 if isfield(analizeOptions,'TES_sides')
     TES.sides=analizeOptions.TES_sides;
     gammas=[2 0.729]*1e3; %valores de gama para Mo y Au
@@ -63,6 +69,7 @@ if isfield(analizeOptions,'TES_sides')
     CN=(gammas.*rhoAs).*([hMo hAu]*TES.sides.^2).*TES.Tc; %%%calculo de cada contribucion por separado.
     CN=sum(CN);
     TES.CN=CN;
+    TESN.CN=CN;
 end
 
 %TES.Rn=circuit.Rn; %TES.sides=(lado). Actualizo la estructura TES para incluir Rn.
@@ -96,6 +103,7 @@ AnalizedData.GsetN=GsetN;
 AnalizedData.RpTES=RpTES;
 AnalizedData.TES=TES;
 AnalizedData.TESN=TESN;
+AnalizedData.TFS=TFS;
 AnalizedData.P=P;
 AnalizedData.PN=PN;
 AnalizedData.analizeOptions=analizeOptions;

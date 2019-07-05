@@ -39,9 +39,9 @@ for i=indx%length(P),
     
     ecX='rp';
     %ecX='Tb';
-    ecX='ai./sqrt(1+2*bi)';%%%k figure of merit
+    %ecX='ai./sqrt(1+2*bi)';%%%k figure of merit
     %ecX='ai./sqrt((1+2*bi).*(1+M.^2).*(1+Mph.^2))';%%%K modified with Mjo
-    ecX='1./(rp*Rn+2e-3)'
+    %ecX='1./(rp*Rn+2e-3)'
     x=eval(ecX);
     %ecY='ExRes./ThRes';%%%Ecuacion para la Y
     
@@ -63,8 +63,9 @@ for i=indx%length(P),
     %ecY='sqrt(ExRes.^2-ThRes.^2)';
     
     %ecY='ai./sqrt(1+2*bi)';%%%k figure of merit
-    ecY='ThRes./sqrt(C)';
-    ecY='M';
+    %ecY='ThRes./sqrt(C)';
+    %ecY='M';
+    ecY='(Z0-Zinf)./(Z0+rp*TES.Rn)';
     y=eval(ecY);
     h=plot(x,y,'.-');hold on
     set(h,optname,optvalue);

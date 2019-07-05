@@ -36,8 +36,8 @@ end
         cd(datadir);
     end
     
-filesP=ListInTbathOrder('IVs\*_p_*');
-filesN=ListInTbathOrder('IVs\*_n_*');
+filesP=ListInTbathOrder('IVs\*_p_*matlab.txt');
+filesN=ListInTbathOrder('IVs\*_n_*matlab.txt');
 
 cd 'IVs'
 IVset=ImportFullIV(filesP);
@@ -53,9 +53,9 @@ cd ..
         else
             try
                 evalin('caller','load(''circuit.mat'')');
-                vars=evalin('caller','who');
+                vars=evalin('caller','who')
                 circuit=evalin('caller','circuit')
-                IVset=GetIVTES(circuit,IVset);
+                IVset=GetIVTES(circuit,IVset)
                 IVsetN=GetIVTES(circuit,IVsetN);
             catch
                     if ~isempty(datadir)

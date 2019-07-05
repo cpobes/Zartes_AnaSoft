@@ -58,6 +58,8 @@ tau0=1/(2*pi*fS(indY(1)));%%%tau0 es el valor inicial de taueff. Lo estimamos a 
             d2=0.1;
 feff0=1e2;
 
+fS=fS(ind);
+
 for i=1:length(zt)
 
     p0=[Zinf(i) Z0(i) tau0];
@@ -66,7 +68,26 @@ for i=1:length(zt)
     %p0=[Zinf(i) Z0(i) tau0 tau1 tau2 d1 d2];%%%p0 for 3 block model.
     %pinv0=[Zinf(i) 1/Y0(i) tau0];%%%p0 for 1/Z fits.
     %size(zt{i})
-    [p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,p0,fS,[real(zt{i}) imag(zt{i})]);%%%uncomment for real parameters.
+    
+    %%%[p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,p0,fS,[real(zt{i}) imag(zt{i})]);%%%uncomment for real parameters.
+    
+    XDATA=fS;
+    YDATA=[real(zt{i}) imag(zt{i})];
+            model=BuildThermalModel();
+            p0=model.X0;
+            switch model.nombre
+                case 'default'
+                    p0=[Zinf(i) Z0(i) tau0];%%%
+            end
+            LB=model.LB;%%%[-Inf -Inf 0 0 0]
+            UB=model.UB;%%%[]
+            fitfunc=model.function;%%%@fitZ
+    %%%%%Weigthed method
+            weight=sqrt((XDATA));            
+            costfunction=@(p)weight.*sqrt(sum((fitfunc(p,XDATA)-YDATA).^2,2));
+            [p,aux1,aux2,aux3,out,aux4,auxJ]=lsqnonlin(costfunction,p0,LB,UB);%%%uncomment for real parameters.
+            %[p,aux1,aux2,aux3,out,aux4,auxJ]=lsqcurvefit(fitfunc,p0,XDATA,YDATA,LB,UB);
+            ci = nlparci(p,aux2,'jacobian',auxJ);
     %[p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,pinv0,fS,[real(1./zt{i}) imag(1./zt{i})]);%%%uncomment for inverse Ztes fit.
     %[p,aux1,aux2,aux3,out]=lsqcurvefit(@fitReZ,p0,fS,[real(zt{i})],[0 -Inf 0],[1 Inf 1]);%%%uncomment for real part only.
 

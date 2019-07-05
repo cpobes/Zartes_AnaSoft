@@ -8,6 +8,9 @@ if nargin==0
         [file,path]=uigetfile('C:\Users\Carlos\Desktop\ATHENA\medidas\TES\2016\Mayo2016\Z(w)\*','','Multiselect','on');
         T=strcat(path,file);
     end
+elseif isempty(varargin{1})
+        [file,path]=uigetfile('C:\Users\Carlos\Desktop\ATHENA\medidas\TES\2016\Mayo2016\Z(w)\*','','Multiselect','on');
+        T=strcat(path,file);
 else
     T=varargin{1};
 end

@@ -1,4 +1,4 @@
-function Cv=CvDesign(T)
+function Cv=CvDesign(T,varargin)
 %Calculo capacidades termicas para varios materiales.
 R=8.31;
 
@@ -50,6 +50,7 @@ if nargin==1
     %h=340e-9;
     %h=6e-6; %bismuto
 else
+    option=varargin{1};
     material_str=option.material;
     sizes=option.sizes;
     A=option.A;

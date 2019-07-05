@@ -17,9 +17,9 @@ for i=1:length(str)
     if strfind(str(i).name,Tbathstr) & str(i).isdir, break;end%%%Para pintar automáticamente los ruido a una cierta temperatura.50mK.(tiene que funcionar con 50mK y 50.0mK, pero ojo con 50.2mK p.e.)
 end
 
-Tdir=str(i).name
-files=ls(strcat(str(i).name,pattern));
-[ii,jj]=size(files)
+%Tdir=str(i).name
+files=ls(strcat(str(i).name,pattern))
+[ii,jj]=size(files);
 for i=1:ii
 Iaux(i)=sscanf(char(regexp(files(i,:),'\d+(\.\d*)?','match')),'%f');
 end

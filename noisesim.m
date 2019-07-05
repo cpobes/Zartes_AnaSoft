@@ -47,7 +47,7 @@ else
     %C=TES.OP.C;
     C=OP.C;
     L=Circuit.L;
-    G=TES.G;
+    
     %alfa=TES.OP.ai;
     alfa=OP.ai;
     %bI=TES.OP.bi;
@@ -58,12 +58,22 @@ else
     RL=Rs+Rpar;
     R0=OP.R0;
     beta=(R0-Rs)/(R0+Rs);
-    %T0=OP.T0;
-    T0=TES.Tc;
-    Ts=OP.Tbath
+    
+    Ts=OP.Tbath;
     P0=OP.P0;
     I0=OP.I0;
     V0=OP.V0;
+    T0=TES.Tc;
+    G=TES.G;
+    if isfield(TES,'Ttes')
+        T0=TES.Ttes(P0,Ts);
+    end
+    if isfield(TES,'Gtes')
+        G=TES.Gtes(T0);
+    end
+    %T0=OP.T0;
+
+
     L0=P0*alfa/(G*T0);
     n=TES.n;
     M=0;

@@ -21,7 +21,7 @@ if nargin>2,
     end
 else
     ind=1:length(TFS.f);
-    ind=50:length(TFS.f)-3000;
+    %ind=50:length(TFS.f)-3000;
 
 h(1)=figure;
 h(2)=figure;
@@ -72,5 +72,7 @@ else
 
     xlabel('Freq(Hz)(Z)');title('Real (blue) and Imaginary (red) parts of Ztes with fits (black)');
     ztes=ztes(ind);
+    ztes={ztes};
+    file={file};
 end
 grid on

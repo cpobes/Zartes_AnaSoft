@@ -1,4 +1,4 @@
-function param=GetModelParameters(p,IVmeasure,Ib,TES,Circuit)
+function param=GetModelParameters(p,IVmeasure,Ib,TES,Circuit,varargin)
 %extrae los parámetros térmicos del sistema a partir de un modelo térmico y
 %conociendo el punto de operación y la 'G'
 
@@ -9,6 +9,14 @@ function param=GetModelParameters(p,IVmeasure,Ib,TES,Circuit)
 %G=1.66e-12;%1.7e-12;
 %T0=0.155;%;0.07;
 %global R0 P0 I0 T0 G C ai bi
+
+if nargin==5
+    opt.boolC=0;
+else
+    opt=varargin{1}; %%si quiero fijar o no la C
+    %%%opt.boolC={1,0}
+    %%%opt.C=TES.CN;
+end
 
 Rn=TES.Rn;
 T0=TES.Tc;
@@ -24,6 +32,7 @@ Vout=ppval(pp,Ib);
 IVaux.ibias=Ib;
 IVaux.vout=Vout;
 IVaux.Tbath=IVmeasure.Tbath;
+Tb=IVaux.Tbath;
 IVstruct=GetIVTES(Circuit,IVaux);%%%
 
 I0=IVstruct.ites;
@@ -68,11 +77,13 @@ if(length(p)==3)
         param.R0=R0;
         param.I0=I0;
         param.T0=T0;
+        param.parray=[rp(1) rp(2) rp(3)];
         %%%%fixed C=1.2pJ/K.
-        if (0)
+        if (opt.boolC)
             %C=1.2e-12;%%%%1.2e-12
             %C=0.75e-12;
-            C=10e-15;%2Z4_64.
+            %C=10e-15;%2Z4_64.
+            C=opt.C;
             %C=15e-15;%%%1Z11_46A
             param.rp=R0/Rn;            
             param.Zinf=rp(1);
@@ -110,15 +121,29 @@ if(length(p)==3)
         param.geff=p(4);%%%gt1/((gt1+gtb)(L-1))
         param.taueff=rp(3);
         param.L=(p(2)-p(1))*(1+p(4))/((R0+p(1))+(p(2)-p(1))*(1+p(4)));%%%Esto es com�n a todos los modelos
-        
+        param.parray=p;
         %%%Hanging Model
         %%%si gtb=GIV=G0:
-        param.g_1=G0*(1/(1-p(4)*(param.L-1))-1);
-        param.C=p(3)*(param.L-1)*(param.g_1+G0);
-        param.C_1=p(5)*param.g_1;
-        param.ai=param.L*T0*(param.g_1+G0)/P0;    
+%         param.g_1=G0*(1/(1-p(4)*(param.L-1))-1);
+%         param.C=p(3)*(param.L-1)*(param.g_1+G0);
+%         param.C_1=p(5)*param.g_1;
+%         param.ai=param.L*T0*(param.g_1+G0)/P0;    
+%         param.tau0=param.C/G0;
+%         param.L0=param.L;
+        
+        %%%Intermediate Model
+        %%% n=m, K1=K2, -> g1,b=gt,1(T1) -> p(4)*(L-1)=0.5;
+        %%% n=m K1!=K2. -> gc=g1,b/gt,1(T1).
+        param.g_t_b=p(4)*(param.L-1);%%%cociente. gt,1(T1)/(gt,1(T1)+g1,b)
+        param.g_c=(1-param.g_t_b)/param.g_t_b;%%%
+        param.T1=(param.g_t_b*T0.^TES.n+(1-param.g_t_b)*Tb.^TES.n).^(1./TES.n);
+        param.g_1=G0./(1-param.g_t_b); %%% g_1=gt,1(T0);
+        param.C=p(3)*(param.L-1)*param.g_1;
+        param.C_1=p(5)*TES.Gtes(param.T1)*(1+param.g_c);
+        param.ai=param.L*T0*(param.g_1)/P0;
         param.tau0=param.C/G0;
         param.L0=param.L;
+        
 
     elseif(length(p)==7)
         param=nan;

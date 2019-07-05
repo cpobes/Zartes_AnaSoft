@@ -59,4 +59,8 @@ for i=1:length(IVmeasure)
     if isfield(IVmeasure,'good') IVstruct(i).good=IVmeasure(i).good; else IVstruct(i).good=1; end %%%%Para no machacarlo si ya existe. y si no, lo creo.
     
     IVstruct(i).Tbath=Tbath;
+    
+    %%%%%Spline IV
+    %[max,ii]=max(abs(IVmeasure(i).vout));
+    
 end

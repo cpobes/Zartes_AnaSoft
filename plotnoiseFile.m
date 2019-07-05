@@ -166,9 +166,9 @@ if iscell(file)
         si0=auxnoise;%debug,para N=1 ver la SI.
         medfilt_w=20;
             if(strcmp(tipo,'current'))
-                 %filtered_current_noise=medfilt1(V2I(noise{i}(:,2),circuit)*1e12,medfilt_w);
-                 filtered_current_noise=colfilt(V2I(noise{i}(:,2),circuit)*1e12,[10 1],'sliding',@min);
-                 filtered_current_noise=medfilt1(filtered_current_noise,40);
+                 filtered_current_noise=medfilt1(V2I(noise{i}(:,2),circuit)*1e12,medfilt_w);
+                 %filtered_current_noise=colfilt(V2I(noise{i}(:,2),circuit)*1e12,[10 1],'sliding',@min);
+                 %filtered_current_noise=medfilt1(filtered_current_noise,40);
                  loglog(noise{i}(:,1),V2I(noise{i}(:,2),circuit)*1e12,'.-r'),hold on,grid on,%%%for noise in Current.  Multiplico 1e12 para pA/sqrt(Hz)!Ojo, tb en plotnoise!
                  loglog(noise{i}(:,1),filtered_current_noise,'.-k'),hold on,grid on,%%%for noise in Current.  Multiplico 1e12 para pA/sqrt(Hz)!Ojo, tb en plotnoise!
                 

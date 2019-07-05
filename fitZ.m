@@ -75,7 +75,11 @@ elseif length(p)==7
     imz=-abs(imag(fz));
 end
 %fz=rfz+1i*imz;%%%uncomment for complex parameters.
-fz=[rfz imz];%%%uncomment for real parameters.
+if iscolumn(rfz)
+    fz=[rfz imz];%%%uncomment for real parameters.
+else
+    fz=[rfz' imz'];%%%uncomment for real parameters.
+end
 
 %%%para ajustar 1/fZ.try1.
 %ifz=1./fz;

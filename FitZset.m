@@ -194,8 +194,14 @@ for i=1:length(dirs)
             %ind_z=find(fS>500 & fS<100e3);%%%%filtro en frecuencias
             %ind_z=30:length(ztes)-500;%
             ind_z=1:length(ztes);
+            %fS
             if isfield(options,'f_ind')
-                ind_z=find(fS>options.f_ind(1) & fS<options.f_ind(2));
+                ind_z=[];
+                for iii=1:length(options.f_ind(:,1))
+                    %find(fS>options.f_ind(i,1) & fS<options.f_ind(i,2))'
+                    %ind_z
+                    ind_z=[ind_z; find(fS>options.f_ind(iii,1) & fS<options.f_ind(iii,2))];
+                end
             end
         %%%valores iniciales del fit
             Zinf=real(ztes(ind_z(end)));
@@ -226,6 +232,8 @@ for i=1:length(dirs)
             switch model.nombre
                 case 'default'
                     p0=[Zinf Z0 tau0];%%%
+                case '2TB_hanging'
+                    p0=[Zinf Z0 tau0 0.03 1/(2*pi*1e3)];
             end
             LB=model.LB;%%%[-Inf -Inf 0 0 0]
             UB=model.UB;%%%[]
@@ -239,8 +247,22 @@ for i=1:length(dirs)
             end
             fitfunc=model.function;%%%@fitZ
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            try
             [p,aux1,aux2,aux3,out,aux4,auxJ]=lsqcurvefit(fitfunc,p0,XDATA,YDATA,LB,UB);%%%uncomment for real parameters.
             ci = nlparci(p,aux2,'jacobian',auxJ);
+            catch
+                error('error in lsqcurvefit');
+                dirs{i}
+                continue;
+            end
+            
+            %%%%%%Weighted Fitting Method.            
+            %weight=sqrt((XDATA));
+            %weight=1;
+            %costfunction=@(p)weight.*sqrt(sum((fitfunc(p,XDATA)-YDATA).^2,2));
+            %[p,aux1,aux2,aux3,out,aux4,auxJ]=lsqnonlin(costfunction,p0,LB,UB);%%%uncomment for real parameters.
+            %ci = nlparci(p,aux2,'jacobian',auxJ);
+            
                 %[p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,pinv0,fS,[real(1./zt{i}) imag(1./zt{i})]);%%%uncomment for inverse Ztes fit.
             %[p,aux1,aux2,aux3,out]=lsqcurvefit(@fitReZ,p0,fS,[real(ztes)],[0 -Inf 0],[1 Inf 1]);%%%uncomment for real part only.
                 %[p,aux1,aux2,aux3,out]=lsqcurvefit(@fitZ,p0,fS,zt{i});%%%uncommetn for complex parameters
@@ -249,14 +271,20 @@ for i=1:length(dirs)
                 %p=Analize_STB_Z(fS,ztes)%%%Otra forma de estimar los parámetros
          %%%Extraemos los parámetros del ajuste.
          
-            param=GetModelParameters(p,IV,Ib,TES,circuit);
+            if isfield(options,'fixCopt')
+                opt.boolC=options.fixCopt;
+                opt.C=TES.CN;
+                param=GetModelParameters(p,IV,Ib,TES,circuit,opt);
+            else
+                param=GetModelParameters(p,IV,Ib,TES,circuit);
+            end
             resN=aux1;
             P(i).p(jj)=param;
             P(i).residuo(jj).resN=resN;
             P(i).residuo(jj).ci=ci;
             
             %%%%%%%%%%%%%%%%%%%%%%Pintamos Gráficas
-                boolShow=1;
+                boolShow=0;
             if boolShow
                 %if param.rp> 0.5 continue;end %%%%ojo!!!
                 ind=1:3:length(ztes);
@@ -289,6 +317,7 @@ for i=1:length(dirs)
          %%%Analizamos el ruido
          %medfilt_w=40;
          if ~isempty(filesNoise)
+             dirs{i}, filesNoise{jj}
             [noisedata,file]=loadnoise(0,dirs{i},filesNoise{jj});%%%quito '.txt'
             OP=setTESOPfromIb(Ib,IV,param);
             OP.parray=p;%%%añadido para modelos a 2TB.
@@ -392,7 +421,7 @@ end
         end
         end
         P(i).Tbath=Tbath*1e-3;%%%se lee en mK
-end
+end%%% forr principal
 %if ~isempty(filesNoise) P=rmfield(P,{'ExRes','ThRes','M','Mph'});end
 try P=rmfield(P,{'ExRes','ThRes','M','Mph'});catch end;
     
