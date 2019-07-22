@@ -1,5 +1,5 @@
 function AnalizedData=AnalizeRun(analizeOptions)
-%%%%%Función para lanzar un aálisis automático sobre un RUN completo desde
+%%%%%Función para lanzar un análisis automático sobre un RUN completo desde
 %%%%%cualquier directorio de análisis. Podemos pasar como argumento sólo el
 %%%%%datadir (path al run a analizar) y cogerá opciones por defecto, o
 %%%%%pasar una estructura con las opciones de análisis, donde el datadir es
@@ -35,7 +35,7 @@ if isfield(analizeOptions,'ZfitOpt')
 else
     ZfitOpt.TFdata='HP';
     ZfitOpt.Noisedata='HP';
-    ZfitOpt.f_ind=[1 1e5];
+    ZfitOpt.f_ind=[1 1e5];%%%[fmin fmax] De momento no admite un rango arbitrario.
     %ZfitOpt.Temps=50;%Temp en mK.
     ZfitOpt.ThermalModel='irwin';
 end
