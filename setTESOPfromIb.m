@@ -64,4 +64,11 @@ else
     OP.Zinf=p.Zinf;
     %OP.G0=OP.P0*OP.ai./(OP.L0*OP.T0);
     OP.G0=OP.C./OP.tau0;
+    if (isfield(p,'M'))
+        OP.M=p.M;
+    end
+    if (isfield(p,'Mph'))
+        OP.Mph=p.Mph;
+    end
+    OP.P=p;%%%%Para modelos a 2TB necesitamos parámetros que no están en el modelo simple
 end

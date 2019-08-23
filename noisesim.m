@@ -40,6 +40,7 @@ if nargin==1
     L0=P0*alfa/(G*T0);
     M=1;
     Nsquid=3e-12;
+    n=3;
 else
     TES=varargin{1};
     OP=varargin{2};
@@ -94,14 +95,16 @@ tau_el=L/(RL+R0*(1+bI));
 
 %f=1:1e6;
 f=logspace(0,6,1000);
-if strcmp(model,'wouter')
+
+switch model
+    case 'wouter'
     %%%ecuaciones 2.25-2.27 Tesis de Wouter.
     i_ph=sqrt(4*gamma*Kb*T0^2*G)*alfa*I0*R0./(G*T0*(R0+Rs)*(1+beta*L0)*sqrt(1+4*pi^2*taueff^2.*f.^2));
     i_jo=sqrt(4*Kb*T0*R0)*sqrt(1+4*pi^2*tau^2.*f.^2)./((R0+Rs)*(1+beta*L0)*sqrt(1+4*pi^2*taueff^2.*f.^2));
     i_sh=sqrt(4*Kb*Ts*Rs)*sqrt((1-L0)^2+4*pi^2*tau^2.*f.^2)./((R0+Rs)*(1+beta*L0)*sqrt(1+4*pi^2*taueff^2.*f.^2));%%%
     noise.ph=i_ph;noise.jo=i_jo;noise.sh=i_sh;noise.sum=sqrt(i_ph.^2+i_jo.^2+i_sh.^2);
 
-elseif strcmp(model,'irwin') 
+    case 'irwin'
     %%% ecuaciones capitulo Irwin
     
     sI=-(1/(I0*R0))*(L/(tau_el*R0*L0)+(1-RL/R0)-L*tau*(2*pi*f).^2/(L0*R0)+1i*(2*pi*f)*L*tau*(1/tauI+1/tau_el)/(R0*L0)).^-1;%funcion de transferencia.
@@ -153,34 +156,77 @@ elseif strcmp(model,'irwin')
     noise.Res_tfn_tes=Res_tfn_tes;noise.Res_tfn_ssh=Res_tfn_ssh;noise.Res_ssh_tes=Res_ssh_tes;
     noise.squid=Nsquid;noise.squidarray=Nsquid*ones(1,length(f));
 
-elseif strcmp(model,'2TB_hanging')
-    model=BuildThermalModel('2TB_1');
-    func=model.function;
-    %param%!!!%%%necesitamos los p0 para ztes, RL, L, R0, bi, V0, Ts, T0, n,G, tau_1
-    p0=OP.parray;
-    tau_1=p0(5);
-    zdata=func(p0,f);%%%p0=[p1 p2 p3 p4 p5];!!!!!ojo al formato!
-    ztes=zdata(1:end/2)+1i*zdata(end/2+1:end);
-    zcirc=ztes+RL+1i*2*pi*f*L;
-    sI=(ztes-R0*(1+bI))./(zcirc*V0*(2+bI));
-    w=2*pi*f;
-    t=Ts/T0;
-    F=(t^(n+2)+1)/2;%%%specular limit
-    stfn_b=4*Kb*T0^2*G*abs(sI).^2*F;%%%ruido térmico al baño
-    stfn_1=4*Kb*T0^2*G*abs(sI).^2.*(w*tau_1).^2./(1+(w*tau_1).^2);%%%ruido termico absorbente-TES
-    stes=(4*Kb*T0*R0*(1+2*bI)).*abs(ztes+R0).^2./(R0^2*(2+bI).^2*abs(zcirc).^2);%%%ruido johnson
-    ssh=4*Kb*Ts*RL./abs(zcirc).^2;%%%johnson en la shunt
-    
-    NEP=sqrt(stfn_b+stfn_1+ssh+stes)./abs(sI);
-    Res=2.35/sqrt(trapz(f,1./NEP.^2))/2/1.609e-19;%resoluciÃ³n en eV. Tesis Wouter (2.37).
-
-    %%%...noise.definir estructura noise
-    noise.f=f;
-    noise.sI=abs(sI);
-    noise.ph_b=sqrt(stfn_b);noise.ph_1=sqrt(stfn_1);noise.jo=sqrt(stes);noise.sh=sqrt(ssh);
-    noise.sum=sqrt(stfn_b+stfn_1+stes+ssh);
-    noise.NEP=NEP;noise.Res=Res;
-    noise.squid=Nsquid;noise.squidarray=Nsquid*ones(1,length(f));
-else
-    error('no valid model')
+    case '2TB_hanging'
+        %model=BuildThermalModel('2TB_1');
+        %func=model.function;
+        func=@(p,f)[real(p(1)+(p(2)-p(1)).*(1+p(4)).*(1-1i*(2*pi*f)*p(3)+p(4)./(1+1i*(2*pi*f)*p(5))).^-1)...
+            imag(p(1)+(p(2)-p(1)).*(1+p(4)).*(1-1i*(2*pi*f)*p(3)+p(4)./(1+1i*(2*pi*f)*p(5))).^-1)];
+        
+        %param%!!!%%%necesitamos los p0 para ztes, RL, L, R0, bi, V0, Ts, T0, n,G, tau_1
+        p0=OP.parray;
+        tau_1=p0(5);
+        zdata=func(p0,f);%%%p0=[p1 p2 p3 p4 p5];!!!!!ojo al formato!
+        ztes=zdata(1:end/2)+1i*zdata(end/2+1:end);
+        zcirc=ztes+RL+1i*2*pi*f*L;
+        sI=(ztes-R0*(1+bI))./(zcirc*V0*(2+bI));
+        w=2*pi*f;
+        t=Ts/T0;
+        F=(t^(n+2)+1)/2;%%%specular limit
+        stfn_b=4*Kb*T0^2*G*abs(sI).^2*F;%%%ruido térmico al baño
+        stfn_1=4*Kb*T0^2*G*abs(sI).^2.*(w*tau_1).^2./(1+(w*tau_1).^2);%%%ruido termico absorbente-TES
+        stes=(4*Kb*T0*R0*(1+2*bI)).*abs(ztes+R0).^2./(R0^2*(2+bI).^2*abs(zcirc).^2);%%%ruido johnson
+        ssh=4*Kb*Ts*RL./abs(zcirc).^2;%%%johnson en la shunt
+        
+        NEP=sqrt(stfn_b+stfn_1+ssh+stes)./abs(sI);
+        Res=2.35/sqrt(trapz(f,1./NEP.^2))/2/1.609e-19;%resoluciÃ³n en eV. Tesis Wouter (2.37).
+        
+        %%%...noise.definir estructura noise
+        noise.f=f;
+        noise.sI=abs(sI);
+        noise.ph_b=sqrt(stfn_b);noise.ph_1=sqrt(stfn_1);noise.jo=sqrt(stes);noise.sh=sqrt(ssh);
+        noise.sum=sqrt(stfn_b+stfn_1+stes+ssh);
+        noise.NEP=NEP;noise.Res=Res;
+        noise.squid=Nsquid;noise.squidarray=Nsquid*ones(1,length(f));
+        
+    case '2TB_intermediate'
+        %model=BuildThermalModel('2TB_1');
+        %func=model.function;
+        func=@(p,f)[real(p(1)+(p(2)-p(1)).*(1+p(4)).*(1-1i*(2*pi*f)*p(3)+p(4)./(1+1i*(2*pi*f)*p(5))).^-1)...
+            imag(p(1)+(p(2)-p(1)).*(1+p(4)).*(1-1i*(2*pi*f)*p(3)+p(4)./(1+1i*(2*pi*f)*p(5))).^-1)];
+        
+        %param%!!!%%%necesitamos los p0 para ztes, RL, L, R0, bi, V0, Ts, T0, n,G, tau_1
+        p0=OP.parray;
+        tau_1=p0(5);
+        zdata=func(p0,f);%%%p0=[p1 p2 p3 p4 p5];!!!!!ojo al formato!
+        ztes=zdata(1:end/2)+1i*zdata(end/2+1:end);
+        zcirc=ztes+RL+1i*2*pi*f*L;
+        sI=(ztes-R0*(1+bI))./(zcirc*V0*(2+bI));
+        w=2*pi*f;
+        t=Ts/T0;
+        T1=OP.P.T1;%%%Temperatura del bloque1
+        t_1b=Ts/T1;%%%%cociente temperaturas bloque1/baño
+        t_t1=T1/T0;%%%% cociente temperaturas tes-bloque1
+        F_1b=(t_1b^(n+2)+1)/2;%%%specular limit
+        F_t1=(t_t1^(n+2)+1)/2;%%%specular limit
+        g_t_b=OP.P.g_t_b;%%(este cociente se usa directamente en las expresiones)
+        
+        P2_1b=4*Kb*T1^2*G*F_1b;
+        P2_t1=4*Kb*T0^2*G*F_t1;
+        stfn_1b=P2_1b*abs(sI).^2*g_t_b^2*1./(1+(w*tau_1).^2);%%%ruido térmico de bloque 1 al baño
+        stfn_t1=P2_t1*abs(sI).^2.*((1-g_t_b)^2+(w*tau_1).^2)./(1+(w*tau_1).^2);%%%ruido termico TES-bloque1
+        stes=(4*Kb*T0*R0*(1+2*bI)).*abs(ztes+R0).^2./(R0^2*(2+bI).^2*abs(zcirc).^2);%%%ruido johnson
+        ssh=4*Kb*Ts*RL./abs(zcirc).^2;%%%johnson en la shunt
+        
+        NEP=sqrt(stfn_1b+stfn_t1+ssh+stes)./abs(sI);
+        Res=2.35/sqrt(trapz(f,1./NEP.^2))/2/1.609e-19;%resoluciÃ³n en eV. Tesis Wouter (2.37).
+        
+        %%%...noise.definir estructura noise
+        noise.f=f;
+        noise.sI=abs(sI);
+        noise.ph_1b=sqrt(stfn_1b);noise.ph_t1=sqrt(stfn_t1);noise.jo=sqrt(stes);noise.sh=sqrt(ssh);
+        noise.sum=sqrt(stfn_1b+stfn_t1+stes+ssh);
+        noise.NEP=NEP;noise.Res=Res;
+        noise.squid=Nsquid;noise.squidarray=Nsquid*ones(1,length(f));
+    otherwise
+        error('no valid model')
 end

@@ -12,10 +12,12 @@ function param=GetModelParameters(p,IVmeasure,Ib,TES,Circuit,varargin)
 
 if nargin==5
     opt.boolC=0;
+    opt.model='irwin';
 else
     opt=varargin{1}; %%si quiero fijar o no la C
     %%%opt.boolC={1,0}
     %%%opt.C=TES.CN;
+    %%%opt.model=modelo_termico
 end
 
 Rn=TES.Rn;
@@ -60,7 +62,8 @@ end
 
 rp=p;
 %rp(3)=abs(rp(3));
-if(length(p)==3)
+switch opt.model
+    case 'irwin'
         %derived parameters
         %for simple model p(1)=Zinf, p(2)=Z0, p(3)=taueff
         %rp=real(p);
@@ -95,7 +98,7 @@ if(length(p)==3)
             param.bi=(rp(1)/R0)-1;
             param.C=C;
         end
-    elseif(length(p)==4)%%%1TB con reactancia.
+    case '1TB_reactancia'%%%1TB con reactancia. NO IMPLEMENTADO REALMENTE
         %derived parameters
         %for simple model p(1)=Zinf, p(2)=Z0, p(3)=taueff
         %rp=real(p);
@@ -111,7 +114,7 @@ if(length(p)==3)
         param.Z0=rp(2);
         param.Lt=p(4);
      
-    elseif(length(p)==5)
+    case '2TB_hanging'
         %derived parameters for 2 block model case A
         param.rp=R0/Rn;
         param.bi=(rp(1)/R0)-1;  
@@ -124,13 +127,23 @@ if(length(p)==3)
         param.parray=p;
         %%%Hanging Model
         %%%si gtb=GIV=G0:
-%         param.g_1=G0*(1/(1-p(4)*(param.L-1))-1);
-%         param.C=p(3)*(param.L-1)*(param.g_1+G0);
-%         param.C_1=p(5)*param.g_1;
-%         param.ai=param.L*T0*(param.g_1+G0)/P0;    
-%         param.tau0=param.C/G0;
-%         param.L0=param.L;
-        
+        param.g_1=G0*(1/(1-p(4)*(param.L-1))-1);
+        param.C=p(3)*(param.L-1)*(param.g_1+G0);
+        param.C_1=p(5)*param.g_1;
+        param.ai=param.L*T0*(param.g_1+G0)/P0;    
+        param.tau0=param.C/G0;
+        param.L0=param.L;
+    case '2TB_intermediate'    
+        %derived parameters for 2 block model case A
+        param.rp=R0/Rn;
+        param.bi=(rp(1)/R0)-1;  
+        param.Zinf=p(1);
+        param.Z0=p(2);
+        param.t_1=p(5);
+        param.geff=p(4);%%%gt1/((gt1+gtb)(L-1))
+        param.taueff=rp(3);
+        param.L=(p(2)-p(1))*(1+p(4))/((R0+p(1))+(p(2)-p(1))*(1+p(4)));%%%Esto es común a todos los modelos
+        param.parray=p;
         %%%Intermediate Model
         %%% n=m, K1=K2, -> g1,b=gt,1(T1) -> p(4)*(L-1)=0.5;
         %%% n=m K1!=K2. -> gc=g1,b/gt,1(T1).
@@ -145,7 +158,7 @@ if(length(p)==3)
         param.L0=param.L;
         
 
-    elseif(length(p)==7)
+    otherwise
         param=nan;
 end
 

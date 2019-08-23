@@ -1,4 +1,9 @@
 function NEP=fitjohnson(M,f,PARAMETERS)
+%%%%Función para ajustar simultáneamente el ruido NEP experimental
+%%%%expresado en attoW con la Mph y la Mjo al modelo de IRwin!
+%%%%Ojo porque para sacar el NEP necesitamos la sI, que se saca del modelo,
+%%%%así que para cada modelo hay que pasarle el modelo correcto a
+%%%%noisesim.
 
 Kb=1.38e-23;
 

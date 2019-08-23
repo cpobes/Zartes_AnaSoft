@@ -36,8 +36,12 @@ else
     ZfitOpt.TFdata='HP';
     ZfitOpt.Noisedata='HP';
     ZfitOpt.f_ind=[1 1e5];%%%[fmin fmax] De momento no admite un rango arbitrario.
+    %%%En realidad puede ser una matriz con f_ind(1,:)=[fmin1 fmax1],
+    %%%f_ind(2,:)=[fmin2 fmax2], etc.
     %ZfitOpt.Temps=50;%Temp en mK.
-    ZfitOpt.ThermalModel='irwin';
+    ZfitOpt.ThermalModel='default';
+    ZfitOpt.NoiseFilterModel.model='medfilt'; %see BuildNoiseOptions
+    ZfitOpt.NoiseFilterModel.wmed=40;
 end
 % if nargin>2
 %     dir=varargin{1};

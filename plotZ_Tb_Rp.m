@@ -44,7 +44,7 @@ for i=1:length(Rp)
     [~,jj]=min(abs([anaStruct.P(mP).p.rp]-Rp(i)));
     zx=fitZ(px(jj,:),anaStruct.TFS.f);
     figure(10)
-    plot(zx(:,1),zx(:,2),'-k');
+    plot(zx(:,1),zx(:,2),'-r');
     figure(11)
     semilogx(anaStruct.TFS.f,zx(:,2),'-r');
     semilogx(anaStruct.TFS.f,zx(:,1),'-k');

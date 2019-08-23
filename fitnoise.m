@@ -90,10 +90,10 @@ t=Ts/T0;
 %F=t^(n+1)*(n+1)*(t^(2*n+3)-1)/((2*n+3)*(t^(n+1)-1));%F de Mather. La
 %diferencia entre las dos fÃ³rmulas es menor del 1%.
 F=(t^(n+2)+1)/2;%%%specular limit. OJO! la expresion que usaba de Irwin no tiende a 1/2!!! 
-stfn=4*Kb*T0^2*G*abs(sI).^2*F*1;%(1+M(2)^2);%Thermal Fluctuation Noise
+stfn=4*Kb*T0^2*G*abs(sI).^2*F*(1+M(1)^2);%Thermal Fluctuation Noise
 ssh=4*Kb*Ts*I0^2*RL*(L0-1)^2*(1+4*pi^2*f.^2*tau^2/(1-L0)^2).*abs(sI).^2/L0^2; %Load resistor Noise
 %M=1.8;
-stes=4*Kb*T0*I0^2*R0*(1+2*bI)*(1+4*pi^2*f.^2*tau^2).*abs(sI).^2/L0^2*(1+M(1)^2);%%%Johnson noise at TES.
+stes=4*Kb*T0*I0^2*R0*(1+2*bI)*(1+4*pi^2*f.^2*tau^2).*abs(sI).^2/L0^2*(1+M(2)^2);%%%Johnson noise at TES.
 smax=4*Kb*T0^2*G.*abs(sI).^2;
 sfaser=0;%21/(2*pi^2)*((6.626e-34)^2/(1.602e-19)^2)*(10e-9)*P0/R0^2/(2.25e-8)/(1.38e-23*T0);%%%eq22 faser
 
@@ -120,6 +120,27 @@ noise.max=sqrt(smax);
 %noise.Res=Res;
 noise.tbath=i_temp;
 OutNoise=noise.NEP*1e18;
+elseif strcmp(model,'2TB_1')
+    func=@(p,f)[real(p(1)+(p(2)-p(1)).*(1+p(4)).*(1-1i*(2*pi*f)*p(3)+p(4)./(1+1i*(2*pi*f)*p(5))).^-1)...
+                 imag(p(1)+(p(2)-p(1)).*(1+p(4)).*(1-1i*(2*pi*f)*p(3)+p(4)./(1+1i*(2*pi*f)*p(5))).^-1)];
+    
+    %param%!!!%%%necesitamos los p0 para ztes, RL, L, R0, bi, V0, Ts, T0, n,G, tau_1
+    p0=OP.parray;
+    tau_1=p0(5);
+    zdata=func(p0,f);%%%p0=[p1 p2 p3 p4 p5];!!!!!ojo al formato!
+    ztes=zdata(1:end/2)+1i*zdata(end/2+1:end);
+    zcirc=ztes+RL+1i*2*pi*f*L;
+    sI=(ztes-R0*(1+bI))./(zcirc*V0*(2+bI));
+    w=2*pi*f;
+    t=Ts/T0;
+    F=(t^(n+2)+1)/2;%%%specular limit
+    stfn_b=4*Kb*T0^2*G*abs(sI).^2*F;%%%ruido térmico al baño
+    stfn_1=4*Kb*T0^2*G*abs(sI).^2.*(w*tau_1).^2./(1+(w*tau_1).^2);%%%ruido termico absorbente-TES
+    stes=(4*Kb*T0*R0*(1+2*bI)).*abs(ztes+R0).^2./(R0^2*(2+bI).^2*abs(zcirc).^2)*(1+M^2);%%%ruido johnson
+    ssh=4*Kb*Ts*RL./abs(zcirc).^2;%%%johnson en la shunt
+    
+    NEP=sqrt(stfn_b+stfn_1+ssh+stes)./abs(sI);
+    OutNoise=NEP*1e18;
 else
     error('no valid model')
 end

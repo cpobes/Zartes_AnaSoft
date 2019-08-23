@@ -12,7 +12,9 @@ for i=1:length(IVmeasure)
         end
     %'color',[0.8500    0.3250    0.0980]
     %'color',[0    0.4470    0.7410]
-    plot(IVstruct.ttes,IVstruct.Rtes*1e3,'.-','color',[0    0.4470    0.7410],'DisplayName',strcat(num2str(1000*IVstruct.Tbath),'mK'));
+    blue=[0    0.4470    0.7410];
+    naranja=[0.8500    0.3250    0.0980];
+    plot(IVstruct.ttes,IVstruct.Rtes*1e3,'.-','color',naranja,'DisplayName',strcat(num2str(1000*IVstruct.Tbath),'mK'));
     xlabel('T_{TES}(K)','fontsize',12,'fontweight','bold');ylabel('R_{TES}(m\Omega)','fontsize',12,'fontweight','bold');grid on,hold on
     
     legend('-DynamicLegend')

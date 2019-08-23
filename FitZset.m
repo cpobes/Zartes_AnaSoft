@@ -227,20 +227,23 @@ for i=1:length(dirs)
             %pinv0=[Zinf 1/Y0 tau0];
             %%%%%%%%%%%%%%%%%%%Thermal model definition.
             
-            model=BuildThermalModel(options.ThermalModel);
+            model=BuildThermalModel(options.ThermalModel);           
             p0=model.X0;
             switch model.nombre
                 case 'default'
                     p0=[Zinf Z0 tau0];%%%
                 case '2TB_hanging'
+                    p0=[Zinf Z0 tau0 100 1/(2*pi*1e3)];
+                case '2TB_intermediate'
                     p0=[Zinf Z0 tau0 0.03 1/(2*pi*1e3)];
+
             end
             LB=model.LB;%%%[-Inf -Inf 0 0 0]
             UB=model.UB;%%%[]
             %UB=[0.035 0 1];
             XDATA=fS(ind_z);
             switch model.nombre
-                case {'default' '2TB_hanging'}
+                case {'default' '2TB_hanging' '2TB_intermediate'}
                     YDATA=[real(ztes(ind_z)) imag(ztes(ind_z))];
                 case 'ImZ'
                     YDATA=imag(ztes(ind_z));
@@ -273,11 +276,12 @@ for i=1:length(dirs)
          
             if isfield(options,'fixCopt')
                 opt.boolC=options.fixCopt;
-                opt.C=TES.CN;
-                param=GetModelParameters(p,IV,Ib,TES,circuit,opt);
             else
-                param=GetModelParameters(p,IV,Ib,TES,circuit);
+                opt.boolC=0;
             end
+              opt.C=TES.CN;                
+              opt.model=model.nombre;
+             param=GetModelParameters(p,IV,Ib,TES,circuit,opt);
             resN=aux1;
             P(i).p(jj)=param;
             P(i).residuo(jj).resN=resN;
@@ -321,7 +325,10 @@ for i=1:length(dirs)
             [noisedata,file]=loadnoise(0,dirs{i},filesNoise{jj});%%%quito '.txt'
             OP=setTESOPfromIb(Ib,IV,param);
             OP.parray=p;%%%añadido para modelos a 2TB.
-            noiseIrwin=noisesim('irwin',TES,OP,circuit);
+            %noiseIrwin=noisesim('irwin',TES,OP,circuit);
+            parameters.TES=TES;parameters.OP=OP;parameters.circuit=circuit;%%%movido de L391.
+            model=BuildThermalModel(options.ThermalModel,parameters);%%%lo estamos llamando 2 veces pq en la primera, OP no está definido.
+            noiseIrwin=model.noise;%%%%El modelo de ruido se define en BuilThermalModel
             %noiseIrwin.squid=3e-12;
             %size(noisedata),size(noiseIrwin.sum)
             f=logspace(0,6,1000);%%%Ojo, la definición de 'f' debe coincidir con la que hay dentro de noisesim!!!
@@ -387,9 +394,10 @@ for i=1:length(dirs)
             %ydata=colfilt(NEP(findx)*1e18,[15 1],'sliding',@min);
             %ydata=medfilt1(ydata,medfilt_w);
             ydata=filterNoise(NEP(findx)*1e18,noise_filt_model);
-            parameters.TES=TES;parameters.OP=OP;parameters.circuit=circuit;        
+            %parameters.TES=TES;parameters.OP=OP;parameters.circuit=circuit;        
             if sum(isinf(ydata))==0  %%%Algunos OP dan NEP Inf.pq?
                 maux=lsqcurvefit(@(x,xdata) fitjohnson(x,xdata,parameters),[0 0],xdata,ydata);
+                %maux=lsqcurvefit(@(x,xdata) fitnoise(x,xdata,TES,OP,circuit),[0 0],xdata,ydata);
                 P(i).M(jj)=maux(2);
                 P(i).Mph(jj)=maux(1);
             else

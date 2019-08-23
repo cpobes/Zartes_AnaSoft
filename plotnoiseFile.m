@@ -132,7 +132,8 @@ if iscell(file)
         file{i}
         strcat(NoiseBaseName,'_%fuA*')
         Ib=sscanf(file{i},strcat(NoiseBaseName,'_%fuA*'))*1e-6 %%%HP_noise para ZTES18.!!!
-        OP=setTESOPfromIb(Ib,IVstr,p,circuit)
+        %length(p)
+        OP=setTESOPfromIb(Ib,IVstr,p(i),circuit)
         %%OP.Tbath=1.5*OP.Tbath;%%%effect of Tbath error.Despreciable.
         [ncols,nrows]=SmartSplit(N);
 %         nrows=4;
@@ -155,7 +156,7 @@ if iscell(file)
             modelname='irwin';
         end
         
-        if strcmp(modelname,'2TB_hanging')
+        if strfind(modelname,'2TB')
             OP.parray=[p.Zinf p.Z0 p.taueff p.geff p.t_1];
         end
         auxnoise=noisesim(modelname,ZTES,OP,circuit,M);
@@ -163,7 +164,7 @@ if iscell(file)
         
         f=logspace(0,6,1000);
         %si0(i)=auxnoise.sI(1);
-        si0=auxnoise;%debug,para N=1 ver la SI.
+        %si0=auxnoise;%debug,para N=1 ver la SI.
         medfilt_w=20;
             if(strcmp(tipo,'current'))
                  filtered_current_noise=medfilt1(V2I(noise{i}(:,2),circuit)*1e12,medfilt_w);
@@ -176,6 +177,9 @@ if iscell(file)
                 if Mph==0
                     totnoise=sqrt(auxnoise.sum.^2+auxnoise.squidarray.^2);
                 else
+                    %%%%%OJO, PARA modelos 2TB no existe noise.ph ya que
+                    %%%%%hay 2 componentes de ph diferentes por tanto
+                    %%%%%totnoise no se puede definir así.
                     %totnoise=sqrt(auxnoise.max.^2+auxnoise.jo.^2+auxnoise.sh.^2+auxnoise.squidarray.^2);
                     Mexph=OP.Mph;
                     totnoise=sqrt((auxnoise.ph.^2)*(1+Mexph^2)+auxnoise.jo.^2+auxnoise.sh.^2+auxnoise.squidarray.^2);
