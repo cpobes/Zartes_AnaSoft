@@ -52,7 +52,7 @@ if nargin==1
 else
     option=varargin{1};
     material_str=option.material;
-    sizes=option.sizes;
+    %sizes=option.sizes;
     A=option.A;
     h=option.h;
 end

@@ -19,6 +19,8 @@ if nargin>2,
         h(i)=varargin{i+1};
     end
     end
+    h(1)=figure;
+    h(2)=figure;
 else
     ind=1:length(TFS.f);
     %ind=50:length(TFS.f)-3000;

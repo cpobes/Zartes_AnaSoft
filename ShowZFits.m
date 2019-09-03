@@ -6,8 +6,8 @@ bdir=pwd;
 
 dir=ZTESDATA.datadir;
 cd(dir);
-ssn=ZTESDATA.session; %%%%!!!!Ojo, a la definición de 'sesion' o 'session'.
-aux=load(ssn,'TFS');
+%ssn=ZTESDATA.session; %%%%!!!!Ojo, a la definición de 'sesion' o 'session'.
+%aux=load(ssn,'TFS');
 
 
 %FitZfiles(ZTESDATA.IVset,ZTESDATA.circuit,ZTESDATA.TES,aux.TFS);
@@ -17,6 +17,6 @@ aux=load(ssn,'TFS');
 %     if strfind(str(i).name,Tbath) & str(i).isdir, break;end%%%Para pintar automáticamente los ruido a una cierta temperatura.50mK.(tiene que funcionar con 50mK y 50.0mK, pero ojo con 50.2mK p.e.)
 % end
 
-FitZset(ZTESDATA.IVset,ZTESDATA.circuit,ZTESDATA.TES,aux.TFS,Tbath);%%%%Hay que poner boolShow=1 dentro de la funcion.
+FitZset(ZTESDATA.IVset,ZTESDATA.circuit,ZTESDATA.TES,ZTESDATA.TFS,Tbath);%%%%Hay que poner boolShow=1 dentro de la funcion.
 
 cd(bdir);
