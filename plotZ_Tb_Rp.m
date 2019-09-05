@@ -4,6 +4,10 @@ function plotZ_Tb_Rp(anaStruct,Rp,Temp)
 
 olddir=pwd;
 
+cd('G:\Unidades compartidas\X-IFU\Datos\Datos Dilución');
+load('colores.mat')%%%esto carga la estructura colores.
+cd(olddir)
+%[ 0    0.4470    0.7410]
 datadir=anaStruct.analizeOptions.datadir;
 cd(datadir);
  
@@ -26,7 +30,7 @@ tfList=importTF(strcat(str(i).name,'\',fileList));
 for i=1:length(tfList)
       zList{i}=GetZfromTF(tfList{i},anaStruct.TFS,anaStruct.circuit);
       figure(10)
-      plot(zList{i}.tf,'.-','color',[ 0    0.4470    0.7410]),hold on
+      plot(zList{i}.tf,'.-','color',colores.azul),hold on
       figure(11)
       semilogx(zList{i}.f,imag(zList{i}.tf),'.-'),hold on
       semilogx(zList{i}.f,real(zList{i}.tf),'.-'),hold on

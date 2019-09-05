@@ -63,7 +63,7 @@ end
 rp=p;
 %rp(3)=abs(rp(3));
 switch opt.model
-    case 'irwin'
+    case {'irwin','default'}
         %derived parameters
         %for simple model p(1)=Zinf, p(2)=Z0, p(3)=taueff
         %rp=real(p);

@@ -323,6 +323,7 @@ for i=1:length(dirs)
          if ~isempty(filesNoise)
              dirs{i}, filesNoise{jj}
             [noisedata,file]=loadnoise(0,dirs{i},filesNoise{jj});%%%quito '.txt'
+            %param
             OP=setTESOPfromIb(Ib,IV,param);
             OP.parray=p;%%%añadido para modelos a 2TB.
             %noiseIrwin=noisesim('irwin',TES,OP,circuit);
