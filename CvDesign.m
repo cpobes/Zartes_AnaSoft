@@ -37,15 +37,15 @@ Si3N4.conductivity=0;
 
 
 if nargin==1
-    material_str='oro';
+    material_str='bismuto';%'oro'
     %geometria y parametros del TES.
     sizes=[50, 100, 150,200,250]*1e-6;
     %sizes=100e-6;%bismuto.
-    sizes=240e-6;%%%Oro 1Z1_62A
+    sizes=100e-6;%%%Oro 1Z1_62A
     %sizes=150e-6;
     %sizes=sqrt(100*140)*1e-6;
     A=sizes.^2; %area
-    h=2.40e-6;   %altura.Au del 1Z10_45A:1.5e-6, 1Z10_62A:2.4e-6.
+    h=6.0e-6;   %altura.Au del 1Z10_45A:1.5e-6, 1Z10_62A:2.4e-6.
     %h=265e-9;
     %h=340e-9;
     %h=6e-6; %bismuto

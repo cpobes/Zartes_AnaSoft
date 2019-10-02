@@ -208,7 +208,7 @@ switch model
         t_t1=T1/T0;%%%% cociente temperaturas tes-bloque1
         F_1b=(t_1b^(n+2)+1)/2;%%%specular limit
         F_t1=(t_t1^(n+2)+1)/2;%%%specular limit
-        g_t_b=OP.P.g_t_b;%%(este cociente se usa directamente en las expresiones)
+        g_t_b=OP.P.a;%%(este cociente se usa directamente en las expresiones)(ojo a la denominacion)
         
         P2_1b=4*Kb*T1^2*G*F_1b;
         P2_t1=4*Kb*T0^2*G*F_t1;

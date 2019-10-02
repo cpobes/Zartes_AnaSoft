@@ -219,7 +219,7 @@ for i=1:length(dirs)
             
          %%%Hacemos el ajuste a Z(w)
             p0=[Zinf Z0 tau0];%%%1TB
-            Lt=1e-9;
+            %Lt=1e-9;
             %p0=[Zinf Z0 tau0 Lt];%%%1TB+reactancia.
             p04=0.01;%1/(0.7-IV.rtes(jj));
             %p0=[Zinf Z0 tau0 p04 1e-6];%%%p0 for 2 block model.
@@ -233,22 +233,46 @@ for i=1:length(dirs)
                 case 'default'
                     p0=[Zinf Z0 tau0];%%%
                 case '2TB_hanging'
-                    p0=[Zinf Z0 tau0 100 1/(2*pi*1e3)];
+                    %p0=[Zinf Z0 tau0 100 1/(2*pi*1e3)];
+                    %p0=[Zinf Z0 1/(2*pi*1e2) 1 1/(2*pi*3e3)];
+                    %p0=[0.008 -0.01 1.4e-3 50 2.5e-3];
+                    rps=[0:0.01:1];
+                    Ibs=BuildIbiasFromRp(IV,rps);
+                    [~,iii]=min(abs(Ibs-Ib*1e6));
+                    if rps(iii)<0.4
+                        p0=[0.0075 -0.0883 2e-4 7.7778 2e-3];
+                    elseif rps(iii)>=0.4 && rps(iii)<=0.7
+                        p0=[0.0085 -0.01 -2e-4 -7.45 0.0022];%%%p0(40%)
+                    elseif rps(iii)>0.7
+                        p0=[0.0120 0.0365 -3.3686e-05 -0.86 0.0030];%%%p0(75%)
+                    end
                 case '2TB_intermediate'
                     p0=[Zinf Z0 tau0 0.03 1/(2*pi*1e3)];
-
+                case '2TB_hanging_Lh-a'
+                    rps=[0:0.01:1];
+                    Ibs=BuildIbiasFromRp(IV,rps);
+                    [~,iii]=min(abs(Ibs-Ib*1e6));
+                    if rps(iii)<0.4
+                        p0=[0.0075 1.009 2e-4 0.07 2e-3];
+                    elseif rps(iii)>=0.4 && rps(iii)<=0.7
+                        p0=[0.0085 0.9329 -2e-4 0.5 0.0022];%%%p0(40%)
+                    elseif rps(iii)>0.7
+                        p0=[0.0120 0.2214 -3.3686e-05 0.6697 0.0030];%%%p0(75%)
+                    end
             end
+            
             LB=model.LB;%%%[-Inf -Inf 0 0 0]
             UB=model.UB;%%%[]
             %UB=[0.035 0 1];
             XDATA=fS(ind_z);
             switch model.nombre
-                case {'default' '2TB_hanging' '2TB_intermediate'}
+                case {'default' '2TB_hanging' '2TB_hanging_Lh-a' '2TB_intermediate'}
                     YDATA=[real(ztes(ind_z)) imag(ztes(ind_z))];
                 case 'ImZ'
                     YDATA=imag(ztes(ind_z));
             end
             fitfunc=model.function;%%%@fitZ
+            p0
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             try
             [p,aux1,aux2,aux3,out,aux4,auxJ]=lsqcurvefit(fitfunc,p0,XDATA,YDATA,LB,UB);%%%uncomment for real parameters.
@@ -283,7 +307,13 @@ for i=1:length(dirs)
               opt.model=model.nombre;
              param=GetModelParameters(p,IV,Ib,TES,circuit,opt);
             resN=aux1;
-            P(i).p(jj)=param;
+            %P(i).p(jj)=param;
+            if jj==1 
+                P(i).p(jj)=param;%%%Necesario inicializar los campos?
+            else
+                P(i).p(jj)=UpdateStruct(P(i).p(jj-1),param);
+            end
+            P(i).p(jj).p0=p0;
             P(i).residuo(jj).resN=resN;
             P(i).residuo(jj).ci=ci;
             

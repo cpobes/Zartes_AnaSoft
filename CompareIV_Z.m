@@ -26,6 +26,7 @@ function CompareIV_Z(IVset,P,Tbath)
     Za_effAprox=[p.ai]./(1+[p.bi]);
     %ecY='ai./(1+bi)';%%alfa_eff_Aprox
     
+    %Za_eff=[p.ai_fixed].*(2*[p.L0]+[p.bi])./(2+[p.bi])./[p.L0];
     Za_eff=[p.ai].*(2*[p.L0]+[p.bi])./(2+[p.bi])./[p.L0];
     %ecY='ai.*(2*L0+bi)./(2+bi)./L0';%%%alfa_eff1
     

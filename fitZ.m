@@ -67,7 +67,8 @@ elseif length(p)==5
      %fz=p(1)+(p(1)-p(2)).*(-1+1i*w*p(3).*(1-p(4)*1i*w*p(5)./(1+1i*w*p(5)))).^-1;%%%SRON
      %fz=p(1)+(p(2)-p(1)).*(1-1i*w*p(3)+p(4)./(1+1i*w*p(5))).^-1;%%%TFG_Marc
      rfz=real(fz);
-     imz=-abs(imag(fz));
+     imz=imag(fz);
+     %imz=-abs(imag(fz));
 elseif length(p)==7
     %p=[Zinf Z0 tau_I tau_1 tau_2 d1 d2]. Maasilta IH.
     fz=p(1)+(p(2)-p(1)).*(1-p(6)-p(7)).*(1+1i*w*p(3)-p(6)./(1+1i*w*p(4))-p(7)./(1+1i*w*p(5))).^-1;

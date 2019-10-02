@@ -121,18 +121,49 @@ switch opt.model
         param.Zinf=p(1);
         param.Z0=p(2);
         param.t_1=p(5);
-        param.geff=p(4);%%%gt1/((gt1+gtb)(L-1))
+        param.geff=p(4);%%%gt1/((gt1+gtb)(Lh-1))
         param.taueff=rp(3);
-        param.L=(p(2)-p(1))*(1+p(4))/((R0+p(1))+(p(2)-p(1))*(1+p(4)));%%%Esto es común a todos los modelos
+        %%%!!!La expresión de abajo está mal. De donde salió?sobraR0.
+        %param.Lh=(p(2)-p(1))*(1+p(4))/((R0+p(1))+(p(2)-p(1))*(1+p(4)));%%%Esto es común a todos los modelos
+        param.Lh=(p(2)-p(1))*(1+p(4))/(p(1)+(p(2)-p(1))*(1+p(4)));
         param.parray=p;
         %%%Hanging Model
         %%%si gtb=GIV=G0:
-        param.g_1=G0*(1/(1-p(4)*(param.L-1))-1);
-        param.C=p(3)*(param.L-1)*(param.g_1+G0);
+        param.g_1=G0*(1/(1-p(4)*(param.Lh-1))-1);
+        param.C=p(3)*(param.Lh-1)*(param.g_1+G0);
         param.C_1=p(5)*param.g_1;
-        param.ai=param.L*T0*(param.g_1+G0)/P0;    
+        param.ai=param.Lh*T0*(param.g_1+G0)/P0;    
         param.tau0=param.C/G0;
-        param.L0=param.L;
+        param.a=1/(1-param.Z0*(1+1/param.geff)/param.Zinf);
+        param.L0=param.Lh*(1-param.a);
+        %%%%%Parametros con C_1 fija
+        param.C_1_fixed=800e-15;
+        param.g_1_fixed=param.C_1_fixed/p(5);
+        param.a_fixed=param.g_1_fixed/(param.g_1_fixed+G0);
+        param.Lh_fixed=param.a_fixed/p(4)+1;
+        param.ai_fixed=param.Lh_fixed*T0*(param.g_1_fixed+G0)/P0;   
+        param.C_fixed=p(3)*(param.Lh_fixed-1)*(param.g_1_fixed+G0);
+    case '2TB_hanging_Lh-a'
+        %derived parameters for 2 block model case A expresado en función
+        %de Lh y 'a' (cociente de conductancias).
+        param.rp=R0/Rn;
+        param.bi=(rp(1)/R0)-1;  
+        param.Zinf=p(1);
+        param.Lh=p(2);
+        param.t_1=p(5);
+        param.geff=p(4)/(p(2)-1);%%%gt1/((gt1+gtb)(L-1))
+        param.a=p(4);
+        param.taueff=rp(3);
+        param.parray=p;
+        param.Z0=p(1)*(1-p(4))/(1-p(4)-p(2));
+        %%%Hanging Model
+        %%%si gtb=GIV=G0:
+        param.g_1=G0*param.a/(1-param.a);
+        param.C=p(3)*(param.Lh-1)*(param.g_1+G0);
+        param.C_1=p(5)*param.g_1;
+        param.ai=param.Lh*T0*(param.g_1+G0)/P0;    
+        param.tau0=param.C/G0;
+        param.L0=param.Lh*(1-param.a);
     case '2TB_intermediate'    
         %derived parameters for 2 block model case A
         param.rp=R0/Rn;
@@ -142,22 +173,24 @@ switch opt.model
         param.t_1=p(5);
         param.geff=p(4);%%%gt1/((gt1+gtb)(L-1))
         param.taueff=rp(3);
-        param.L=(p(2)-p(1))*(1+p(4))/((R0+p(1))+(p(2)-p(1))*(1+p(4)));%%%Esto es común a todos los modelos
+        %param.L=(p(2)-p(1))*(1+p(4))/((R0+p(1))+(p(2)-p(1))*(1+p(4)));%%%Esto es común a todos los modelos
+        param.L=(p(2)-p(1))*(1+p(4))/(p(1)+(p(2)-p(1))*(1+p(4)));
         param.parray=p;
         %%%Intermediate Model
-        %%% n=m, K1=K2, -> g1,b=gt,1(T1) -> p(4)*(L-1)=0.5;
-        %%% n=m K1!=K2. -> gc=g1,b/gt,1(T1).
-        param.g_t_b=p(4)*(param.L-1);%%%cociente. gt,1(T1)/(gt,1(T1)+g1,b)
-        param.g_c=(1-param.g_t_b)/param.g_t_b;%%%
-        param.T1=(param.g_t_b*T0.^TES.n+(1-param.g_t_b)*Tb.^TES.n).^(1./TES.n);
-        param.g_1=G0./(1-param.g_t_b); %%% g_1=gt,1(T0);
-        param.C=p(3)*(param.L-1)*param.g_1;
-        param.C_1=p(5)*TES.Gtes(param.T1)*(1+param.g_c);
-        param.ai=param.L*T0*(param.g_1)/P0;
+        %%% n=m, K1=K2, -> g1,b=gt,1(T1) -> p(4)*(L-1)=0.5;g_c=1
+        %%% n=m K1!=K2. -> g_c=g1,b/gt,1(T1).
+        param.a=p(4)*(param.L-1);%%%cociente. gt,1(T1)/(gt,1(T1)+g1,b)
+        param.g_c=(1-param.a)/param.a;%%%
+        param.T1=(param.a*T0.^TES.n+(1-param.a)*Tb.^TES.n).^(1./TES.n);
+        param.g_t1_0=G0./(1-param.a); %%% From ec10 Maasilta.Asumimos Geff=G0.
+        param.g_t1_1=param.g_t1_0*(param.T1/T0).^(TES.n-1);%%%G(T1)=n*K*T1^(n-1)
+        param.g_1b=param.g_t1_1*param.g_c;
+        param.C=p(3)*(param.L-1)*param.g_t1_0;
+        param.C_1=p(5)*(param.g_t1_1+param.g_1b);
+        param.ai=param.L*T0*(param.g_t1_0)/P0;
         param.tau0=param.C/G0;
-        param.L0=param.L;
+        param.L0=P0*param.ai/(T0*G0);%%%ec.10 p9 Maasilta.
         
-
     otherwise
         param=nan;
 end

@@ -36,17 +36,25 @@ for i=1:length(tfList)
       semilogx(zList{i}.f,real(zList{i}.tf),'.-'),hold on
 end
 
-if length(anaStruct.P(mP).p(1).parray)==3
-    px=[GetPparam(anaStruct.P(mP).p,'Zinf')' GetPparam(anaStruct.P(mP).p,'Z0')' GetPparam(anaStruct.P(mP).p,'taueff')' ];
-else
-    px=[GetPparam(anaStruct.P(mP).p,'Zinf')' GetPparam(anaStruct.P(mP).p,'Z0')' ...
-    GetPparam(anaStruct.P(mP).p,'taueff')' GetPparam(anaStruct.P(mP).p,'geff')' GetPparam(anaStruct.P(mP).p,'t_1')' ];
+% if length(anaStruct.P(mP).p(1).parray)==3
+%     px=[GetPparam(anaStruct.P(mP).p,'Zinf')' GetPparam(anaStruct.P(mP).p,'Z0')' GetPparam(anaStruct.P(mP).p,'taueff')' ];
+% else
+%     px=[GetPparam(anaStruct.P(mP).p,'Zinf')' GetPparam(anaStruct.P(mP).p,'Z0')' ...
+%     GetPparam(anaStruct.P(mP).p,'taueff')' GetPparam(anaStruct.P(mP).p,'geff')' GetPparam(anaStruct.P(mP).p,'t_1')' ];
+% end
+
+for ii=1:length([anaStruct.P(mP).p.rp])
+    px(ii,:)=anaStruct.P(mP).p(ii).parray;
 end
 
+m_name=anaStruct.analizeOptions.ZfitOpt.ThermalModel;
+model=BuildThermalModel(m_name);
+func=model.function
 
 for i=1:length(Rp)
     [~,jj]=min(abs([anaStruct.P(mP).p.rp]-Rp(i)));
-    zx=fitZ(px(jj,:),anaStruct.TFS.f);
+    %zx=fitZ(px(jj,:),anaStruct.TFS.f);
+    zx=func(px(jj,:),anaStruct.TFS.f);
     figure(10)
     plot(zx(:,1),zx(:,2),'-r');
     figure(11)
