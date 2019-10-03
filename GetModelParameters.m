@@ -124,8 +124,8 @@ switch opt.model
         param.geff=p(4);%%%gt1/((gt1+gtb)(Lh-1))
         param.taueff=rp(3);
         %%%!!!La expresión de abajo está mal. De donde salió?sobraR0.
-        %param.Lh=(p(2)-p(1))*(1+p(4))/((R0+p(1))+(p(2)-p(1))*(1+p(4)));%%%Esto es común a todos los modelos
-        param.Lh=(p(2)-p(1))*(1+p(4))/(p(1)+(p(2)-p(1))*(1+p(4)));
+        param.Lh=(p(2)-p(1))*(1+p(4))/((R0+p(1))+(p(2)-p(1))*(1+p(4)));%%%Esto es común a todos los modelos
+        %param.Lh=(p(2)-p(1))*(1+p(4))/(p(1)+(p(2)-p(1))*(1+p(4)));
         param.parray=p;
         %%%Hanging Model
         %%%si gtb=GIV=G0:
@@ -173,8 +173,8 @@ switch opt.model
         param.t_1=p(5);
         param.geff=p(4);%%%gt1/((gt1+gtb)(L-1))
         param.taueff=rp(3);
-        %param.L=(p(2)-p(1))*(1+p(4))/((R0+p(1))+(p(2)-p(1))*(1+p(4)));%%%Esto es común a todos los modelos
-        param.L=(p(2)-p(1))*(1+p(4))/(p(1)+(p(2)-p(1))*(1+p(4)));
+        param.L=(p(2)-p(1))*(1+p(4))/((R0+p(1))+(p(2)-p(1))*(1+p(4)));%%%Esto es común a todos los modelos
+        %param.L=(p(2)-p(1))*(1+p(4))/(p(1)+(p(2)-p(1))*(1+p(4)));
         param.parray=p;
         %%%Intermediate Model
         %%% n=m, K1=K2, -> g1,b=gt,1(T1) -> p(4)*(L-1)=0.5;g_c=1

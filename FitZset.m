@@ -239,9 +239,9 @@ for i=1:length(dirs)
                     rps=[0:0.01:1];
                     Ibs=BuildIbiasFromRp(IV,rps);
                     [~,iii]=min(abs(Ibs-Ib*1e6));
-                    if rps(iii)<0.4
+                    if rps(iii)<0.38
                         p0=[0.0075 -0.0883 2e-4 7.7778 2e-3];
-                    elseif rps(iii)>=0.4 && rps(iii)<=0.7
+                    elseif rps(iii)>=0.38 && rps(iii)<=0.7
                         p0=[0.0085 -0.01 -2e-4 -7.45 0.0022];%%%p0(40%)
                     elseif rps(iii)>0.7
                         p0=[0.0120 0.0365 -3.3686e-05 -0.86 0.0030];%%%p0(75%)

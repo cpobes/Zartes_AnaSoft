@@ -30,7 +30,7 @@ function CompareIV_Z(IVset,P,Tbath)
     Za_eff=[p.ai].*(2*[p.L0]+[p.bi])./(2+[p.bi])./[p.L0];
     %ecY='ai.*(2*L0+bi)./(2+bi)./L0';%%%alfa_eff1
     
-    Zb_eff=([p.bi]+2*[p.L0])./(1-[p.L0]);
+    Zb_eff=([p.bi]+2*[p.Lh])./(1-[p.Lh]);
     %ecY='(bi+2*L0)./(1-L0)';%%%beta_eff
     invZb_eff=1./Zb_eff;
     %ecY='(1-L0)./(bi+2*L0)'; %%%inverse beta_eff
