@@ -74,6 +74,9 @@ if isfield(analizeOptions,'TES_sides')
     CN=sum(CN);
     TES.CN=CN;
     TESN.CN=CN;
+else
+    TES.CN=100e-15;%%%%Valores por defecto si no pasamos TES_sides, para que no de error.
+    TESN.CN=100e-15;
 end
 
 %TES.Rn=circuit.Rn; %TES.sides=(lado). Actualizo la estructura TES para incluir Rn.
@@ -110,4 +113,12 @@ AnalizedData.TESN=TESN;
 AnalizedData.TFS=TFS;
 AnalizedData.P=P;
 AnalizedData.PN=PN;
-AnalizedData.analizeOptions=analizeOptions;
+AnalizedData.analizeOptions.datadir=datadir;
+AnalizedData.analizeOptions.PTrange=PTrange;
+AnalizedData.analizeOptions.PTmodel=PTmodel;
+AnalizedData.analizeOptions.RpTES=RpTES;
+AnalizedData.analizeOptions.ZfitOpt=ZfitOpt;
+if isfield(analizeOptions,'TES_sides')
+    AnalizedData.analizeOptions.TES_sides=TES.sides;
+end
+
