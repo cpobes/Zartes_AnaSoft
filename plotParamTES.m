@@ -19,8 +19,11 @@ end
 if strcmp(yl,'Zinf') index=1;end
 if strcmp(yl,'Z0') index=2;end
 if strcmp(yl,'taueff') index=3;end
+if strcmp(yl,'geff') index=4;end
+if strcmp(yl,'t_1') index=5;end
     
-if strcmp(yl,'taueff')||strcmp(yl,'Zinf')||strcmp(yl,'Z0')
+%if strcmp(yl,'taueff')||strcmp(yl,'Zinf')||strcmp(yl,'Z0')
+if any(strcmp(yl,{'Zinf' 'Z0' 'taueff' 'geff' 't_1'}))    
     for i=1:length(P),
         lb=[];ub=[];for jj=1:length([P(i).p]) lb(jj)=P(i).residuo(jj).ci(index,1);ub(jj)=P(i).residuo(jj).ci(index,2);end
         x=GetPparam(P(i).p,xl);

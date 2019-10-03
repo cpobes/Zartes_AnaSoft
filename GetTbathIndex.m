@@ -7,7 +7,7 @@ function [mIV,mP]=GetTbathIndex(Tbath,varargin)
 if nargin==2 && ~isfield(varargin{1},'Tbath') %%%Pasamos toda la estructura de datos ZTESDATA
 %     IVset=getfield(varargin{1},'IVset');
 %     P=getfield(varargin{1},'P');
-    varargin{1}
+    varargin{1};
     IVset=varargin{1}.('IVset');
     P=varargin{1}.('P');
 elseif nargin==3
