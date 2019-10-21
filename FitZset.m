@@ -239,10 +239,14 @@ for i=1:length(dirs)
                     rps=[0:0.01:1];
                     Ibs=BuildIbiasFromRp(IV,rps);
                     [~,iii]=min(abs(Ibs-Ib*1e6));
-                    if rps(iii)<0.38
-                        p0=[0.0075 -0.0883 2e-4 7.7778 2e-3];
-                    elseif rps(iii)>=0.38 && rps(iii)<=0.7
+                    if rps(iii)<0.51%0.38
+                        %p0=[0.0075 -0.0883 2e-4 7.7778 2e-3];
+                        %p0=[Zinf Z0 2e-4 7.7778 2e-3];
+                        p0=[Zinf Z0 9.3770e-06 1 1.5e-3];
+                    elseif rps(iii)>=0.51 && rps(iii)<0.6
                         p0=[0.0085 -0.01 -2e-4 -7.45 0.0022];%%%p0(40%)
+                    elseif rps(iii)==0.7
+                        p0=[0.0120 -0.1365  -0.3597 -1.35 0.0030];%%%p0(75%)
                     elseif rps(iii)>0.7
                         p0=[0.0120 0.0365 -3.3686e-05 -0.86 0.0030];%%%p0(75%)
                     end

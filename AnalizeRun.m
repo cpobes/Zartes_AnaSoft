@@ -88,6 +88,7 @@ TESDATA=BuildDataStruct;
 P=FitZset_remote(TESDATA,ZfitOpt);
 
 %%%Solicion temporal para analizar tb negativas.
+
 cd(strcat(datadir,'\Negative Bias'))
 TESDATAN.IVset=IVsetN;
 TESDATAN.circuit=TESDATA.circuit;
@@ -95,9 +96,13 @@ TESDATAN.TES=TESN;
 %TESDATAN.TFS=TESDATA.TFS;
 TFS=importTF('..\TFS.txt');
 TESDATAN.TFS=TFS;
+PN=P;
+if(0)
 PN=FitZset_remote(TESDATAN,ZfitOpt);
+end
 %PN=FitZset(IVsetN,circuit,TESN,TFS); 
 cd ..
+
 
 cd(olddir)
 
