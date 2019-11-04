@@ -97,7 +97,7 @@ TESDATAN.TES=TESN;
 TFS=importTF('..\TFS.txt');
 TESDATAN.TFS=TFS;
 PN=P;
-if(0)
+if(1)
 PN=FitZset_remote(TESDATAN,ZfitOpt);
 end
 %PN=FitZset(IVsetN,circuit,TESN,TFS); 

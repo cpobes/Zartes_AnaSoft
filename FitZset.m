@@ -229,6 +229,9 @@ for i=1:length(dirs)
             
             model=BuildThermalModel(options.ThermalModel);           
             p0=model.X0;
+            rps=[0:0.01:1];
+            Ibs=BuildIbiasFromRp(IV,rps);
+            [~,iii]=min(abs(Ibs-Ib*1e6));
             switch model.nombre
                 case 'default'
                     p0=[Zinf Z0 tau0];%%%
@@ -236,9 +239,7 @@ for i=1:length(dirs)
                     %p0=[Zinf Z0 tau0 100 1/(2*pi*1e3)];
                     %p0=[Zinf Z0 1/(2*pi*1e2) 1 1/(2*pi*3e3)];
                     %p0=[0.008 -0.01 1.4e-3 50 2.5e-3];
-                    rps=[0:0.01:1];
-                    Ibs=BuildIbiasFromRp(IV,rps);
-                    [~,iii]=min(abs(Ibs-Ib*1e6));
+
                     if rps(iii)<0.51%0.38
                         %p0=[0.0075 -0.0883 2e-4 7.7778 2e-3];
                         %p0=[Zinf Z0 2e-4 7.7778 2e-3];
@@ -248,10 +249,14 @@ for i=1:length(dirs)
                     elseif rps(iii)==0.7
                         p0=[0.0120 -0.1365  -0.3597 -1.35 0.0030];%%%p0(75%)
                     elseif rps(iii)>0.7
-                        p0=[0.0120 0.0365 -3.3686e-05 -0.86 0.0030];%%%p0(75%)
+                        %p0=[0.0120 0.0365 -3.3686e-05 -0.86 0.0030];%%%p0(75%)
+                        p0=[0.0706   -0.3593    -5.8333e-04   -2.1667     2.6923e-04];%%%p0(75%)
                     end
                 case '2TB_intermediate'
                     p0=[Zinf Z0 tau0 0.03 1/(2*pi*1e3)];
+                    if rps(iii)>0.8
+                        p0=[0.0706   -0.3593    -5.8333e-04   -2.1667     2.6923e-04];
+                    end
                 case '2TB_hanging_Lh-a'
                     rps=[0:0.01:1];
                     Ibs=BuildIbiasFromRp(IV,rps);

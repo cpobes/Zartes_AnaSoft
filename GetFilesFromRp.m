@@ -21,7 +21,7 @@ end
 files=ls(strcat(str(i).name,pattern))
 [ii,jj]=size(files);
 for i=1:ii
-Iaux(i)=sscanf(char(regexp(files(i,:),'\d+(\.\d*)?','match')),'%f');
+Iaux(i)=sscanf(char(regexp(files(i,:),'-?\d+(\.\d*)?','match')),'%f');
 end
 
 %Iaux

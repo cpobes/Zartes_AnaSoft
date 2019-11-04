@@ -11,9 +11,14 @@ cd(olddir)
 datadir=anaStruct.analizeOptions.datadir;
 cd(datadir);
  
-[mIV,mP]=GetTbathIndex(Temp,anaStruct);
 
-fileList=GetFilesFromRp(anaStruct.IVset(mIV),Temp,Rp,'\TF_*')
+polarity=1;%%%1:P,0:N.
+if polarity
+    fileList=GetFilesFromRp(anaStruct.IVset(mIV),Temp,Rp,'\TF_*')
+else
+    cd('Negative Bias')
+    fileList=GetFilesFromRp(anaStruct.IVsetN(mIV),Temp,Rp,'\TF_*')
+end
 
 %%%%
 str=dir('*mK')
@@ -43,8 +48,10 @@ end
 %     GetPparam(anaStruct.P(mP).p,'taueff')' GetPparam(anaStruct.P(mP).p,'geff')' GetPparam(anaStruct.P(mP).p,'t_1')' ];
 % end
 
-for ii=1:length([anaStruct.P(mP).p.rp])
-    px(ii,:)=anaStruct.P(mP).p(ii).parray;
+if polarity
+    for ii=1:length([anaStruct.P(mP).p.rp]) px(ii,:)=anaStruct.P(mP).p(ii).parray; end
+else
+    for ii=1:length([anaStruct.PN(mP).p.rp]) px(ii,:)=anaStruct.PN(mP).p(ii).parray; end
 end
 
 m_name=anaStruct.analizeOptions.ZfitOpt.ThermalModel;
@@ -53,7 +60,12 @@ func=model.function
 
 %%%Pintamos el modelo
 for i=1:length(Rp)
-    [~,jj]=min(abs([anaStruct.P(mP).p.rp]-Rp(i)));
+    if polarity
+        [~,jj]=min(abs([anaStruct.P(mP).p.rp]-Rp(i)));
+    else
+        [~,jj]=min(abs([anaStruct.PN(mP).p.rp]-Rp(i)));
+    end
+    
     %zx=fitZ(px(jj,:),anaStruct.TFS.f);
     zx=func(px(jj,:),anaStruct.TFS.f);
     figure(10)

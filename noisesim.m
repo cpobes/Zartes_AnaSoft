@@ -106,16 +106,31 @@ switch model
 
     case 'irwin'
     %%% ecuaciones capitulo Irwin
-    
+    func=@(p,f)([p(1)-(p(1)-p(2))./(1+((2*pi*f).^2)*(p(3).^2)) ...
+                    -abs(-(p(1)-p(2))*(2*pi*f)*p(3)./(1+((2*pi*f).^2)*(p(3).^2)))]);
+                if nargin>1
+    p0=[OP.Zinf OP.Z0 OP.P.taueff];%%%Ojo a OP, no incluye taueff
+    zdata=func(p0,f);%%%p0=[p1 p2 p3 p4 p5];!!!!!ojo al formato!
+    ztes=zdata(1:end/2)+1i*zdata(end/2+1:end);
+    zcirc=ztes+RL+1i*2*pi*f*L;
+    %sI=(ztes-R0*(1+bI))./(zcirc*V0*(2+bI));
+                end
     sI=-(1/(I0*R0))*(L/(tau_el*R0*L0)+(1-RL/R0)-L*tau*(2*pi*f).^2/(L0*R0)+1i*(2*pi*f)*L*tau*(1/tauI+1/tau_el)/(R0*L0)).^-1;%funcion de transferencia.
     
     t=Ts/T0;
     %%%calculo factor F. See McCammon p11.
     %n=3.1;
     %F=t^(n+1)*(t^(n+2)+1)/2;%F de boyle y rogers. n= exponente de la ley de P(T). El primer factor viene de la pag22 del cap de Irwin.
-    F=(t^(n+2)+1)/2;%%%specular limit
-    %F=t^(n+1)*(n+1)*(t^(2*n+3)-1)/((2*n+3)*(t^(n+1)-1));%F de Mather. La
-    %diferencia entre las dos fÃ³rmulas es menor del 1%.
+    %%%%UPDATE.23-Oct-2019. Además de eliminar el factor t^(n+1) que era el
+    %%%%responsable de que F tendiese a cero en lugar de 1/2 el uso del
+    %%%%exponente estaba mal, las expresiones de McCammon no usan el 'n'
+    %%%%nuestro, sino el exponente de la ley de G, es decir, 'n-1'. Esto
+    %%%%cambia las expresiones y cambia la estimación de 'F', sobre todo a Tbath baja.
+    %%%%De hecho, la diferencia entre el specular y el diffusive puede llegar también al 10%
+    bb=n-1;
+    F=(t^(bb+2)+1)/2;%%%specular limit
+    %F=(bb+1)*(t^(2*bb+3)-1)/((2*bb+3)*(t^(bb+1)-1));%F de Mather.%diffusive limit
+    %%%La diferencia entre las dos fÃ³rmulas es menor del 1%.
     %F=(n+1)*(t^(2*n+3)-1)/((2*n+3)*(t^(n+1)-1));%%%diffusive limit.
     
     stfn=4*Kb*T0^2*G*abs(sI).^2*F;%Thermal Fluctuation Noise
@@ -171,9 +186,13 @@ switch model
         sI=(ztes-R0*(1+bI))./(zcirc*V0*(2+bI));
         w=2*pi*f;
         t=Ts/T0;
-        F=(t^(n+2)+1)/2;%%%specular limit
-        stfn_b=4*Kb*T0^2*G*abs(sI).^2*F;%%%ruido térmico al baño
-        stfn_1=4*Kb*T0^2*G*abs(sI).^2.*(w*tau_1).^2./(1+(w*tau_1).^2);%%%ruido termico absorbente-TES
+        bb=n-1;
+        F=(t^(bb+2)+1)/2;%%%specular limit
+        %F=(bb+1)*(t^(2*bb+3)-1)/((2*bb+3)*(t^(bb+1)-1));%F de Mather.
+        g0=G;
+        g1=OP.P.g_1;
+        stfn_b=4*Kb*T0^2*g0*abs(sI).^2*F;%%%ruido térmico al baño
+        stfn_1=4*Kb*T0^2*g1*abs(sI).^2.*(w*tau_1).^2./(1+(w*tau_1).^2);%%%ruido termico absorbente-TES
         stes=(4*Kb*T0*R0*(1+2*bI)).*abs(ztes+R0).^2./(R0^2*(2+bI).^2*abs(zcirc).^2);%%%ruido johnson
         ssh=4*Kb*Ts*RL./abs(zcirc).^2;%%%johnson en la shunt
         
@@ -206,8 +225,11 @@ switch model
         T1=OP.P.T1;%%%Temperatura del bloque1
         t_1b=Ts/T1;%%%%cociente temperaturas bloque1/baño
         t_t1=T1/T0;%%%% cociente temperaturas tes-bloque1
-        F_1b=(t_1b^(n+2)+1)/2;%%%specular limit
-        F_t1=(t_t1^(n+2)+1)/2;%%%specular limit
+        bb=n-1;
+        F_1b=(t_1b^(bb+2)+1)/2;%%%specular limit
+        F_t1=(t_t1^(bb+2)+1)/2;%%%specular limit
+        %F=(bb+1)*(t^(2*bb+3)-1)/((2*bb+3)*(t^(bb+1)-1));%F de Mather.
+        %F=(bb+1)*(t^(2*bb+3)-1)/((2*bb+3)*(t^(bb+1)-1));%F de Mather.
         g_t_b=OP.P.a;%%(este cociente se usa directamente en las expresiones)(ojo a la denominacion)
         
         P2_1b=4*Kb*T1^2*G*F_1b;
