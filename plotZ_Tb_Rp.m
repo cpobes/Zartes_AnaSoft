@@ -11,6 +11,7 @@ cd(olddir)
 datadir=anaStruct.analizeOptions.datadir;
 cd(datadir);
  
+[mIV,mP]=GetTbathIndex(Temp,anaStruct);%%%Se asume que para todas las temperaturas se toman tanto datos positivos como negativos.
 
 polarity=1;%%%1:P,0:N.
 if polarity
