@@ -12,7 +12,8 @@ if nargin==0
     model.nombre='default'
     model.function=@(p,f)([p(1)-(p(1)-p(2))./(1+((2*pi*f).^2)*(p(3).^2)) ...
       -abs(-(p(1)-p(2))*(2*pi*f)*p(3)./(1+((2*pi*f).^2)*(p(3).^2)))]);
-    
+    model.Cfunction=@(p,f)(p(1)+(p(2)-p(1)).*(1-1i*(2*pi*f)*p(3)).^-1);
+
        %%%model.function=@(p,f)([ ... %%%%modelo para ajustar sólo Imag(Z).
       %%%-abs(-(p(1)-p(2))*(2*pi*f)*p(3)./(1+((2*pi*f).^2)*(p(3).^2)))]);
     
@@ -34,6 +35,7 @@ else
                 model.function=@(p,f)([p(1)-(p(1)-p(2))./(1+((2*pi*f).^2)*(p(3).^2)) ...
                     -abs(-(p(1)-p(2))*(2*pi*f)*p(3)./(1+((2*pi*f).^2)*(p(3).^2)))]);
                 
+                model.Cfunction=@(p,f)(p(1)+(p(2)-p(1)).*(1-1i*(2*pi*f)*p(3)).^-1);
                 model.description='p(1)=Zinf p(2)=Z0 p(3)=taueff'
                 model.X0=[-1e-2 1e-2 1e-6];%%%p0=[Zinf Z0 tau0];%%%1TB
                 model.LB=[-Inf -Inf 0];%%%lower bounds
