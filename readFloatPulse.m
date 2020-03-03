@@ -22,5 +22,6 @@ switch version
         data=fread(fid,opt.RL,'float');
         fclose(fid);
         L=0:1/opt.SR:((opt.RL-1)/opt.SR);
-        pulso=[L' data']; 
+        %size(data),size(L),
+        pulso=[L(:) data(:)]; 
 end

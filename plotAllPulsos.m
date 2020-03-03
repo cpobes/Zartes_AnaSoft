@@ -13,15 +13,23 @@ for i=1:nargin
     if ischar(varargin{i})
         dir=varargin{i};
     end
+    if isnumeric(varargin{i});
+        ind=varargin{i};
+    end
 end
 
 dir
-faux=ls(strcat(dir,'\',basename))
+faux=ls(strcat(dir,'\',basename));
 
 hold off
 
-for i=108:125%i=1:length(faux(:,1)) 
-    pulso=importdata(strcat(dir,'\',faux(i,:)));
+%for i=1:length(faux(:,1)); %%108:125%i=1:length(faux(:,1)) 
+opt.RL=2000;
+opt.SR=1e5;
+for i=ind;
+    %pulso=importdata(strcat(dir,'\',faux(i,:)));
+    file=strcat(dir,'\',faux(i,:));
+    pulso=readFloatPulse(file,opt);
     if isempty(pulso)
         {'pulso' i 'vacio'}
     else
