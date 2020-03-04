@@ -26,6 +26,7 @@ hold off
 %for i=1:length(faux(:,1)); %%108:125%i=1:length(faux(:,1)) 
 opt.RL=2000;
 opt.SR=1e5;
+ind
 for i=ind;
     %pulso=importdata(strcat(dir,'\',faux(i,:)));
     file=strcat(dir,'\',faux(i,:));
@@ -52,7 +53,7 @@ for i=ind;
     end
 end
 
-set(gca,'fontsize',20,'fontweight','bold')
+set(gca,'fontsize',12,'fontweight','bold')
 xlabel('t(ms)')
 ylabel('V_{out}')
 axis tight
