@@ -4,7 +4,8 @@ function plotZ_Tb_Rp(anaStruct,Rp,Temp)
 
 olddir=pwd;
 
-cd('G:\Unidades compartidas\X-IFU\Datos\Datos Dilución');
+%cd('G:\Unidades compartidas\X-IFU\Datos\Datos Dilución
+cd('G:\Shared drives\X-IFU\Datos\Datos Dilución');
 load('colores.mat')%%%esto carga la estructura colores.
 cd(olddir)
 %[ 0    0.4470    0.7410]
@@ -13,12 +14,14 @@ cd(datadir);
  
 [mIV,mP]=GetTbathIndex(Temp,anaStruct);%%%Se asume que para todas las temperaturas se toman tanto datos positivos como negativos.
 
-polarity=1;%%%1:P,0:N.
+polarity=0;%%%1:P,0:N.
 if polarity
     fileList=GetFilesFromRp(anaStruct.IVset(mIV),Temp,Rp,'\TF_*')
+    color=colores.azul;
 else
     cd('Negative Bias')
     fileList=GetFilesFromRp(anaStruct.IVsetN(mIV),Temp,Rp,'\TF_*')
+    color=colores.naranja;
 end
 
 %%%%
@@ -36,9 +39,10 @@ tfList=importTF(strcat(str(i).name,'\',fileList));
 for i=1:length(tfList)
       zList{i}=GetZfromTF(tfList{i},anaStruct.TFS,anaStruct.circuit);
       figure(10)
-      plot(zList{i}.tf,'.-','color',colores.azul),hold on
+      plot(zList{i}.tf,'.-','color',color),hold on
+      plot(zList{i}.tf(529),'o','linewidth',5);%%% pintamos el punto en que f=2e3.(indice 529).
       figure(11)
-      semilogx(zList{i}.f,imag(zList{i}.tf),'.-'),hold on
+      %semilogx(zList{i}.f,imag(zList{i}.tf),'.-'),hold on
       semilogx(zList{i}.f,real(zList{i}.tf),'.-'),hold on
 end
 
@@ -70,10 +74,11 @@ for i=1:length(Rp)
     %zx=fitZ(px(jj,:),anaStruct.TFS.f);
     zx=func(px(jj,:),anaStruct.TFS.f);
     figure(10)
-    plot(zx(:,1),zx(:,2),'-k');
+    plot(zx(:,1),zx(:,2),'-k');grid on
     figure(11)
-    semilogx(anaStruct.TFS.f,zx(:,2),'-r');
+    %semilogx(anaStruct.TFS.f,zx(:,2),'-r');
     semilogx(anaStruct.TFS.f,zx(:,1),'-k');
+    grid on
 end
 
 cd(olddir)
