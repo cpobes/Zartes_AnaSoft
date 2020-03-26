@@ -95,4 +95,3 @@ cd ..
     PulseParameters.tau_rise=tau_rise;
     PulseParameters.tau_fall=tau_fall;
     PulseParameters.t0=t0;
-    

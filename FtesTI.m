@@ -21,7 +21,7 @@ r=(ttes+ites.^(2/3)).^1; %i=(1-t)^(3/2) -> i^(2/3)+t=1 -> (i^(2/3)+t)^n=r.
 %Se puede hacer n=1.
 
 %%%available models:'power', 'erf', 'recta', 'ere', 'TFM', 'tanh'
-model='BKT1';%'erf';%'recta';
+model='RTI';%'BKT1';%'erf';%'recta';
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 global RTI %%%intento de crear modelo spline de la superficie.
