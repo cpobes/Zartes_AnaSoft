@@ -103,7 +103,7 @@ else
                  imag(p(1)+(p(2)-p(1)).*(1+p(4)).*(1-1i*(2*pi*f)*p(3)+p(4)./(1+1i*(2*pi*f)*p(5))).^-1)];
             model.Cfunction=@(p,f)(p(1)+(p(2)-p(1)).*(1+p(4)).*(1-1i*(2*pi*f)*p(3)+p(4)./(1+1i*(2*pi*f)*p(5))).^-1);
             model.description='p=[Zinf Z0 tau_I d1 tau1]; *tau_I=Ctes/(Gtes+G)(LH-1),  *d=Gtes/(Gtes+G)(LH-1), tau1=CA/Gtes';
-            model.X0=[-1e-2 1e-2 1/(2*pi*1e4) 0.03 1/(2*pi*1e2)];
+            model.X0=[1e-2 -1e-2 1/(2*pi*1e4) 0.03 1/(2*pi*1e2)];
             model.LB=[0 -Inf -Inf -Inf 0];
             model.UB=[Inf Inf Inf Inf 1];
                 if isempty(opt)

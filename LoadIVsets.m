@@ -9,7 +9,8 @@ function [IVset,IVsetN]=LoadIVsets(varargin)
 %%%%%% analizando desde un directorio de análisis sin tener que ir saltando
 %%%%%% al dir de datos. Combinarla con FitZset_remote.
 
-colordir='G:\Unidades compartidas\X-IFU\Datos\Datos Dilución';
+%colordir='G:\Unidades compartidas\X-IFU\Datos\Datos Dilución';
+colordir='G:\Shared drives\X-IFU\Datos\Datos Dilución';
 
 % command=strcat('''load(''''',colordir,'\','colores.mat',''''')''')
 % evalin('caller',command); no funciona.

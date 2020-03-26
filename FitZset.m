@@ -77,6 +77,11 @@ if nargin==4 || (nargin==5 && isstruct(varargin{1}))
 
     %return;
 elseif nargin>4 && isnumeric(varargin{1})
+            options.TFdata='HP';
+            options.Noisedata='HP';
+            options.ThermalModel='2TB_intermediate';%'default';
+            options.NoiseFilterModel.model='default';
+            options.NoiseFilterModel.wmed=40;
     t=varargin{1};
     for iii=1:length(t)
         str=dir('*mK');
@@ -253,9 +258,10 @@ for i=1:length(dirs)
                         p0=[0.0706   -0.3593    -5.8333e-04   -2.1667     2.6923e-04];%%%p0(75%)
                     end
                 case '2TB_intermediate'
-                    p0=[Zinf Z0 tau0 0.03 1/(2*pi*1e3)];
-                    if rps(iii)>0.8
-                        p0=[0.0706   -0.3593    -5.8333e-04   -2.1667     2.6923e-04];
+                    p0=[Zinf Z0 tau0 1 1/(2*pi*2e3)];
+                    if rps(iii)>0.7%0.8
+                        %p0=[0.0706   -0.3593    -5.8333e-04   -2.1667     2.6923e-04];
+                        p0=[Zinf   Z0   sign(Zinf)*1/(2*pi*1e3)    sign(Zinf)*10     1/(2*pi*2e3)];
                     end
                 case '2TB_hanging_Lh-a'
                     rps=[0:0.01:1];
