@@ -10,10 +10,12 @@ sides=TES.sides;
 
 %hMo=55e-9; hAu=340e-9;
 hMo=45e-9; hAu=265e-9;
+hBi=0;%6e-6;
 if isfield(TES,'hMo') hMo=TES.hMo;end
 if isfield(TES,'hAu') hAu=TES.hAu;end
+if isfield(TES,'hBi') hBi=TES.hBi;end
 %hAu
-hBi=0;%6e-6;
+
 sides^2*hBi*rhoAs(3)
 %hAu=1.1e-6;
 if length(hAu)==1 hAu=hAu*ones(1,length(TES.Tc));end

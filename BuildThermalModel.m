@@ -111,6 +111,22 @@ else
                 else
                     model.noise=noisesim('2TB_intermediate',opt.TES,opt.OP,opt.circuit);
                 end
+                
+        case '2TB_parallel'
+            model.nombre='2TB_parallel'
+            %fz=p(1)+(p(2)-p(1)).*(1+p(4)).*(1-1i*w*p(3)+p(4)./(1+1i*w*p(5))).^-1;
+            model.function=@(p,f)[real(p(1)+(p(2)-p(1)).*(1+p(4)).*(1-1i*(2*pi*f)*p(3)+p(4)./(1+1i*(2*pi*f)*p(5))).^-1)...
+                 imag(p(1)+(p(2)-p(1)).*(1+p(4)).*(1-1i*(2*pi*f)*p(3)+p(4)./(1+1i*(2*pi*f)*p(5))).^-1)];
+            model.Cfunction=@(p,f)(p(1)+(p(2)-p(1)).*(1+p(4)).*(1-1i*(2*pi*f)*p(3)+p(4)./(1+1i*(2*pi*f)*p(5))).^-1);
+            model.description='p=[Zinf Z0 tau_I geff/(Lp-1) tau1]; *tau_I=Ctes/(Gtes,1+Gtes,b)(Lp-1),  geff=Gt,1(T0)*Gt,1(T1)/((Gt,1+Gt,b)*(T0->T1)), tau1=C1/(gt,1(T0)+gt,b)';
+            model.X0=[1e-2 -1e-2 1/(2*pi*1e4) 0.03 1/(2*pi*1e2)];
+            model.LB=[0 -Inf -Inf -Inf 0];
+            model.UB=[Inf Inf Inf Inf 1];
+                if isempty(opt)
+                    model.noise=noisesim('irwin');%%%!!!ojo, noise model con default options
+                else
+                    model.noise=noisesim('2TB_parallel',opt.TES,opt.OP,opt.circuit);
+                end
     end
 end
 

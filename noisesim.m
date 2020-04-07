@@ -232,8 +232,10 @@ switch model
         %F=(bb+1)*(t^(2*bb+3)-1)/((2*bb+3)*(t^(bb+1)-1));%F de Mather.
         g_t_b=OP.P.a;%%(este cociente se usa directamente en las expresiones)(ojo a la denominacion)
         
-        P2_1b=4*Kb*T1^2*G*F_1b;
-        P2_t1=4*Kb*T0^2*G*F_t1;
+        g_t1=OP.P.g_t1_0;
+        g_1b=OP.P.g_1b;
+        P2_1b=4*Kb*T1^2*g_1b*F_1b;%%%%%%Update.06/04/20. Estaba usando G de las IVs en lugar de g_1b y g_t1. Como afecta?
+        P2_t1=4*Kb*T0^2*g_t1*F_t1;
         stfn_1b=P2_1b*abs(sI).^2*g_t_b^2*1./(1+(w*tau_1).^2);%%%ruido térmico de bloque 1 al baño
         stfn_t1=P2_t1*abs(sI).^2.*((1-g_t_b)^2+(w*tau_1).^2)./(1+(w*tau_1).^2);%%%ruido termico TES-bloque1
         stes=(4*Kb*T0*R0*(1+2*bI)).*abs(ztes+R0).^2./(R0^2*(2+bI).^2*abs(zcirc).^2);%%%ruido johnson
@@ -249,6 +251,60 @@ switch model
         noise.sum=sqrt(stfn_1b+stfn_t1+stes+ssh);
         noise.NEP=NEP;noise.Res=Res;
         noise.squid=Nsquid;noise.squidarray=Nsquid*ones(1,length(f));
+        
+     case '2TB_parallel'
+        %model=BuildThermalModel('2TB_1');
+        %func=model.function;
+        func=@(p,f)[real(p(1)+(p(2)-p(1)).*(1+p(4)).*(1-1i*(2*pi*f)*p(3)+p(4)./(1+1i*(2*pi*f)*p(5))).^-1)...
+            imag(p(1)+(p(2)-p(1)).*(1+p(4)).*(1-1i*(2*pi*f)*p(3)+p(4)./(1+1i*(2*pi*f)*p(5))).^-1)];
+        
+        %param%!!!%%%necesitamos los p0 para ztes, RL, L, R0, bi, V0, Ts, T0, n,G, tau_1
+        p0=OP.parray;
+        tau_1=p0(5);
+        zdata=func(p0,f);%%%p0=[p1 p2 p3 p4 p5];!!!!!ojo al formato!
+        ztes=zdata(1:end/2)+1i*zdata(end/2+1:end);
+        zcirc=ztes+RL+1i*2*pi*f*L;
+        sI=(ztes-R0*(1+bI))./(zcirc*V0*(2+bI));
+        w=2*pi*f;
+        t=Ts/T0;
+        %T1=OP.P.T1;%%%Temperatura del bloque1
+        T1=T0;%%Suponemos los dos bloques a igual T.
+        t_1b=Ts/T1;%%%%cociente temperaturas bloque1/baño
+        t_t1=T1/T0;%%%% cociente temperaturas tes-bloque1
+        bb=n-1;
+        F_1b=(t_1b^(bb+2)+1)/2;%%%specular limit
+        F_t1=(t_t1^(bb+2)+1)/2;%%%specular limit. Va a ser 1.
+        F_tb=F_1b;%%%specular limit. Igual a Ftb
+        %F=(bb+1)*(t^(2*bb+3)-1)/((2*bb+3)*(t^(bb+1)-1));%F de Mather.
+        %F=(bb+1)*(t^(2*bb+3)-1)/((2*bb+3)*(t^(bb+1)-1));%F de Mather.
+        g_t_b=OP.P.a;%%(este cociente se usa directamente en las expresiones)(ojo a la denominacion)
+        
+        g1b=OP.P.g_1b;
+        gt1=OP.P.g_t1;
+        gtb=OP.p.g_tb;
+        P2_1b=4*Kb*T1^2*g1b*F_1b;
+        P2_t1=4*Kb*T0^2*gt1*F_t1;
+        P2_tb=4*Kb*T0^2*gtb*F_tb;
+        
+        gb_1b=OP.P.g_t1/(OP.P.g_t1+OP.P.g_1b);
+        gb_t1=OP.P.g_1b/(OP.P.g_t1+OP.P.g_1b);%%=1-gb_1b
+        stfn_1b=P2_1b*abs(sI).^2*gb_1b^2*1./(1+(w*tau_1).^2);%%%ruido térmico de bloque 1 al baño
+        stfn_t1=P2_t1*abs(sI).^2.*(gb_t1^2+(w*tau_1).^2)./(1+(w*tau_1).^2);%%%ruido termico TES-bloque1
+        stfn_tb=P2_tb*abs(sI).^2;%%%ruido termico TES-baño.
+        stes=(4*Kb*T0*R0*(1+2*bI)).*abs(ztes+R0).^2./(R0^2*(2+bI).^2*abs(zcirc).^2);%%%ruido johnson
+        ssh=4*Kb*Ts*RL./abs(zcirc).^2;%%%johnson en la shunt
+        
+        NEP=sqrt(stfn_1b+stfn_t1+stfn_tb+ssh+stes)./abs(sI);
+        Res=2.35/sqrt(trapz(f,1./NEP.^2))/2/1.609e-19;%resoluciÃ³n en eV. Tesis Wouter (2.37).
+        
+        %%%...noise.definir estructura noise
+        noise.f=f;
+        noise.sI=abs(sI);
+        noise.ph_1b=sqrt(stfn_1b);noise.ph_t1=sqrt(stfn_t1);noise.ph_tb=sqrt(stfn_tb);noise.jo=sqrt(stes);noise.sh=sqrt(ssh);
+        noise.sum=sqrt(stfn_1b+stfn_t1+stes+ssh);
+        noise.NEP=NEP;noise.Res=Res;
+        noise.squid=Nsquid;noise.squidarray=Nsquid*ones(1,length(f));
+        
     otherwise
         error('no valid model')
 end

@@ -191,6 +191,41 @@ switch opt.model
         param.tau0=param.C/G0;
         param.L0=P0*param.ai/(T0*G0);%%%ec.10 p9 Maasilta.
         
+    case '2TB_parallel'    
+        %derived parameters for 2 block model case A
+        param.rp=R0/Rn;
+        param.bi=(rp(1)/R0)-1;  
+        param.Zinf=p(1);
+        param.Z0=p(2);
+        param.t_1=p(5);
+        param.geff=p(4);%%%gt1/((gt1+gtb)(L-1))
+        param.taueff=rp(3);
+        param.L=(p(2)-p(1))*(1+p(4))/((R0+p(1))+(p(2)-p(1))*(1+p(4)));%%%Esto es común a todos los modelos
+        %param.L=(p(2)-p(1))*(1+p(4))/(p(1)+(p(2)-p(1))*(1+p(4)));
+        param.parray=p;
+        %%%Parallel Model
+        %%%%Parametros especificos del Parallel model
+        %%%...
+        param.a=p(4)*(param.L-1);%%%Es el parametro adimensional cociente de Gs
+        %%%Necesitamos hipótesis. Por ejemplo, que los 2 bloques vienen del
+        %%%propio TES y la gt,1 es una g interna que sólo se manifiesta a
+        %%%alta freq. En esas condiciones, la Geff_maasilta(ec14)=gt,b+g1,b
+        %%%(haciendo gt,1->inf). También suponemos T0=T1 aprox. Dependiendo
+        %%%del volúmen de cada bloque se tendrá g1,b=a*gt,b (el mecanismo
+        %%%de conduccion es el mismo pero tienen distinta zona radiante.
+        %%%Desarrollando geffp(el parametro adimensional) y despreciando
+        %%%terminos de gt,1^2 se llega a gt,1=GIV/(1/geffp -1)
+        a=0.2;%%%esta es la fraccion de TES que asignamos al bloque 1.
+        param.g_t1=G0/(param.a.^-1 -1);
+        param.g_tb=(1-a)*G0;
+        param.g_1b=a*G0;
+        param.ai=param.L*T0*(param.g_t1+param.g_tb);
+        param.C_1=p(5)*(param.g_t1+param.g_1b);
+        param.C_t=param.taueff*(param.L-1)*(param.g_t1+param.g_tb);
+        param.C=param.C_1+param.C_2;%%%Suponemos que la C total del TES es la suma de los dos bloques
+        param.tau0=param.C/G0;
+        param.L0=P0*param.ai/(T0*G0);%%%seguimos definiendo estos parametros por completitud.
+        
     otherwise
         param=nan;
 end
