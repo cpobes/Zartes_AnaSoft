@@ -30,6 +30,12 @@ else
     RpTES=0.75;
 end
 
+if isfield(analizeOptions,'Tmax')
+    Tmax=analizeOptions.Tmax;%%%Pasamos la temperatura máxima para hacer el fit de las IVs. Esto hay que mirarlo a mano, pero una vez hecho la primera vez, queda para otros analisis.
+else
+    Tmax=1;
+end
+
 if isfield(analizeOptions,'ZfitOpt')
     ZfitOpt=analizeOptions.ZfitOpt;
 else
@@ -49,9 +55,13 @@ end
 % end
 
 faux=figure('visible','off');
-[IVset,IVsetN]=LoadIVsets(datadir);%%%Cargamos las IVs
-Gset=fitPvsTset(IVset,PTrange,PTmodel);
-GsetN=fitPvsTset(IVsetN,PTrange,PTmodel);%%%Ajusto los datos P-Tbath.
+
+[IVset,IVsetN]=LoadIVsets(datadir);%%%Cargamos las IVs. Como el 'caller' es AnalizeRun, y no pasamos el circuit a LoadIVsets, dentro se ejecutara
+%%% el load(circuit) desde dentro del datadir, por lo que se cargara el
+%%% circuit correcto.
+ind=[IVset.Tbath]<Tmax;
+Gset=fitPvsTset(IVset(ind),PTrange,PTmodel);
+GsetN=fitPvsTset(IVsetN(ind),PTrange,PTmodel);%%%Ajusto los datos P-Tbath.
 close(faux);
 
 %RpTES=0.75;%%%Defino el %Rn al que fijar los datos del TES.
@@ -59,7 +69,7 @@ TES=BuildTESStructFromRp(RpTES,Gset);
 TESN=BuildTESStructFromRp(RpTES,GsetN);
 
 cd(datadir);
-evalin('caller','load(''circuit.mat'')');
+evalin('caller','load(''circuit.mat'')'); %%esto va a ir machacando la estructura circuit del workspace, ojo si se usa en un analisis conjunto.
 circuit=evalin('caller','circuit')
 IVset=GetIVTES(circuit,IVset,TES);
 IVsetN=GetIVTES(circuit,IVsetN,TESN);

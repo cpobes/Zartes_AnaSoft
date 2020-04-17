@@ -47,7 +47,18 @@ if nargin==4 || (nargin==5 && isstruct(varargin{1}))
     
     options
     
-    if ~isfield(options,'Temps')
+    if isfield(options,'Temps') & ~isempty(options.Temps)
+        %%%       
+            t=options.Temps;
+            for iii=1:length(t)
+                str=dir('*mK');
+                for jjj=1:length(str)
+                    if strfind(str(jjj).name,num2str(t(iii))) & str(jjj).isdir, break;end%%%Para pintar automáticamente los ruido a una cierta temperatura.50mK.(tiene que funcionar con 50mK y 50.0mK, pero ojo con 50.2mK p.e.)
+                end
+                dirs{iii}=str(jjj).name;
+            end
+        %%%
+    else
         f=dir;
         f=f([f.isdir]);
         dirs={};
@@ -64,15 +75,6 @@ if nargin==4 || (nargin==5 && isstruct(varargin{1}))
         [ii,jj]=sort(aux)
         %for i=1:length(aux) dirs{i}=strcat(num2str(aux(i)),'mK'),end
         dirs=newdirs(jj)
-    else
-            t=options.Temps;
-            for iii=1:length(t)
-                str=dir('*mK');
-                for jjj=1:length(str)
-                    if strfind(str(jjj).name,num2str(t(iii))) & str(jjj).isdir, break;end%%%Para pintar automáticamente los ruido a una cierta temperatura.50mK.(tiene que funcionar con 50mK y 50.0mK, pero ojo con 50.2mK p.e.)
-                end
-                dirs{iii}=str(jjj).name;
-            end
     end
 
     %return;
@@ -281,7 +283,7 @@ for i=1:length(dirs)
             %UB=[0.035 0 1];
             XDATA=fS(ind_z);
             switch model.nombre
-                case {'default' '2TB_hanging' '2TB_hanging_Lh-a' '2TB_intermediate'}
+                case {'default' '2TB_hanging' '2TB_hanging_Lh-a' '2TB_intermediate' '2TB_parallel'}
                     YDATA=[real(ztes(ind_z)) imag(ztes(ind_z))];
                 case 'ImZ'
                     YDATA=imag(ztes(ind_z));
@@ -378,6 +380,8 @@ for i=1:length(dirs)
             %noiseIrwin.squid=3e-12;
             %size(noisedata),size(noiseIrwin.sum)
             f=logspace(0,6,1000);%%%Ojo, la definición de 'f' debe coincidir con la que hay dentro de noisesim!!!
+            %noiseIrwin
+            try
             sIaux=ppval(spline(f,noiseIrwin.sI),noisedata{1}(:,1));
             NEP=sqrt(V2I(noisedata{1}(:,2),circuit).^2-noiseIrwin.squid.^2)./sIaux;
             %[~,nep_index]=find(~isnan(NEP))
@@ -388,6 +392,11 @@ for i=1:length(dirs)
             RES=2.35/sqrt(trapz(noisedata{1}(1:length(NEP),1),1./filtNEP.^2))/2/1.609e-19;
             P(i).ExRes(jj)=RES;
             P(i).ThRes(jj)=noiseIrwin.Res;
+            catch %me da error el 1Z10_62B RUN007,50mK,92uA.
+                P(i).ExRes(jj)=0;
+                P(i).ThRes(jj)=0;
+                NEP=ones(1,length(noisedata{1}(:,1)))*Inf;
+            end
             
             %%%Excess noise trials.
             %%%Johnson Excess
@@ -439,9 +448,11 @@ for i=1:length(dirs)
             %ydata=medfilt1(NEP(findx)*1e18,medfilt_w);
             %ydata=colfilt(NEP(findx)*1e18,[15 1],'sliding',@min);
             %ydata=medfilt1(ydata,medfilt_w);
-            ydata=filterNoise(NEP(findx)*1e18,noise_filt_model);
+            
             %parameters.TES=TES;parameters.OP=OP;parameters.circuit=circuit;        
-            if sum(isinf(ydata))==0  %%%Algunos OP dan NEP Inf.pq?
+            if sum(isinf(NEP))==0
+            %if sum(isinf(ydata))==0  %%%Algunos OP dan NEP Inf.pq?
+                ydata=filterNoise(NEP(findx)*1e18,noise_filt_model);
                 maux=lsqcurvefit(@(x,xdata) fitjohnson(x,xdata,parameters),[0 0],xdata,ydata);
                 %maux=lsqcurvefit(@(x,xdata) fitnoise(x,xdata,TES,OP,circuit),[0 0],xdata,ydata);
                 P(i).M(jj)=maux(2);

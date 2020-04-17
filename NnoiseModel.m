@@ -1,4 +1,4 @@
-function N=NnoiseModel(circuit, Tbath)
+function N=NnoiseModel(circuit, Tbath, varargin)
 %%%Función para devolver el modelo de ruido total en estado normal o
 %%%superconductor
 
@@ -17,13 +17,20 @@ else
 end
 
 tau=circuit.L/(RL+RN);
-f=logspace(0,6);
+f=logspace(0,6,1000);
 w=2*pi*f;
 
 Rtes=RN;
-Zcirc=RL+Rtes+1i*w*tau;% impedancia del circuito.
+if nargin==3 
+    Ttes=varargin{1};
+else
+    Ttes=Tbath;
+end 
+%Ttes=max(Tbath,Tc);
+
+Zcirc=RL+Rtes+1i*w*circuit.L;% impedancia del circuito.
 v2_sh=4*Kb*Tbath*RL; % ruido voltaje Rsh (mas parasita).
-v2_tes=4*Kb*Tbath*Rtes;%ruido voltaje en el TES en estado normal.
+v2_tes=4*Kb*Ttes*Rtes;%ruido voltaje en el TES en estado normal.
 i_jo=sqrt(v2_sh+v2_tes)./abs(Zcirc);
 %%i_jo=sqrt(4*Kb*Tbath/(RTES))./sqrt(1+(tau*w).^2);%%%06-04-20.no elevaba al cuadrado tau*w!!!
 %i_jo=sqrt(4*Kb*Tbath/(RTES))./(1+tau*w);

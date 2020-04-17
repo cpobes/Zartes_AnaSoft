@@ -281,7 +281,7 @@ switch model
         
         g1b=OP.P.g_1b;
         gt1=OP.P.g_t1;
-        gtb=OP.p.g_tb;
+        gtb=OP.P.g_tb;
         P2_1b=4*Kb*T1^2*g1b*F_1b;
         P2_t1=4*Kb*T0^2*gt1*F_t1;
         P2_tb=4*Kb*T0^2*gtb*F_tb;

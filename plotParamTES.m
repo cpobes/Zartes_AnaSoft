@@ -28,8 +28,8 @@ if any(strcmp(yl,{'Zinf' 'Z0' 'taueff' 'geff' 't_1'}))
         lb=[];ub=[];for jj=1:length([P(i).p]) lb(jj)=P(i).residuo(jj).ci(index,1);ub(jj)=P(i).residuo(jj).ci(index,2);end
         x=GetPparam(P(i).p,xl);
         y=GetPparam(P(i).p,yl);
-        %h=plot(x,y,'.');hold on
-        h=errorbar(x,y,ub-lb);hold on
+        h=plot(x,y,'.');hold on
+        %h=errorbar(x,y,ub-lb);hold on
         set(h,optname,optvalue);
     end
     set(gca,'linewidth',2,'fontsize',12,'fontweight','bold')

@@ -3,23 +3,21 @@ function FileList=GetFilesFromRp(IVset,Tbath,Rp,varargin)
 %%%Rp. V0: hay que estar en el directorio raiz del TES a analizar.
 %%%Pasar Tbath como string numerico en milikelvin sin el mK: Tbath='50'.
 %%%%V1: cambio input Tbath de string a numeric por uniformizar.
+%%%V2(16-04-20): encapsulo la parte de buscar el dir en GetDirfromTbath,
+%%%que funciona tanto con string como con numerico (en K o mK).
 
 if nargin==3
     pattern='\HP_noise*';
 else
-    pattern=varargin{1};%%%Pasamos la cadena de caracteres a buscar.(HP_noise o PXI_noise.)
+    pattern=varargin{1};%%%Pasamos la cadena de caracteres a buscar.(HP_noise o PXI_noise.). Puede ser tb 'TF_*' para buscar las TFs. 
 end
 
-str=dir('*mK')
-Tbathstr=num2str(Tbath);
-for i=1:length(str)
-    str(i)
-    if strfind(str(i).name,Tbathstr) & str(i).isdir, break;end%%%Para pintar automáticamente los ruido a una cierta temperatura.50mK.(tiene que funcionar con 50mK y 50.0mK, pero ojo con 50.2mK p.e.)
-end
+Tdir=GetDirfromTbath(Tbath);%%%Esto funciona tanto si pasamos Tbath como string (que tiene que ser el propio directorio por lo que esto esredundante)
+%%%como si lo pasamos numérico sea en Kelvin o mK.
 
-%Tdir=str(i).name
-files=ls(strcat(str(i).name,pattern))
-[ii,jj]=size(files);
+files=ls(strcat(Tdir,pattern));
+
+[ii,~]=size(files);
 for i=1:ii
 Iaux(i)=sscanf(char(regexp(files(i,:),'-?\d+(\.\d*)?','match')),'%f');
 end

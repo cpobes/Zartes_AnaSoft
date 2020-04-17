@@ -1,5 +1,7 @@
 function plotABCT(P,varargin)
 
+nargin
+
 warning off
 if nargin==1
     %color='b';
@@ -7,7 +9,7 @@ if nargin==1
 elseif nargin==2
     colors=varargin{1};
 elseif nargin==3
-    colors=varargin{1};
+    colors=varargin{1}
     TES=varargin{2};
     gammas=[2 0.729]*1e3; %valores de gama para Mo y Au
     rhoAs=[0.107 0.0983]; %valores de Rho/A para Mo y Au

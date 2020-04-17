@@ -40,7 +40,8 @@ for i=1:length(IVmeasure)
     ptes=vtes.*ites;
     IVstruct(i).ibias=IVmeasure(i).ibias;
     IVstruct(i).vout=IVmeasure(i).vout;
-    IVstruct(i).Rtes=vtes./ites;
+    IVstruct(i).Rtes=vtes./ites; 
+    if ites==0 IVstruct(i).Rtes=0;end
     IVstruct(i).rtes=IVstruct(i).Rtes/Rn;
     IVstruct(i).ites=ites;
     IVstruct(i).vtes=vtes;

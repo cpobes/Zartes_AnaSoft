@@ -4,6 +4,8 @@ function [mIV,mP]=GetTbathIndex(Tbath,varargin)
 %%%como un número y se busca la Tbath más cercana de cada estructura. Si no
 %%%existe ninguna dentro de un margen definido por thr(=1mK) se devuelve
 %%%error.
+if ischar(Tbath) Tbath=sscanf(Tbath,'%d');end
+if Tbath<1 Tbath=Tbath*1e3;end%%%Asumimos que si Tbath<1 la estamos pasando en Kelvin.
 if nargin==2 && ~isfield(varargin{1},'Tbath') %%%Pasamos toda la estructura de datos ZTESDATA
 %     IVset=getfield(varargin{1},'IVset');
 %     P=getfield(varargin{1},'P');

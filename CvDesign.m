@@ -1,6 +1,5 @@
 function Cv=CvDesign(T,varargin)
 %Calculo capacidades termicas para varios materiales.
-R=8.31;
 
 %definicion materiales
 %%%ORO
@@ -78,8 +77,9 @@ Tf=material.Tf;TD=material.TD;d=material.densidad;M=material.masa_molar;L=materi
 f_obs_free=material.f_obs_free;
 %rho=material.conductivity;
 
-cve=8.31*pi^2*(.5*(T/Tf))*f_obs_free
-cvp=8.31*pi^2*((12*pi^2/5)*(T/TD).^3) % J/K*mol
+R=8.31;
+cve=R*pi^2*(.5*(T/Tf))*f_obs_free
+cvp=R*pi^2*((12*pi^2/5)*(T/TD).^3) % J/K*mol
 cv=cve+cvp;
 %definimos sensitivity as T/E (incremento de temperatura esperado para un
 %determinado depósito de energía). De Q=cv(g)*m*T=E -> S=1/cv(g)*M
@@ -89,13 +89,15 @@ cv=cve+cvp;
 % sizes=[1]*1e-3%%%membrana
 % h=500e-9
 % A=sizes.^2; %area
-Cve=cve*d*A*h/M
-Cvp=cvp*d*A*h/M
-A*h*d/M
-Cv=cv*d*A*h/M;
+Nmol=A*h*d/M;
+Cve=cve*Nmol
+Cvp=cvp*Nmol
+Cv=cv*Nmol;
 
 disp(Cv)
 return;
+
+
 %S=M/(cv*d*A*h)*1.602e-19 *1e3; %K/keV
 alfa=100;
 Emax=10; %keV

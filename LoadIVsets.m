@@ -9,16 +9,15 @@ function [IVset,IVsetN]=LoadIVsets(varargin)
 %%%%%% analizando desde un directorio de análisis sin tener que ir saltando
 %%%%%% al dir de datos. Combinarla con FitZset_remote.
 
-%colordir='G:\Unidades compartidas\X-IFU\Datos\Datos Dilución';
-colordir='G:\Shared drives\X-IFU\Datos\Datos Dilución';
-
+colordir=GetCloudDataDir();%%%La variable colores está en el directorio raiz principal de los datos en la nube.
 % command=strcat('''load(''''',colordir,'\','colores.mat',''''')''')
 % evalin('caller',command); no funciona.
 
 olddir=pwd;
 
 cd(colordir)%%%Cargamos automaticamente la estructura colores para trabajar con ella
-evalin('caller','load(''colores.mat'')');
+%evalin('caller','load(''colores.mat'')');
+load('colores.mat');
 cd(olddir)
 
 datadir=[];

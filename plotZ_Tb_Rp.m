@@ -1,20 +1,21 @@
 function plotZ_Tb_Rp(anaStruct,Rp,Temp)
 %%%% funcion para pintar la Z(w) y los fits a un porcentaje a partir de una
-%%%% estructura.
+%%%% estructura. ej: Rp=[0.2:0.05:0.8]. Temp=50 (temperatura en mK).
 
 olddir=pwd;
 
-%cd('G:\Unidades compartidas\X-IFU\Datos\Datos Dilución
-cd('G:\Shared drives\X-IFU\Datos\Datos Dilución');
+%%%Cargamos la estructura colores para los plots.
+colordir=GetCloudDataDir();
+cd(colordir);
 load('colores.mat')%%%esto carga la estructura colores.
 cd(olddir)
-%[ 0    0.4470    0.7410]
+
 datadir=anaStruct.analizeOptions.datadir;
 cd(datadir);
  
 [mIV,mP]=GetTbathIndex(Temp,anaStruct);%%%Se asume que para todas las temperaturas se toman tanto datos positivos como negativos.
 
-polarity=0;%%%1:P,0:N.
+polarity=1;%%%1:P,0:N.
 if polarity
     fileList=GetFilesFromRp(anaStruct.IVset(mIV),Temp,Rp,'\TF_*')
     color=colores.azul;
@@ -24,26 +25,24 @@ else
     color=colores.naranja;
 end
 
-%%%%
-str=dir('*mK')
-Tbathstr=num2str(Temp);
-for i=1:length(str)
-    str(i)
-    if strfind(str(i).name,Tbathstr) & str(i).isdir, break;end%%%Para pintar automáticamente los ruido a una cierta temperatura.50mK.(tiene que funcionar con 50mK y 50.0mK, pero ojo con 50.2mK p.e.)
-end
-%%%%%
-strcat(str(i).name,'\',fileList)
+Tdir=GetDirfromTbath(Temp);
+strcat(Tdir,'\',fileList)
 
-tfList=importTF(strcat(str(i).name,'\',fileList));
+tfList=importTF(strcat(Tdir,'\',fileList));
+
+figZs=findobj('name','Zfig');
+figImRe=findobj('name','ImRefig');
+if ~isempty(figZs) hZ=figZs.Number; else figZs=figure('name','Zfig');hZ=figZs.Number; end
+if ~isempty(figImRe) hImRe=figImRe.Number; else figImRe=figure('name','ImRefig');hImRe=figImRe.Number; end
 
 for i=1:length(tfList)
       zList{i}=GetZfromTF(tfList{i},anaStruct.TFS,anaStruct.circuit);
-      figure(10)
+      figure(hZ)
       plot(zList{i}.tf,'.-','color',color),hold on
-      plot(zList{i}.tf(529),'o','linewidth',5);%%% pintamos el punto en que f=2e3.(indice 529).
-      figure(11)
-      %semilogx(zList{i}.f,imag(zList{i}.tf),'.-'),hold on
-      semilogx(zList{i}.f,real(zList{i}.tf),'.-'),hold on
+      %plot(zList{i}.tf(625),'o','linewidth',5);%%% pintamos el punto en que f=2e3.(indice 529).<-serie 2Z4? f=8e3 (625)1Z2.
+      figure(hImRe)
+      semilogx(zList{i}.f,imag(zList{i}.tf),'.-'),hold on
+      %semilogx(zList{i}.f,real(zList{i}.tf),'.-'),hold on
 end
 
 % if length(anaStruct.P(mP).p(1).parray)==3
@@ -73,11 +72,11 @@ for i=1:length(Rp)
     
     %zx=fitZ(px(jj,:),anaStruct.TFS.f);
     zx=func(px(jj,:),anaStruct.TFS.f);
-    figure(10)
+    figure(hZ)
     plot(zx(:,1),zx(:,2),'-k');grid on
-    figure(11)
-    %semilogx(anaStruct.TFS.f,zx(:,2),'-r');
-    semilogx(anaStruct.TFS.f,zx(:,1),'-k');
+    figure(hImRe)
+    semilogx(anaStruct.TFS.f,zx(:,2),'-r');
+    %semilogx(anaStruct.TFS.f,zx(:,1),'-k');
     grid on
 end
 

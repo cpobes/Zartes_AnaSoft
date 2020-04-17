@@ -193,6 +193,10 @@ if iscell(file)
 
                 if ~boolcomponents
                     %loglog(f,totnoise/totnoise(1));%%para pintar normalizados.
+                    
+                    if OP.r0>=0.8 totnoise=NnoiseModel(circuit,Tbath*1e-3);end%%%Una prueba para pintar el modelo de ruido 'N' a alto %Rn.
+                    totnoise(1)
+                    if  Ib<OP.Ibiasmin totnoise=SnoiseModel(circuit,Tbath*1e-3);end %%%para pintar el modelo 'S' 
                     loglog(f,totnoise*1e12,'b');
                     h=findobj(gca,'color','b');
                     %legend({'Experimental','STM'})
@@ -243,9 +247,10 @@ if iscell(file)
         set(gca,'XMinorGrid','off','YMinorGrid','off','GridLineStyle','-')
         set(gca,'xtick',[10 100 1000 1e4 1e5],'xticklabel',{'10' '10^2' '10^3' '10^4' '10^5'})
         title(strcat(num2str(round(OP.r0*100)),'%Rn'),'fontsize',12);
-        OP.Z0,OP.Zinf%debug
-        if abs(OP.Z0-OP.Zinf)<1.5e-3 set(get(findobj(gca,'type','axes'),'title'),'color','r');end
-         
+        %OP.Z0,OP.Zinf%debug
+        %if abs(OP.Z0-OP.Zinf)<1.5e-3 set(get(findobj(gca,'type','axes'),'title'),'color','r');end
+        if Ib<OP.Ibiasmin set(get(findobj(gca,'type','axes'),'title'),'color','r');end
+        
          %%%obsolet0.
 %          if(0)
 %          sIaux=ppval(spline(f,auxnoise.sI),noise{i}(:,1));

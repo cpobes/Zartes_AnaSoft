@@ -25,21 +25,24 @@ T0=TES.Tc;
 G0=TES.G0;
 [iaux,ii]=unique(IVmeasure.ibias,'stable');
 vaux=IVmeasure.vout(ii);
-[m,i3]=min(diff(vaux)./diff(iaux));
+[~,i3]=min(diff(vaux)./diff(iaux));
+Ibiasmin=iaux(i3);
 pp=spline(iaux(1:i3),vaux(1:i3));%%ojo, el spline no es bueno fuera de la transici√≥n.
 Vout=ppval(pp,Ib);
 %ind=find(abs(IVmeasure.ib-Ib)<1e-10);
 %Vout=IVmeasure.vout(ind);
 %[I0,V0]=GetIVTES(Vout,Ib,Rf);
+
 IVaux.ibias=Ib;
 IVaux.vout=Vout;
+
 IVaux.Tbath=IVmeasure.Tbath;
 Tb=IVaux.Tbath;
 IVstruct=GetIVTES(Circuit,IVaux);%%%
 
 I0=IVstruct.ites;
 V0=IVstruct.vtes;
-
+if Ib<Ibiasmin V0=0;end %%%identificamos puntos de operaciÛn en estado S para que la R0 no de valores anÛmalos. Ojo, pq esto va a dar ai,etc Inf.
 %R0=0.46*Rn;%0.0147;
 %T0=145e-3;
 %V0=0.507e-6;I0=43.78e-6;
@@ -88,14 +91,9 @@ switch opt.model
             %C=10e-15;%2Z4_64.
             C=opt.C;
             %C=15e-15;%%%1Z11_46A
-            param.rp=R0/Rn;            
-            param.Zinf=rp(1);
-            param.Z0=rp(2);
-            param.taueff=rp(3);
             param.tau0=C/G0;
             param.L0=C/(G0*param.taueff)-1;%%%OJO AL SIGNO
             param.ai=param.L0*G0*T0/P0;
-            param.bi=(rp(1)/R0)-1;
             param.C=C;
         end
     case '1TB_reactancia'%%%1TB con reactancia. NO IMPLEMENTADO REALMENTE
@@ -219,10 +217,10 @@ switch opt.model
         param.g_t1=G0/(param.a.^-1 -1);
         param.g_tb=(1-a)*G0;
         param.g_1b=a*G0;
-        param.ai=param.L*T0*(param.g_t1+param.g_tb);
+        param.ai=param.L*T0*(param.g_t1+param.g_tb)/P0;
         param.C_1=p(5)*(param.g_t1+param.g_1b);
         param.C_t=param.taueff*(param.L-1)*(param.g_t1+param.g_tb);
-        param.C=param.C_1+param.C_2;%%%Suponemos que la C total del TES es la suma de los dos bloques
+        param.C=param.C_1+param.C_t;%%%Suponemos que la C total del TES es la suma de los dos bloques
         param.tau0=param.C/G0;
         param.L0=P0*param.ai/(T0*G0);%%%seguimos definiendo estos parametros por completitud.
         

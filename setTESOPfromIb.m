@@ -9,12 +9,16 @@ itaux=IV.ites(ii);
 vtaux=IV.vtes(ii);
 paux=IV.ptes(ii);
 if (isfield(IV,'ttes')) taux=IV.ttes(ii);end
-[m,i3]=min(diff(vaux)./diff(iaux));
+[~,i3]=min(diff(vaux)./diff(iaux));
 %[m,i3]=min(diff(IV.vout)./diff(IV.ibias));%%%Calculamos el índice del salto de estado N->S.
-
+Ibiasmin=iaux(i3);
+OP.Ibiasmin=Ibiasmin;
 OP.vout=ppval(spline(iaux(1:i3),vaux(1:i3)),Ib);
+
+if Ib<Ibiasmin OP.vout=0;end
 OP.ibias=Ib;
 OP.Tbath=IV.Tbath;
+
 if nargin==4 
     Circuit=varargin{1};
     IVstruct=GetIVTES(Circuit,OP);

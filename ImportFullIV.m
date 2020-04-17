@@ -25,6 +25,7 @@ if ~iscell(file)
     for i=1:ii, file2{i}=file(i,:);end
     file=file2;
 end
+j=1;
 for i=1:length(T)
     T{i}
     %cargamos datos.Ojo al formato.
@@ -38,6 +39,7 @@ for i=1:length(T)
     %%%auxS=corregir4ramas(data);%%para importar ficheros con 4 ramas (sin header)
     
     auxS.Tbath=sscanf(char(regexp(file{i},'\d+.?\d+mK*','match')),'%fmK')*1e-3; %%%ojo al %d o %0.1f
-    IVset(i)=auxS;
+    if auxS.Tbath==0, continue;end %%%No queremos importar IVs que se hayan etiquetado como tomadas a 0mK.
+    IVset(j)=auxS;j=j+1;
 end
 if nargin==2 IVset=GetIVTES(circuit,IVset);end
