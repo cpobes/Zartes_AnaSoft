@@ -19,7 +19,16 @@ olddir=pwd;
 if isfield(ZTESDATA,'analizeOptions')
     cd(ZTESDATA.analizeOptions.datadir)
 end
-Tbath=sscanf(Tbathstring,'%f');
+isnumeric(Tbathstring) & Tbathstring<1
+if ischar(Tbathstring)
+    Tbath=sscanf(Tbathstring,'%f');
+end
+if isnumeric(Tbathstring) & Tbathstring<1
+    Tbath=Tbathstring*1e3;
+else
+    Tbath=Tbathstring;
+end
+Tdir=GetDirfromTbath(Tbath);
 files=GetFilesFromRp(IVset(GetTbathIndex(Tbath,IVset,P)),Tbath,Rps,option.NoiseBaseName)
-plotnoiseFile(IVset,P,circuit,TES,Tbathstring,files,option);
+plotnoiseFile(IVset,P,circuit,TES,Tdir,files,option);
 cd(olddir);
