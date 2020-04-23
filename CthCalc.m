@@ -1,7 +1,8 @@
 function CN=CthCalc(TES)
 %%%función para calcular la C teorica de un TES de Mo Au en estado normal
 %%%Se calcula sólo la contribución electronica a partir de la expresión 111
-%%%de Irwin y los valroes de la tabla.
+%%%de Irwin y los valroes de la tabla. Válido también para absorbentes de
+%%%Oro. Si no, hay que usar CvDesign.
 
 gammas=[2 0.729 0.008]*1e-3; %valores de gama para Mo y Au y Bi. Multiplicado por 1e-3 para J/molK^2
 rhoAs=[0.107 0.0983 0.0468]*1e6;%valores de Rho/A para Mo y Au. Multiplcado por 1e6 para mol/m^3

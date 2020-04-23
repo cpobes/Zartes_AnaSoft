@@ -1,5 +1,8 @@
 function Cv=CvDesign(T,varargin)
 %Calculo capacidades termicas para varios materiales.
+%Calcula la suma de la contribución eléctrica y phononica, pero ojo, para
+%el molibdeno no tengo datos para la contribución phononica. Para calcular
+%la Celectrica de una bicapa tengo CthCalc.
 
 %definicion materiales
 %%%ORO

@@ -42,7 +42,7 @@ for i=1:length(tfList)
       %plot(zList{i}.tf(625),'o','linewidth',5);%%% pintamos el punto en que f=2e3.(indice 529).<-serie 2Z4? f=8e3 (625)1Z2.
       figure(hImRe)
       semilogx(zList{i}.f,imag(zList{i}.tf),'.-'),hold on
-      %semilogx(zList{i}.f,real(zList{i}.tf),'.-'),hold on
+      semilogx(zList{i}.f,real(zList{i}.tf),'.-'),hold on
 end
 
 % if length(anaStruct.P(mP).p(1).parray)==3
@@ -76,7 +76,7 @@ for i=1:length(Rp)
     plot(zx(:,1),zx(:,2),'-k');grid on
     figure(hImRe)
     semilogx(anaStruct.TFS.f,zx(:,2),'-r');
-    %semilogx(anaStruct.TFS.f,zx(:,1),'-k');
+    semilogx(anaStruct.TFS.f,zx(:,1),'-k');
     grid on
 end
 

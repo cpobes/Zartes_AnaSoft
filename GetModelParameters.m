@@ -1,16 +1,8 @@
 function param=GetModelParameters(p,IVmeasure,Ib,TES,Circuit,varargin)
-%extrae los parÃ¡metros tÃ©rmicos del sistema a partir de un modelo tÃ©rmico y
-%conociendo el punto de operaciÃ³n y la 'G'
+%extrae los paraetros termicos del sistema a partir de un modelo termico y
+%conociendo el punto de operacion y la 'G'
 
-%known parameters
-%R0=210e-3;%79e-3;
-%P0=80e-15;%77e-15;
-%I0=(P0/R0)^.5;
-%G=1.66e-12;%1.7e-12;
-%T0=0.155;%;0.07;
-%global R0 P0 I0 T0 G C ai bi
-
-if nargin==5
+if nargin==5%%%Esto en realidad es obsoleto, porque puedo calcular los parametros con Cfixed siempre.
     opt.boolC=0;
     opt.model='irwin';
 else
@@ -85,7 +77,12 @@ switch opt.model
         param.T0=T0;
         param.parray=[rp(1) rp(2) rp(3)];
         %%%%fixed C=1.2pJ/K.
-        if (opt.boolC)
+        if isfield(TES,'Cabs') C1fx=TES.Cabs;else C1fx=TES.CN;end
+        param.C_fixed=C1fx;%%%%En TES.CN guardo la estimación teórica de la Ctotal.
+        param.tau0_fixed=param.C_fixed/G0;
+        param.L0_fixed=param.C_fixed/(G0*param.taueff)-1;
+        param.ai_fixed=param.L0_fixed*G0*T0/P0;
+        if(0) % (opt.boolC). No necesito reanalizar todo con Cfixed, puedo calcular los parametros con C libre y fija a la vez.
             %C=1.2e-12;%%%%1.2e-12
             %C=0.75e-12;
             %C=10e-15;%2Z4_64.
@@ -135,12 +132,14 @@ switch opt.model
         param.a=1/(1-param.Z0*(1+1/param.geff)/param.Zinf);
         param.L0=param.Lh*(1-param.a);
         %%%%%Parametros con C_1 fija
-        param.C_1_fixed=800e-15;
+        if isfield(TES,'Cabs') C1fx=TES.Cabs;else C1fx=TES.CN;end
+        param.C_1_fixed=C1fx;%800e-15;Ojo, en dos bloques, tendríamos que guardar en TES.CN la Cabs. Esto habría que mejorarlo.
         param.g_1_fixed=param.C_1_fixed/p(5);
         param.a_fixed=param.g_1_fixed/(param.g_1_fixed+G0);
         param.Lh_fixed=param.a_fixed/p(4)+1;
         param.ai_fixed=param.Lh_fixed*T0*(param.g_1_fixed+G0)/P0;   
         param.C_fixed=p(3)*(param.Lh_fixed-1)*(param.g_1_fixed+G0);
+        param.L0_fixed=param.Lh_fixed*(1-param.a_fixed);
     case '2TB_hanging_Lh-a'
         %derived parameters for 2 block model case A expresado en función
         %de Lh y 'a' (cociente de conductancias).

@@ -11,7 +11,7 @@ elseif ischar(Tbath)
     Tbathstr=Tbath;
 end
 for i=1:length(str)
-    str(i)
+    %str(i)
     if strfind(str(i).name,Tbathstr) & str(i).isdir, break;end
 end
 Tdir=str(i).name;
