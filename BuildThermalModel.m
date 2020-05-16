@@ -127,6 +127,26 @@ else
                 else
                     model.noise=noisesim('2TB_parallel',opt.TES,opt.OP,opt.circuit);
                 end
+                
+        case '3TB_general'
+            model.nombre='3TB'
+            %fz=p(1)+(p(2)-p(1)).*(1+p(4)).*(1-1i*w*p(3)+p(4)./(1+1i*w*p(5))).^-1;
+            model.function=@(p,f)[real(p(1)+(p(2)-p(1)).*(1+p(4)+p(6)).*(1-1i*(2*pi*f)*p(3)+p(4)./(1+1i*(2*pi*f)*p(5))+p(6)./(1+1i*(2*pi*f)*p(7))).^-1)...
+                 imag(p(1)+(p(2)-p(1)).*(1+p(4)).*(1-1i*(2*pi*f)*p(3)+p(4)./(1+1i*(2*pi*f)*p(5))+p(6)./(1+1i*(2*pi*f)*p(7))).^-1)];
+            model.Cfunction=@(p,f)(p(1)+(p(2)-p(1)).*(1+p(4)+p(6)).*(1-1i*(2*pi*f)*p(3)+p(4)./(1+1i*(2*pi*f)*p(5))+p(6)./(1+1i*(2*pi*f)*p(7))).^-1);
+            model.description='p=[Zinf Z0 tau_I K1 tau1 K2 tau2]'; 
+            a1=0.9;a2=0.1;L=0.2;tau0=4.5e-5;tau1=20*5e-5;tau2=40e-5;
+            %model.X0=[1e-2 -1e-2 1/(2*pi*1e4) 0.03 1/(2*pi*1e2) 0.1 1/(2*pi*1e6)];
+            K1=a1/(L-1);K2=a2/(L-1);tI0=tau0/(L-1);
+            model.X0=[1e-2 -1e-2 tI0 K1 tau1 K2 tau2];
+            if sign(L-1)>0 lb=0;ub=Inf; else lb=-Inf,ub=0;end
+            model.LB=[0 -Inf lb lb 0 lb 0];
+            model.UB=[Inf Inf ub ub 1 ub 1];
+                if isempty(opt)
+                    model.noise=noisesim('irwin');%%%!!!ojo, noise model con default options
+                else
+                    model.noise=noisesim('3TB',opt.TES,opt.OP,opt.circuit);%%%Falta implementar modelo ruido.
+                end
     end
 end
 

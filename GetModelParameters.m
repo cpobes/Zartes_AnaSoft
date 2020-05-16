@@ -118,10 +118,13 @@ switch opt.model
         param.t_1=p(5);
         param.geff=p(4);%%%gt1/((gt1+gtb)(Lh-1))
         param.taueff=rp(3);
-        %%%!!!La expresión de abajo está mal. De donde salió?sobraR0.
-        param.Lh=(p(2)-p(1))*(1+p(4))/((R0+p(1))+(p(2)-p(1))*(1+p(4)));%%%Esto es común a todos los modelos
-        %param.Lh=(p(2)-p(1))*(1+p(4))/(p(1)+(p(2)-p(1))*(1+p(4)));
+        param.Lh=(p(2)-p(1))*(1+p(4))/((R0+p(1))+(p(2)-p(1))*(1+p(4)));%%%Esto es común a todos los modelos        
         param.parray=p;
+        param.R0=R0;
+        param.I0=I0;
+        param.V0=V0;
+        param.P0=P0;
+        
         %%%Hanging Model
         %%%si gtb=GIV=G0:
         param.g_1=G0*(1/(1-p(4)*(param.Lh-1))-1);
@@ -129,11 +132,13 @@ switch opt.model
         param.C_1=p(5)*param.g_1;
         param.ai=param.Lh*T0*(param.g_1+G0)/P0;    
         param.tau0=param.C/G0;
-        param.a=1/(1-param.Z0*(1+1/param.geff)/param.Zinf);
+        %param.a=1/(1-param.Z0*(1+1/param.geff)/param.Zinf);%%%wtf! esto
+        %esta mal
+        param.a=p(4)*(param.Lh-1);%%% definimos 'a' como el cociente g1/(g1+G0).
         param.L0=param.Lh*(1-param.a);
         %%%%%Parametros con C_1 fija
         if isfield(TES,'Cabs') C1fx=TES.Cabs;else C1fx=TES.CN;end
-        param.C_1_fixed=C1fx;%800e-15;Ojo, en dos bloques, tendríamos que guardar en TES.CN la Cabs. Esto habría que mejorarlo.
+        param.C_1_fixed=C1fx;%800e-15;
         param.g_1_fixed=param.C_1_fixed/p(5);
         param.a_fixed=param.g_1_fixed/(param.g_1_fixed+G0);
         param.Lh_fixed=param.a_fixed/p(4)+1;
@@ -142,7 +147,7 @@ switch opt.model
         param.L0_fixed=param.Lh_fixed*(1-param.a_fixed);
     case '2TB_hanging_Lh-a'
         %derived parameters for 2 block model case A expresado en función
-        %de Lh y 'a' (cociente de conductancias).
+        %de Lh (p(2)) y 'a'(p(4)) (cociente de conductancias).
         param.rp=R0/Rn;
         param.bi=(rp(1)/R0)-1;  
         param.Zinf=p(1);
@@ -171,8 +176,8 @@ switch opt.model
         param.geff=p(4);%%%gt1/((gt1+gtb)(L-1))
         param.taueff=rp(3);
         param.L=(p(2)-p(1))*(1+p(4))/((R0+p(1))+(p(2)-p(1))*(1+p(4)));%%%Esto es común a todos los modelos
-        %param.L=(p(2)-p(1))*(1+p(4))/(p(1)+(p(2)-p(1))*(1+p(4)));
         param.parray=p;
+        
         %%%Intermediate Model
         %%% n=m, K1=K2, -> g1,b=gt,1(T1) -> p(4)*(L-1)=0.5;g_c=1
         %%% n=m K1!=K2. -> g_c=g1,b/gt,1(T1).
@@ -216,12 +221,12 @@ switch opt.model
         param.g_t1=G0/(param.a.^-1 -1);
         param.g_tb=(1-a)*G0;
         param.g_1b=a*G0;
-        param.ai=param.L*T0*(param.g_t1+param.g_tb)/P0;
+        param.ai=param.L*T0.*(param.g_t1+param.g_tb)/P0;
         param.C_1=p(5)*(param.g_t1+param.g_1b);
         param.C_t=param.taueff*(param.L-1)*(param.g_t1+param.g_tb);
         param.C=param.C_1+param.C_t;%%%Suponemos que la C total del TES es la suma de los dos bloques
         param.tau0=param.C/G0;
-        param.L0=P0*param.ai/(T0*G0);%%%seguimos definiendo estos parametros por completitud.
+        param.L0=P0.*param.ai./(T0.*G0);%%%seguimos definiendo estos parametros por completitud.
         
     otherwise
         param=nan;

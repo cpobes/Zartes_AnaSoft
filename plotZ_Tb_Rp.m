@@ -1,4 +1,4 @@
-function plotZ_Tb_Rp(anaStruct,Rp,Temp)
+function plotZ_Tb_Rp(anaStruct,Rp,Temp,varargin)
 %%%% funcion para pintar la Z(w) y los fits a un porcentaje a partir de una
 %%%% estructura. ej: Rp=[0.2:0.05:0.8]. Temp=50 (temperatura en mK).
 
@@ -15,6 +15,11 @@ cd(datadir);
  
 [mIV,mP]=GetTbathIndex(Temp,anaStruct);%%%Se asume que para todas las temperaturas se toman tanto datos positivos como negativos.
 
+if nargin==4
+    f_index=varargin{1};
+else
+    f_index=1:length(anaStruct.TFS.f);
+end
 polarity=1;%%%1:P,0:N.
 if polarity
     fileList=GetFilesFromRp(anaStruct.IVset(mIV),Temp,Rp,'\TF_*')
@@ -38,11 +43,12 @@ if ~isempty(figImRe) hImRe=figImRe.Number; else figImRe=figure('name','ImRefig')
 for i=1:length(tfList)
       zList{i}=GetZfromTF(tfList{i},anaStruct.TFS,anaStruct.circuit);
       figure(hZ)
-      plot(zList{i}.tf,'.-','color',color),hold on
+      plot(zList{i}.tf(f_index),'.-','color',color),hold on
       %plot(zList{i}.tf(625),'o','linewidth',5);%%% pintamos el punto en que f=2e3.(indice 529).<-serie 2Z4? f=8e3 (625)1Z2.
       figure(hImRe)
-      semilogx(zList{i}.f,imag(zList{i}.tf),'.-'),hold on
-      semilogx(zList{i}.f,real(zList{i}.tf),'.-'),hold on
+      freqs=zList{i}.f(f_index);
+      semilogx(freqs,imag(zList{i}.tf(f_index)),'.-'),hold on
+      semilogx(freqs,real(zList{i}.tf(f_index)),'.-'),hold on
 end
 
 % if length(anaStruct.P(mP).p(1).parray)==3
@@ -62,6 +68,10 @@ m_name=anaStruct.analizeOptions.ZfitOpt.ThermalModel;
 model=BuildThermalModel(m_name);
 func=model.function
 
+%%%1TB model
+model1TB=BuildThermalModel('default');
+Z1TB=model1TB.Cfunction;
+%%%
 %%%Pintamos el modelo
 for i=1:length(Rp)
     if polarity
@@ -69,15 +79,21 @@ for i=1:length(Rp)
     else
         [~,jj]=min(abs([anaStruct.PN(mP).p.rp]-Rp(i)));
     end
-    
+    %%%
+    p1tb=px(jj,[1:3]);p1tb(3)=-sign(p1tb(2))*abs(p1tb(3));
+    z1tbx=Z1TB(p1tb,anaStruct.TFS.f);
     %zx=fitZ(px(jj,:),anaStruct.TFS.f);
     zx=func(px(jj,:),anaStruct.TFS.f);
     figure(hZ)
-    plot(zx(:,1),zx(:,2),'-k');grid on
+    plot(zx(:,1),zx(:,2),'-r');grid on
+    if(1)% si quiero pintar también el modelo 1TB.
+    plot(z1tbx,'--k');
+    end
     figure(hImRe)
     semilogx(anaStruct.TFS.f,zx(:,2),'-r');
     semilogx(anaStruct.TFS.f,zx(:,1),'-k');
     grid on
+    figure(hZ)
 end
 
 cd(olddir)
