@@ -13,6 +13,7 @@ classdef BasicAnalisisClass < handle
         auxSingleFitStruct=[];
         fGlobalIndex=[];
         mcmcresult=[];
+        mcmcchain=[];
     end
     methods
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -318,12 +319,7 @@ classdef BasicAnalisisClass < handle
             %p0=[p0(1) p0(2) -9.3489e-05 -1.1284 8.2593e-04];%%%data(2)
             p0x=obj.P0Estimate(Temp(jj),actualRps(1));%Estima las taus y K.
             p0(3:5)=p0x(3:5);
-            %p0(3:5)=[1.e-5 0.02 2.6e-5];
-            %p0=[0.008   -0.0053   -0.05  -10.0355    1.8512e-05];%1Z10_62A.
-            %p0=[0.0130    0.0337   -0.0001   -0.9436    0.0006];%1Z10_62A_down.80%
-            %p0=[0.0106   -0.0248   -8.9747e-05   -1.0527   1.9215e-04];%1Z10_62A_down.60%
-            %p0=[ 0.0057   -0.0048    4.8e-5    1.7139    0.0024];%1Z10_62B.
-            %p0=[0.0152   -0.0114    2.5e-3    0.01    2e-5];%1Z1_54B.
+
             if nargin==4% para jugar con el p0 por ejemplo a un %Rn dado.
                 if isnumeric(varargin{1})
                     p0=varargin{1};
@@ -338,22 +334,30 @@ classdef BasicAnalisisClass < handle
                     UB=model.UB;
                 end
             end
+            
+            %p0(3:5)=[1.e-5 0.02 2.6e-5];
+            %p0=[0.008   -0.0053   -0.05  -10.0355    1.8512e-05];%1Z10_62A.
+            %p0=[0.0130    0.0337   -0.0001   -0.9436    0.0006];%1Z10_62A_down.80%
+            %p0=[0.0106   -0.0248   -8.9747e-05   -1.0527   1.9215e-04];%1Z10_62A_down.60%
+            %p0=[ 0.0057   -0.0048    4.8e-5    1.7139    0.0024];%1Z10_62B.
+            %p0=[0.0152   -0.0114    2.5e-3    0.01    2e-5];%1Z1_54B.
+            p0=[0.0152   -0.0114    5e-5    0.07    2e-4];%1Z1_54B.
             for i=1:numel(ZtesData)
                 %ind_z=ind_z(10:end-1*i);%test.falla.habria que llamarla
                 %ind_z2.
                 filtZ=medfilt1(ZtesData(i).tf,9);%%%promedio cada 9 puntos, ya que hay un artefacto de sampleo.
                 %ind_z=ind_all(5:9:end-9*round(actualRps(i)*10));%%%intento de quitar más freqs altas a altos %Rn.
                 ind_z=ind_all(5:9:end);
-                ind_z=ind_z([1:end-10]);
+                %ind_z=ind_z([1:end-10]);
                 XDATA=ZtesData(i).f(ind_z);                
                 %YDATA=medfilt1([real(ZtesData(i).tf(ind_z)) imag(ZtesData(i).tf(ind_z))],1);
                 YDATA=[real(filtZ(ind_z)) imag(filtZ(ind_z))];%Seleccionamos el punto central de cada 9.
                 p0(1)=YDATA(end,1);p0(2)=YDATA(1,1);
-                p0,pause(1)
+                %p0,pause(1)
                 %p0_old=obj.GetFittedParameterByName(Temp(jj),rps(i),'p0');
                 %p0=obj.GetFittedParameterByName(Temp(jj),actualRps(i),'parray');%%%Utilizo el p del fit viejo como p0.
                 if i>1 p0=obj.auxSingleFitStruct.parray;p0(1)=YDATA(end,1);p0(2)=YDATA(1,1);end%%%Usamos como p0 el p del punto anterior.
-
+                
 %                 p0=obj.GetFittedParameterByName(Temp(jj),rps(i),'p0');
                  %p0x=obj.P0Estimate(Temp(jj),rps(i));%Intento de estimacion de tauI, k, tau_1.                 
                  %p0(3:5)=p0x(3:5);
@@ -386,7 +390,7 @@ classdef BasicAnalisisClass < handle
                 ci = nlparci(p,aux2,'jacobian',auxJ);
                 resN= aux1;
                 %%%Salvamos fit con formato de Estructura
-                paux=obj.GetParameterFromFit(Temp(jj),actualRps(i),p);
+                paux=obj.GetParameterFromFit(Temp(jj),actualRps(i),p,modelname);
                 if i==1 Pfit(jj).p=paux;end%%%en la primera iteracion no existe Pfit.
                 Pfit(jj).p(i)=Pfit(jj).p(1);%%%después necesitamos crear el siguiente indice antes de llamar a UpdateStruct, si no, no existe.
                 Pfit(jj).p(i)=UpdateStruct(Pfit(jj).p(i),paux);%%%paux no contiene p0
@@ -529,22 +533,30 @@ classdef BasicAnalisisClass < handle
                 
                 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 %%%%%%%%MCMC FIT.
+                %zinf=0.006955;
+                zinf=p0(1);
+                %z0=-0.0099;
+                z0=p0(2);
                 params={
-                    {'Zinf',p(1),0,0.1,p(1),0.5e-3}
-                    {'Z0',p(2),-1,0,p(2),0.5e-3}
-                    {'taueff',p(3),-1,1,p(3),2e-6}
-                    {'K1',p(4),-Inf,1,p(4),2e-6}
-                    {'tau1',p(5),0,1,p(5),2e-6}
-                    {'K2',p(6),-Inf,1,p(6),2e-6}
-                    {'tau2',p(7),0,1,p(7),2e-6}
-                    };                
-                mcmcmodel.ssfun=costfunction;%@ssFunct;
+                    {'Zinf',zinf,0,0.1,zinf,0.5e-3}
+                    {'Z0',z0,-1,0,z0,0.5e-3}
+                    {'taueff',p(3),-1,1,p(3),2e-5}
+                    {'K1',p(4),-Inf,1,p(4),1}
+                    {'tau1',p(5),0,1,p(5),2e-5}
+                    {'K2',p(6),-Inf,1,p(6),0.1}
+                    {'tau2',p(7),0,1,p(7),2e-5}
+                    };               
+                ssfunction=@(p,ydata)weight.*sqrt(sum((fitfunc(p,XDATA)-ydata).^2,2));
+                mcmcmodel.ssfun=ssfunction;%@ssFunct;
                 options.nsimu = 100;
                 [results, chain, s2chain]= mcmcrun(mcmcmodel,YDATA,params,options);%data
                 options.nsimu = 100000;
                 options.method  = 'dram';%'mh';%'am';%'dr';%'dram';
                 [results, chain, s2chain]= mcmcrun(mcmcmodel,YDATA,params,options,results);
                 obj.mcmcresult=results;
+                obj.mcmcchain=chain;
+                p=results.mean;
+                %mcmcplot(chain,[],results,'pairs');
                 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 
