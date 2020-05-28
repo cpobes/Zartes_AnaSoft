@@ -20,13 +20,19 @@ if nargin==4
 else
     f_index=1:length(anaStruct.TFS.f);
 end
+Zdata_string=anaStruct.analizeOptions.ZfitOpt.TFdata;
+if strcmp(Zdata_string,'HP')
+    TF_str='\TF_*';
+elseif strcmp(Zdata_string,'PXI')
+    TF_str='\PXI_TF_*';
+end
 polarity=1;%%%1:P,0:N.
 if polarity
-    fileList=GetFilesFromRp(anaStruct.IVset(mIV),Temp,Rp,'\TF_*')
+    fileList=GetFilesFromRp(anaStruct.IVset(mIV),Temp,Rp,TF_str)
     color=colores.azul;
 else
     cd('Negative Bias')
-    fileList=GetFilesFromRp(anaStruct.IVsetN(mIV),Temp,Rp,'\TF_*')
+    fileList=GetFilesFromRp(anaStruct.IVsetN(mIV),Temp,Rp,TF_str)
     color=colores.naranja;
 end
 

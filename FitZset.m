@@ -167,6 +167,7 @@ for i=1:length(dirs)
         
         %thefile=strcat(d,'\',dirs{i},'\',filesZ{jj}); %%%quito '.txt' respecto a version anterior. 
         thefile=strcat(dirs{i},'\',filesZ{jj})
+        %pause(1)
         if ~isempty(filesNoise) thenoisefile=strcat(d,'\',dirs{i},'\',filesNoise{jj}); end%%%quito'.txt'
         
         if isfield(circuit,'ioff')
@@ -177,6 +178,7 @@ for i=1:length(dirs)
         %offset=0.11e-6;%-9e-6;!!!!!
         
         Ib=sscanf(char(regexp(thefile,'-?\d+.?\d+uA','match')),'%fuA')*1e-6+offset
+        if isempty(Ib) Ib=0;end
         %pause(1)%%debug
         
         %%%importamos la TF
@@ -289,6 +291,7 @@ for i=1:length(dirs)
                     YDATA=imag(ztes(ind_z));
             end
             fitfunc=model.function;%%%@fitZ
+            if p0(3)==Inf, p0(3)=1e-3;end
             p0
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             try
@@ -322,6 +325,8 @@ for i=1:length(dirs)
             end
               opt.C=TES.CN;                
               opt.model=model.nombre;
+              %Ib
+              %pause(1)%
              param=GetModelParameters(p,IV,Ib,TES,circuit,opt);
             resN=aux1;
             %P(i).p(jj)=param;

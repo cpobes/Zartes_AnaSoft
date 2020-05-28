@@ -34,7 +34,7 @@ IVstruct=GetIVTES(Circuit,IVaux);%%%
 
 I0=IVstruct.ites;
 V0=IVstruct.vtes;
-if Ib<Ibiasmin V0=0;end %%%identificamos puntos de operación en estado S para que la R0 no de valores anómalos. Ojo, pq esto va a dar ai,etc Inf.
+if abs(Ib)<abs(Ibiasmin) V0=0;end %%%identificamos puntos de operación en estado S para que la R0 no de valores anómalos. Ojo, pq esto va a dar ai,etc Inf.
 %R0=0.46*Rn;%0.0147;
 %T0=145e-3;
 %V0=0.507e-6;I0=43.78e-6;
