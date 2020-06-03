@@ -3,23 +3,29 @@ function plotICpairs(varargin)
 %%%%ICpairs
 
 if nargin==0
-    faux=ls('ICpairs*');
+    faux=ls('ICpairs*mK*')
 else
     faux=varargin{1};
 end
 
+olddir=pwd;
+cd(GetCloudDataDir());
+%colores=load('colores');
 colores=evalin('caller','colores');%%%%ojo, hay que cargar colores antes.
 fc=fieldnames(colores);
 hold off
+cd(olddir)
 
 fcal=4600;%%%muT por Amperio.
-
+%fcal=1;%%%Para ver los valores de corriente en bobina.
 for i=1:length(faux(:,1))
+    i,faux(i,:)
     load(faux(i,:));
     x=regexp(faux(i,:),'ICpairs(?<temp>\d*(.\d+)?mK)','names');
     temps{i}=x.temp;
-    plot([ICpairs.B]*fcal,[ICpairs.p],'o-','color',colores.(fc{i}),'linewidth',1,'markerfacecolor','auto');hold on %%%valido solo para 7 curvas.
-    plot([ICpairs.B]*fcal,[ICpairs.n],'o-','color',colores.(fc{i}),'linewidth',1,'markerfacecolor','auto');
+    if isfield(ICpairs,'B');else ICpairs=ICpairs.ICpairs;end%%%
+    plot([ICpairs.B]*fcal,[ICpairs.p],'.-','color',colores.(fc{mod(i,7)+1}),'linewidth',1,'markerfacecolor','auto');hold on %%%valido solo para 7 curvas.
+    plot([ICpairs.B]*fcal,[ICpairs.n],'.-','color',colores.(fc{mod(i,7)+1}),'linewidth',1,'markerfacecolor','auto');
     %{faux(i,:)  fc{i}}
 end
 
