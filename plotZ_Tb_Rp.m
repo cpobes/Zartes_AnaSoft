@@ -30,6 +30,7 @@ polarity=1;%%%1:P,0:N.
 if polarity
     fileList=GetFilesFromRp(anaStruct.IVset(mIV),Temp,Rp,TF_str)
     color=colores.azul;
+    %color=colores.naranja;
 else
     cd('Negative Bias')
     fileList=GetFilesFromRp(anaStruct.IVsetN(mIV),Temp,Rp,TF_str)
