@@ -24,8 +24,12 @@ if N>1e6
     error('OJO: directorio grande');
 end
 
-opt.RL=2000;
-opt.SR=100000;
+%opt.RL=2000;
+%opt.SR=100000;
+xxx=regexp(files(1,:),'pulso_(?<index>\d*)_RL_(?<RL>\d*)_SR_(?<SR>\d*)','names');
+opt.RL=str2num(xxx.RL);
+opt.SR=str2num(xxx.SR);
+
 i=1;
 cd(dir)
 for iii=ind;%1:N
