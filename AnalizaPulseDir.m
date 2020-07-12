@@ -24,8 +24,12 @@ if N>1e6
     error('OJO: directorio grande');
 end
 
-opt.RL=2000;
-opt.SR=100000;
+%opt.RL=24576;%1e5;%2000;
+%opt.SR=468750;%50e3;%100000;
+xxx=regexp(files(1,:),'pulso_(?<index>\d*)_RL_(?<RL>\d*)_SR_(?<SR>\d*)','names');
+opt.RL=str2num(xxx.RL);
+opt.SR=str2num(xxx.SR);
+
 i=1;
 cd(dir)
 for iii=ind;%1:N
@@ -46,7 +50,7 @@ try
     %v=0;t=0;
     npeaks(i)=numel(v);
     ntimes(i).times=t;
-    if(1)
+    if(0)
         ind_fit=1:L;
         %p0=[0.01 0.001 1e-5];
         %fhandle=@(p,x)p(1)*(exp(-(x-t0)/p(2))-exp(-(x-t0)/p(3))).*heaviside(x-t0);%%%ojo a t0.
@@ -90,9 +94,9 @@ cd ..
     PulseParameters.ntimes=ntimes;
     PulseParameters.names=names;
     PulseParameters.index=index;
-    PulseParameters.fit_pulso=fit_pulso;
-    PulseParameters.area_corrected=area_corrected;
-    PulseParameters.A=A;
-    PulseParameters.tau_rise=tau_rise;
-    PulseParameters.tau_fall=tau_fall;
-    PulseParameters.t0=t0;
+    %PulseParameters.fit_pulso=fit_pulso;
+    %PulseParameters.area_corrected=area_corrected;
+    %PulseParameters.A=A;
+    %PulseParameters.tau_rise=tau_rise;
+    %PulseParameters.tau_fall=tau_fall;
+    %PulseParameters.t0=t0;
