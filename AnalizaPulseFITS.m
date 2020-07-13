@@ -1,7 +1,10 @@
 function PulseParameters= AnalizaPulseFITS(file)
 %%%%Funciona analoga a AnaliaaPulseDir pero para fichero fits
 import matlab.io.*
-Npulsos=5000;
+
+info=fitsinfo(file);
+Npulsos=info.BinaryTable.Rows;
+%Npulsos=10000;
 t0ini=0.1;
 
 fptr=fits.openFile(file)
@@ -28,6 +31,7 @@ for i=1:Npulsos
     timestamp(i)=fits.readCol(fptr,2,i,1);
     %fits.readCol(fptr,1,i,1)
     tbath(i)=fits.readCol(fptr,3,i,1);
+    rsensor(i)=fits.readCol(fptr,4,i,1);
     
         if(boolfit)
         ind_fit=1:L;
@@ -55,6 +59,7 @@ fits.closeFile(fptr);
     PulseParameters.ntimes=ntimes;
     PulseParameters.timestamp=timestamp;
     PulseParameters.tbath=tbath;
+    PulseParameters.rsensor=rsensor;
     if(boolfit)
     PulseParameters.fit.area_corrected=area_corrected;
     PulseParameters.fit.tau_rise=tau_rise;
