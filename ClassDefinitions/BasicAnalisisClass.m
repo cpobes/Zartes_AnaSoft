@@ -594,6 +594,42 @@ classdef BasicAnalisisClass < handle
             end%end_for_jj
             obj.SetAuxFitstruct(Pfit);
         end
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%%Sim functions
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        function [pulso,t]=SimSmallDelta(obj,Temp,rp,varargin)
+            %%%Funcion para simular la respuesta del TES en un OP dado a
+            %%%una delta con la aprox pequeña señal.
+            circuit=obj.structure.circuit;
+            Rsh=circuit.Rsh;
+            Rpar=circuit.Rpar;
+            Rn=circuit.Rn;
+            L=circuit.L;
+            R0=rp*Rn;
+            I0=obj.GetI0(Temp,rp);
+            bi=obj.GetFittedParameterByName(Temp,rp,'bi');
+            tau_el=L/(Rsh+Rpar+R0*(1+bi));
+            L0=obj.GetFittedParameterByName(Temp,rp,'L0');
+            tau_i=obj.GetFittedParameterByName(Temp,rp,'taueff');
+            G=obj.structure.TES.G;
+            %C=obj.structure.TES.CN;
+            C=obj.GetFittedParameterByName(Temp,rp,'C');
+            %C=50e-15;
+            A(1,1)=-1/tau_el;
+            A(1,2)=-L0*G/(I0*L); %A
+            A(2,1)=I0*R0*(2+bi)/C; %B
+            A(2,2)=1/tau_i;
+            s=tf('s');
+            TF=1/(s*eye(2)-A)
+            boolplot=0;
+            if boolplot
+                impulse(TF);
+            else
+                [pulso,t]=impulse(TF);
+            end
+            %[pulso,t]=step(TF);
+        end
     end %end public methods
     
 %     methods (Access=private)

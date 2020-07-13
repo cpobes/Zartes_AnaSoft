@@ -10,8 +10,9 @@ end
 
 olddir=pwd;
 cd(GetCloudDataDir());
-%colores=load('colores');
-colores=evalin('caller','colores');%%%%ojo, hay que cargar colores antes.
+colores=load('colores');
+colores=colores.colores;
+%colores=evalin('base','colores');%%%%ojo, hay que cargar colores antes.
 fc=fieldnames(colores);
 hold off
 cd(olddir)
@@ -24,8 +25,8 @@ for i=1:length(faux(:,1))
     x=regexp(faux(i,:),'ICpairs(?<temp>\d*(.\d+)?mK)','names');
     temps{i}=x.temp;
     if isfield(ICpairs,'B');else ICpairs=ICpairs.ICpairs;end%%%
-    plot([ICpairs.B]*fcal,[ICpairs.p],'.-','color',colores.(fc{mod(i,7)+1}),'linewidth',1,'markerfacecolor','auto');hold on %%%valido solo para 7 curvas.
-    plot([ICpairs.B]*fcal,[ICpairs.n],'.-','color',colores.(fc{mod(i,7)+1}),'linewidth',1,'markerfacecolor','auto');
+    plot([ICpairs.B]*fcal,[ICpairs.p],'.-','color',colores.(fc{mod(i-1,7)+1}),'linewidth',1,'markerfacecolor','auto');hold on %%%valido solo para 7 curvas.
+    plot([ICpairs.B]*fcal,[ICpairs.n],'.-','color',colores.(fc{mod(i-1,7)+1}),'linewidth',1,'markerfacecolor','auto');
     %{faux(i,:)  fc{i}}
 end
 
