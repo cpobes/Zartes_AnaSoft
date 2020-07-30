@@ -102,6 +102,7 @@ classdef BasicAnalisisClass < handle
                 paux=obj.GetPstruct(Temp,varargin{1});%%%Podemos pasar una nueva estructura P o el auxFitstruct.
             end
             rtes=GetPparam(paux.p,'rp');
+            rps=rps(:)';%%%rps tiene que ser vector fila.
             [~,jj]=min(abs(bsxfun(@minus, rtes', rps)));
             param=GetPparam(paux.p,name);
             %actualRps=rtes(jj)
@@ -225,6 +226,7 @@ classdef BasicAnalisisClass < handle
                 p=obj.GetPstruct(Temp,varargin{1}).p;
             end
             rtes=GetPparam(p,'rp');
+            rps=rps(:)';%%%rps tiene que ser vector fila.
             [~,jj]=min(abs(bsxfun(@minus, rtes', rps)));
             jj=unique(jj,'stable');%Necesario stable, si no los ordena de menor a mayor independientemente de rps!
             actualrps=rtes(jj);
