@@ -170,14 +170,14 @@ for i=1:length(dirs)
         %pause(1)
         if ~isempty(filesNoise) thenoisefile=strcat(d,'\',dirs{i},'\',filesNoise{jj}); end%%%quito'.txt'
         
-        if isfield(circuit,'ioff')
-            offset=circuit.ioff;
+        if isfield(circuit,'ioffset')
+            offset=circuit.ioffset;
         else
             offset=0;
         end
         %offset=0.11e-6;%-9e-6;!!!!!
         
-        Ib=sscanf(char(regexp(thefile,'-?\d+.?\d+uA','match')),'%fuA')*1e-6+offset
+        Ib=sscanf(char(regexp(thefile,'-?\d+.?\d+uA','match')),'%fuA')*1e-6-offset
         if isempty(Ib) Ib=0;end
         %pause(1)%%debug
         

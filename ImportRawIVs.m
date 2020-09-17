@@ -1,7 +1,6 @@
-function IVset=importFullIV(varargin)
-%%%Nueva versión de la funcion de importacion de IVs con alguna
-%%%modificacion.
-%%importamos
+function IVset=ImportRawIVs(varargin)
+%%%Versión de ImportFullIV para importar los datos brutos y corregir a
+%%%parte el set, por ejemplo si hay un offset.
 if nargin==0
 [file,path]=uigetfile('C:\Documents and Settings\Usuario\Escritorio\Datos\2016\Noviembre\IVs\*','','multiselect','on');
 end
@@ -32,13 +31,8 @@ for i=1:length(T)
     %data=importdata(T{i},'\t');%%%si hay header hace falta skip.
     data=importdata(T{i});
     if isstruct(data) data=data.data;end
-    %corregir el vout.
-    %auxS.ibias=data(:,2)*1e-6;%%%%raw data.
-    %auxS.vout=data(:,4);%%%raw data.
-    auxS=corregir1rama(data);%% para importar ficheros con 1 rama.
-    %auxS=ApplyOffset(auxS,circuit);
-    %%%auxS=corregir4ramas(data);%%para importar ficheros con 4 ramas (sin header)
-    
+    auxS.ibias=data(:,2)*1e-6;%%%%raw data.
+    auxS.vout=data(:,4);%%%raw data.
     auxS.Tbath=sscanf(char(regexp(file{i},'\d+.?\d+mK*','match')),'%fmK')*1e-3; %%%ojo al %d o %0.1f
     if auxS.Tbath==0, continue;end %%%No queremos importar IVs que se hayan etiquetado como tomadas a 0mK.
     IVset(j)=auxS;j=j+1;
