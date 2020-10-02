@@ -89,6 +89,9 @@ else
     TESN.CN=100e-15;
 end
 
+if isfield(analizeOptions,'Cabs')
+    TES.Cabs=analizeOptions.Cabs;
+end
 %TES.Rn=circuit.Rn; %TES.sides=(lado). Actualizo la estructura TES para incluir Rn.
 %TESN.Rn=TES.Rn;%66.9e-3;%%%<-%%%%%%
 %TFS=importTF('TFS.txt');%%%Necesitamos la TF en estado 'S'!

@@ -13,8 +13,11 @@ for i=1:length(RawIVset)
     else
         voff=nan;
     end
+    [iaux,iii]=unique(RawIVset(i).ibias(ind));
+    vaux=RawIVset(i).vout(ind);
+    vaux=vaux(iii);
         if isnan(voff)
-        voff=spline(RawIVset(i).ibias(ind),RawIVset(i).vout(ind),ioff);
+        voff=spline(iaux,vaux,ioff);
         end
     IVset(i).ibias=RawIVset(i).ibias-ioff;
     IVset(i).vout=RawIVset(i).vout-voff;

@@ -1,7 +1,6 @@
 classdef BasicTESGeometryClass < handle
-    %%%Wrapper Class para encapsular la estructura devuelta por AnalizaRun
-    %%%junto con funciones para acceder a la estructura, pintar los datos y
-    %%%reanalizarlos.
+    %%%Wrapper Class para encapsular la estructura con los datos del TES,
+    %%%bicapa, absorbente y membrana, con metodos para calcular las Cs.
     properties
         TESname=[];
         structure=[];%%%Estructura con los datos de la bicapa, absorbente y membrana.
