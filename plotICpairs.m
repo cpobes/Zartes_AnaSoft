@@ -17,7 +17,8 @@ fc=fieldnames(colores);
 hold off
 cd(olddir)
 
-fcal=4600;%%%muT por Amperio.
+%fcal=4600;%%%muT por Amperio.
+fcal=4.6e-3; %%% muT por muA.
 %fcal=1;%%%Para ver los valores de corriente en bobina.
 for i=1:length(faux(:,1))
     i,faux(i,:)
