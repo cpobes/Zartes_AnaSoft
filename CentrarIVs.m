@@ -7,7 +7,8 @@ else
     ioff=0;
 end
 for i=1:length(RawIVset)
-    ind=find(abs(RawIVset(i).ibias)<10);%%%seleccionamos el rango de corrietnes cercano a 0.
+    %ind=find(abs(RawIVset(i).ibias)<10);%%%seleccionamos el rango de corrietnes cercano a 0.
+    ind=find(sign(RawIVset(i).ibias(1))*(RawIVset(i).ibias)<0);%%%seleccionamos los puntos que pasan al otro lado.
     if isfield(circuit,'voffset')
         voff=circuit.voffset;
     else
@@ -17,7 +18,9 @@ for i=1:length(RawIVset)
     vaux=RawIVset(i).vout(ind);
     vaux=vaux(iii);
         if isnan(voff)
-        voff=spline(iaux,vaux,ioff);
+        %voff=spline(iaux,vaux,ioff);
+        ff=fit(iaux,vaux,fittype('poly1')); %%%El spline vale si el punto está dentro del rango de ajuste.
+        voff=ff(ioff);
         end
     IVset(i).ibias=RawIVset(i).ibias-ioff;
     IVset(i).vout=RawIVset(i).vout-voff;
