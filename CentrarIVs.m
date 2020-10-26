@@ -7,8 +7,15 @@ else
     ioff=0;
 end
 for i=1:length(RawIVset)
-    %ind=find(abs(RawIVset(i).ibias)<10);%%%seleccionamos el rango de corrietnes cercano a 0.
+    %ind=find(abs(RawIVset(i).ibias)<10);%%%seleccionamos el rango de corrientes cercano a 0.
     ind=find(sign(RawIVset(i).ibias(1))*(RawIVset(i).ibias)<0);%%%seleccionamos los puntos que pasan al otro lado.
+    
+    if isempty(ind)
+        ind=find(abs(RawIVset(i).ibias*1e6)<20);%%%seleccionamos el rango de corrientes cercano a 0.
+        %%%Ojo pq según que ibias se use, puede estar en A o uA. 
+    end
+    %ind
+    
     if isfield(circuit,'voffset')
         voff=circuit.voffset;
     else

@@ -56,6 +56,16 @@ end
 
 faux=figure('visible','off');
 
+%%%gestionar la posibilidad de que la unidad este listada en ESP o ENG.
+Unidad='G:\';
+x_esp=ls(strcat(Unidad,'Unidades compartidas'));
+x_eng=ls(strcat(Unidad,'Shared drives'));
+if ~isempty(x_esp)
+    datadir=strrep(datadir,'Shared drives','Unidades compartidas');
+else
+    datadir=strrep(datadir,'Unidades compartidas','Shared drives');
+end
+
 [IVset,IVsetN]=LoadIVsets(datadir);%%%Cargamos las IVs. Como el 'caller' es AnalizeRun, y no pasamos el circuit a LoadIVsets, dentro se ejecutara
 %%% el load(circuit) desde dentro del datadir, por lo que se cargara el
 %%% circuit correcto.
@@ -69,6 +79,7 @@ TES=BuildTESStructFromRp(RpTES,Gset);
 TESN=BuildTESStructFromRp(RpTES,GsetN);
 
 cd(datadir);
+
 evalin('caller','load(''circuit.mat'')'); %%esto va a ir machacando la estructura circuit del workspace, ojo si se usa en un analisis conjunto.
 circuit=evalin('caller','circuit')
 IVset=GetIVTES(circuit,IVset,TES);
