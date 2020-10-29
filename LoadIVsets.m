@@ -61,11 +61,11 @@ cd ..
         else
             try
                 evalin('caller','load(''circuit.mat'')');
-                vars=evalin('caller','who')
-                circuit=evalin('caller','circuit')
+                vars=evalin('caller','who');
+                circuit=evalin('caller','circuit');
                 %IVset=ApplyOffset(IVset,circuit);
                 IVset=CentrarIVs(IVset,circuit);
-                IVset=GetIVTES(circuit,IVset)
+                IVset=GetIVTES(circuit,IVset);
                 %IVsetN=ApplyOffset(IVsetN,circuit);
                 IVsetN=CentrarIVs(IVsetN,circuit);
                 IVsetN=GetIVTES(circuit,IVsetN);
