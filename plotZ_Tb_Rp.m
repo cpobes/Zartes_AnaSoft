@@ -16,8 +16,15 @@ cd(datadir);
 [mIV,mP]=GetTbathIndex(Temp,anaStruct);%%%Se asume que para todas las temperaturas se toman tanto datos positivos como negativos.
 
 if nargin==4
-    f_index=varargin{1};
+    if ischar(varargin{1}) 
+        polstr=varargin{1};
+        f_index=1:length(anaStruct.TFS.f);
+    else
+        f_index=varargin{1};
+    end
+    
 else
+    polstr='p';
     f_index=1:length(anaStruct.TFS.f);
 end
 Zdata_string=anaStruct.analizeOptions.ZfitOpt.TFdata;
@@ -26,7 +33,12 @@ if strcmp(Zdata_string,'HP')
 elseif strcmp(Zdata_string,'PXI')
     TF_str='\PXI_TF_*';
 end
-polarity=1;%%%1:P,0:N.
+%polarity=1;%%%1:P,0:N.
+if strcmpi(polstr,'p')
+    polarity=1;
+else
+    polarity=0;
+end
 if polarity
     fileList=GetFilesFromRp(anaStruct.IVset(mIV),Temp,Rp,TF_str)
     color=colores.azul;

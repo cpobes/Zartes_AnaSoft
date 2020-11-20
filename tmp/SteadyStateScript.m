@@ -1,9 +1,22 @@
-%%%Solver script
+function IV=SteadyStateScript(varargin)
+%%%Solver script. arg1:TES, arg2:circuit.
+
+%%%TES info
+if nargin==0
+    Rsh=2e-3; RL=2.182e-3;
+    n=3.067;K=1.769e-9;
+else
+    TES=varargin{1};
+    circuit=varargin{2};
+    Rsh=circuit.Rsh;Rpar=circuit.Rpar;
+    RL=Rsh+Rpar;
+    n=TES.n;K=TES.K;
+end
+
 TtesArray=0.12:-1e-4:0.06;
 TbathArray=0.08:0.002:0.1;
 I=0:1e-8:50e-6;
-    Rsh=2e-3; RL=2.182e-3;
-    n=3.067;K=1.769e-9;
+
 P=@(x,y) K*(x.^n-y.^n);
 for k=1:length(TbathArray)
     Tbath=TbathArray(k);
