@@ -11,7 +11,8 @@ load('colores.mat')%%%esto carga la estructura colores.
 cd(olddir)
 
 datadir=anaStruct.analizeOptions.datadir;
-cd(datadir);
+%cd(datadir);
+cd2CloudDataDir(datadir);
  
 [mIV,mP]=GetTbathIndex(Temp,anaStruct);%%%Se asume que para todas las temperaturas se toman tanto datos positivos como negativos.
 

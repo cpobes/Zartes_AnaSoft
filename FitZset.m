@@ -262,8 +262,9 @@ for i=1:length(dirs)
                         p0=[0.0706   -0.3593    -5.8333e-04   -2.1667     2.6923e-04];%%%p0(75%)
                     end
                 case '2TB_intermediate'
-                    p0=[Zinf Z0 tau0 1 1/(2*pi*2e3)];
-                    if rps(iii)>0.7%0.8
+                    %p0=[Zinf Z0 tau0 1 1/(2*pi*2e3)];
+                    p0=[Zinf Z0 sign(Zinf)*tau0 sign(Zinf)*1 1/(2*pi*2e3)];
+                    if rps(iii)>1%0.7%0.8
                         %p0=[0.0706   -0.3593    -5.8333e-04   -2.1667     2.6923e-04];
                         p0=[Zinf   Z0   sign(Zinf)*1/(2*pi*1e3)    sign(Zinf)*10     1/(2*pi*2e3)];
                     end
