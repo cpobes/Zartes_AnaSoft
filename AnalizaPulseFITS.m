@@ -8,13 +8,17 @@ Npulsos=info.BinaryTable.Rows
 t0ini=0.1;
 
 fptr=fits.openFile(file)
-fits.movAbsHDU(fptr,3)%%%el fichero de la LNCS está en dos tablas. 
+%fits.movAbsHDU(fptr,3)%%%el fichero de la LNCS está en dos tablas. 
+fits.movAbsHDU(fptr,2);
 Npulsos=fits.getNumRows(fptr);
 boolfit=1;
 SR=1e6;
 fhandle=@(p,t)p(1)*heaviside(t-p(4)).*(exp(-(t-p(4))/p(2))-exp(-(t-p(4))/p(3))+exp(-(t-p(4))/p(5)))/(p(2)+p(5)-p(3));
 %p0=[0.7635    1.0460    0.0085    2.0009    6.4844]*1e-3;
-p0=[0.3979    0.8078    0.0048    2.0032    3.7450]*1e-3
+%p0=[0.3979    0.8078    0.0048    2.0032    3.7450]*1e-3;
+%p0=[5.6925e-04 4.7974*1e-3 4.5895*1e-6 2.0026*1e-3 0.9105*1e-3]; %%%Pulso promedio de los 6.4KeV del p40mK_142uA_PI08 de Julio2020.
+p0=[4.2514e-04 4.0084*1e-3 7.0401*1e-6 2e-3 0.8903*1e-3]; %%%Pulso promedio de 6.4KeV a 90mK Julio2020.
+
 time=(1:20000)/SR;
 px=fhandle(p0,time);
 ofilt=px/sum(px);
@@ -24,7 +28,11 @@ fh2=@(p,t)p(2)*ofilt+p(1);
 fh3=@(p,t)p(2)*fhandle([1 p0(2) p0(3) p(3) p0(5)],time)+p(1);
 for i=1:Npulsos
     %raw=fitsread(file,'binarytable',1,'TableColumns',1,'TableRows',1);%%5Lentisimo.
-    raw=fits.readCol(fptr,1,i,1);
+    try
+        raw=fits.readCol(fptr,1,i,1);
+    catch
+        continue;
+    end
     L=length(raw);
     pulso(:,1)=(1:L)/SR;%%%
     pulso(:,2)=raw;
@@ -56,11 +64,13 @@ for i=1:Npulsos
         %fhandle=@(p,x)p(1)*(exp(-(x-p(4))/p(2))-exp(-(x-p(4))/p(3))).*heaviside(x-p(4));%%%simple
         %fhandle=@(p,t)p(1)*heaviside(t-p(4)).*(exp(-(t-p(4))/p(2))-exp(-(t-p(4))/p(3))+exp(-(t-p(4))/p(5)))/(p(2)+p(5)-p(3));
         %fhandle=@(p,x)p(1)*(1+p(5)*exp(-(x-p(4))/p(2))-(1+p(5))*exp(-(x-p(4))/p(3))).*heaviside(x-p(4));%%%step
-        p0=[0 404 2e-3];
+        %p0=[0 404 2e-3];
+        p0=[0.57 566 2e-3]; %%%p0 para fh3 del pulsopromedio del p40mK_142uA_PI08.
         %fit_pulso=lsqcurvefit(fhandle,p0,pulso(ind_fit,1),pulso(ind_fit,2)-dc(i));
         %size(fh2(p0,ind_fit))
         %size(pulso(ind_fit,2))
-        ft_p3=lsqcurvefit(fh3,p0,ind_fit,pulso(ind_fit,2)');
+        %ft_p3=lsqcurvefit(fh3,p0,ind_fit,pulso(ind_fit,2)');
+        ft_p3=lsqcurvefit(fh3,p0,pulso(:,1),pulso(:,2)');
         
         dcfit(i)=ft_p3(1);
         Afit(i)=ft_p3(2);
