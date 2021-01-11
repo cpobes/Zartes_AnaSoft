@@ -4,7 +4,7 @@ function [IVsim,xf]=simIV(Tb,varargin)
 %Imax=2e-3; %en mA %2e-3;
 Imax=0.5e-3;
 Imin=0.e-3;%0.5e-3;
-Ib=linspace(Imin,Imax,100);
+Ib=linspace(Imin,Imax,200);
 
 %relatstep=-1e-2;
 %Ib=Imin:relatstep*Imax:Imax;
@@ -13,9 +13,12 @@ Ib=linspace(Imin,Imax,100);
 %parametros del TES
 if nargin==1
     %default parameters
-    Rsh=2e-3;Rpar=0.4e-3;%circuito
-    n=3.2;K=1e-11;%membrana
-    Rn=20e-3;Tc=0.1;Ic=1e-3;%TES
+    %Rsh=2e-3;Rpar=0.4e-3;%circuito
+    Rsh=2e-3;Rpar=0.182e-3;
+    %n=3.2;K=1e-11;%membrana
+    n=3.067;K=1.769e-9;
+    %Rn=20e-3;Tc=0.1;Ic=1e-3;%TES
+    Rn=87.2e-3;Tc=0.0927;Ic=1e-1;%TES.2Z
     Circuitparam.Rsh=Rsh;Circuitparam.Rpar=Rpar;TESparam.Rn=Rn;
     TESparam.Ic=Ic;TESparam.Tc=Tc;TESparam.n=n;TESparam.K=K;
     Circuitparam.Rf=3e3;
@@ -45,8 +48,9 @@ ttes=zeros(1,length(Ib));
 %out(1)=crn*ib(1);
 %out(2)=(((Ic*ites(1)).^2*Rn/K+Tb^n).^(1/n))/Tc;
  
-out(1)=K*(Tc^n-Tb^n)/(Ib(end)*Rsh*Rn/(Rsh+Rpar+Rn))/Ic;
-out(2)=1.1;%%%1.2
+%out(1)=K*(Tc^n-Tb^n)/(Ib(end)*Rsh*Rn/(Rsh+Rpar+Rn))/Ic;
+out(2)=2;%%%1.2
+out(1)=sqrt(K*((Tc*out(2))^n-Tb^n)/Rn)/Ic;
 
 for i=length(Ib):-1:1
      y0up=[crs*ib(i) tb];%%%!!!ub<->tb.

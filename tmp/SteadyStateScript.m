@@ -13,9 +13,10 @@ else
     n=TES.n;K=TES.K;
 end
 
-TtesArray=0.12:-1e-4:0.06;
-TbathArray=0.08:0.002:0.1;
-I=0:1e-8:50e-6;
+TtesArray=0.2:-1e-4:0.04;
+%TbathArray=0.08:0.002:0.1;
+TbathArray=[0.04];%:0.005:0.08 0.082:0.002:0.1];
+I=0:1e-8:50e-6;%%%Pruebo step=1e-7 pero genera pequeño artefacto (no es suficiente) y el 1e-8 no alarga sustancialmente el calculo.
 
 P=@(x,y) K*(x.^n-y.^n);
 for k=1:length(TbathArray)
@@ -26,7 +27,7 @@ for i=1:length(TtesArray)
     if Ttes<=TbathArray(k) break;end
     %P=K*(Ttes.^n-Tbath.^n);
     pw=P(Ttes,Tbath);
-    F=@(I) I.^2.*GompertzRTI(Ttes,I)-pw;
+    F=@(x) x.^2.*GompertzRTI(Ttes,x)-pw;
     %Ites(i)=fsolve(F,5e-6);
     m=min(abs(F(I)));
     j=find(abs(F(I))==m);
@@ -41,4 +42,5 @@ IV(k).Rtes=Rtes;IV(k).Rtes(Ites==0)=0;%%%Cuando Ttes<Tb ->Ites=0
 IV(k).Vtes=Rtes.*Ites;
 IV(k).Ptes=Rtes.*Ites.^2;
 IV(k).ibias=Ibias;
+IV(k).Tbath=TbathArray(k);
 end

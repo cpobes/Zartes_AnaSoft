@@ -3,7 +3,7 @@ function Rtes=GompertzRTI(Ttes,Ites,varargin)
 
 %a=0.04;b=0.01;c=0.01;d=1.5e-3;e=1e-4;
 Rn=87.2e-3;
-a=Rn; b=1e-1;c=0;
+a=Rn; b=0e-1;c=0;
 d=1e-3;e=5e2;
 
 if nargin==2

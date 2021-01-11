@@ -20,14 +20,14 @@ if ites<0 | ttes<0, ftes=0;return;end %%%%Prueba para bypasar wrong fits.
 r=(ttes+ites.^(2/3)).^1; %i=(1-t)^(3/2) -> i^(2/3)+t=1 -> (i^(2/3)+t)^n=r.
 %Se puede hacer n=1.
 
-%%%available models:'power', 'erf', 'recta', 'ere', 'TFM', 'tanh'
-model='RTI';%'BKT1';%'erf';%'recta';
+%%%available models:'power', 'erf', 'recta', 'ere', 'TFM', 'tanh', 'RTI'
+model='Gompertz';%'BKT1';%'BKT1';%'erf';%'recta';
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 global RTI %%%intento de crear modelo spline de la superficie.
 if strcmp(model,'RTI')
     %RTI=param;
-    ftes=griddata(RTI.x,RTI.y,RTI.z,ttes,ites)
+    ftes=griddata(RTI.x,RTI.y,RTI.z,ttes,ites);
 elseif strcmp(model,'1')
 %model1. %Dr=0.2;%0.01%for model 1 and model 2.
 %Rtes=Rn./(1+exp(-(sqrt((Ttes/Tc).^2+(Ites/Ic).^2).^4-1)./Dr));
@@ -132,6 +132,10 @@ elseif strcmp(model,'BKT1')
     ftes=exp(lr);
     varargout{1}=(b/2)*(1-t0*(1-ites)).*ttes./((1-ttes).*(ttes-t0*(1-ites)));
     varargout{2}=(b/2)*sqrt(1-ttes)*t0.*ites./(ttes-t0*(1-ites)).^1.5;
+elseif strcmp(model,'Gompertz')
+    d=1e-3;e=5e2;
+    Ic0=1e-1;Tc0=0.0927;
+    ftes=(0.5).^exp(Tc0*(-ttes+1-ites.^(2/3))./(d+e*Ic0*ites));
 end
 
 
