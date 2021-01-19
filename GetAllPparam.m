@@ -4,6 +4,7 @@ function ALL=GetAllPparam(P)
 %%%combinaciones de parametros mas complejas.
 
 ALL.rp=[P.p.rp];
+ALL.R0=[P.p.R0];
 ALL.L0=[P.p.L0];
 ALL.ai=[P.p.ai];
 ALL.bi=[P.p.bi];

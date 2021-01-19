@@ -107,6 +107,7 @@ if nargin==7 %%%%Se puede pasar también tanto el directorio, como los ficheros, 
     IVstr=IVset(Tind);
     [~,Tind]=min(abs([P.Tbath]*1e3-Tbath));
     p=P(Tind).p;
+    AllfilesNoise=ListInBiasOrder(strcat(wdir,'\',NoiseBaseName,'*'),'descend');
 end
 
 % [IVstr.Tbath]
@@ -127,13 +128,14 @@ if ~iscell(file) file={file};end
 if iscell(file)
     N=length(file)
     
-    for i=1:N        
+    for i=1:N
         i
         file{i}
         strcat(NoiseBaseName,'_%fuA*')
         Ib=sscanf(file{i},strcat(NoiseBaseName,'_%fuA*'))*1e-6 %%%HP_noise para ZTES18.!!!
         %length(p)
-        OP=setTESOPfromIb(Ib,IVstr,p(i),circuit)
+        indx=strcmp(AllfilesNoise,deblank(file{i}));%%%no funciona si el nombre del file tiene espacio en blanco.
+        OP=setTESOPfromIb(Ib,IVstr,p(indx),circuit)
         %%OP.Tbath=1.5*OP.Tbath;%%%effect of Tbath error.Despreciable.
         [ncols,nrows]=SmartSplit(N);
 %         nrows=4;
@@ -294,7 +296,7 @@ if iscell(file)
             semilogx(fx(1:end-1),sqrt((2*log(2)./cumsum(1./NEP(1:end-1).^2.*diff(fx))))/1.609e-19,'r')
             %semilogx(fx(1:end-1),((RESJ2./medfilt1(NEP(1:end-1),20)).^2/(2*log(2)).*diff(fx)),'k')
         end
-    end
+    end%%%%end_for
 else
     
 % %     Ib=sscanf(file,strcat(NoiseBaseName,'_%duA*'))*1e-6;

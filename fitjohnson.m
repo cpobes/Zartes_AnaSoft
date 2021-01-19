@@ -29,9 +29,12 @@ TES=PARAMETERS.TES;
     %T0=OP.T0;
     Ts=OP.Tbath
     P0=OP.P0;
+    T0=TES.Ttes(P0,Ts);%%%Recalculamos T0 ya que los parámetros se calculan también con esa Ttes.
+    G=TES.Gtes(T0);%%%Recalculamoss G0 ya que los parámetros se calculan también con esa Gtes.
     I0=OP.I0;
     V0=OP.V0;
-    L0=P0*alfa/(G*T0);
+    %L0=P0*alfa/(G*T0);
+    L0=OP.L0;%%%L0 debe estar también en los parámetros del OP.
     C=OP.C;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

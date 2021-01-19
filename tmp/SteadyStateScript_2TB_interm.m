@@ -30,9 +30,11 @@ else
     Ks=K+B;
 end
 
-TtesArray=0.12:-1e-4:0.06;
-TbathArray=0.08:0.002:0.1;
-I=0:1e-8:50e-6;
+%TtesArray=0.12:-1e-3:0.06;
+%TbathArray=0.08:0.002:0.1;
+TtesArray=0.2:-1e-3:0.04;
+TbathArray=[0.04:0.005:0.08 0.082:0.002:0.1];
+I=(0:1e-2:50)*1e-6;
 
 P=@(x,y) K*(x.^n-y.^n);
 for k=1:length(TbathArray)

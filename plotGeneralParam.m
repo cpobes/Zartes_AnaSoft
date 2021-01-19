@@ -24,18 +24,18 @@ for i=indx%length(P),
     ALL=GetAllPparam(P(i));
     %%%%%expand parameters
     rp=ALL.rp;L0=ALL.L0;ai=ALL.ai;bi=ALL.bi;tau0=ALL.tau0;taueff=ALL.taueff;C=ALL.C;Zinf=ALL.Zinf;Z0=ALL.Z0;ExRes=ALL.ExRes;ThRes=ALL.ThRes;M=ALL.M;Mph=ALL.Mph;
-    Tb=ALL.Tb;
+    Tb=ALL.Tb;R0=ALL.R0;
     %%ecX='ai./sqrt(1+2*bi)';%%%Ecuacion para la X
     %%ecX='ai./bi';
     %%%ecX='ai./L0-1';
     %%%ecX='(1+2*bi)';    
     
-    n=TES.n;K=TES.K
-    %ecY='(2+bi)./(n*(1-K*Tb.^n)-ai)'
-    RL=2.028e-3;
-    %Rn=23.2e-3;
-    Rn=TES.Rn;
-    Tc=TES.Tc;
+%     n=TES.n;K=TES.K;
+%     %ecY='(2+bi)./(n*(1-K*Tb.^n)-ai)'
+%     RL=2.028e-3;
+%     %Rn=23.2e-3;
+%     Rn=TES.Rn;
+%     Tc=TES.Tc;
     
     ecX='rp';
     %ecX='Tb';
@@ -65,7 +65,8 @@ for i=indx%length(P),
     %ecY='ai./sqrt(1+2*bi)';%%%k figure of merit
     %ecY='ThRes./sqrt(C)';
     %ecY='M';
-    ecY='(Z0-Zinf)./(Z0+rp*TES.Rn)';
+    %ecY='(Z0-Zinf)./(Z0+rp*TES.Rn)';
+    ecY='-1./(Z0+R0)'
     y=eval(ecY);
     h=plot(x,y,'.-');hold on
     set(h,optname,optvalue);

@@ -1,7 +1,8 @@
 function IV=SteadyStateScript(varargin)
 %%%Solver script. arg1:TES, arg2:circuit.
 
-%%%TES info
+%%%TES info. La R(T,I) que define también al TES hay que modificarla
+%%%adecuadamente en GompertzRTI.
 if nargin==0
     Rsh=2e-3; RL=2.182e-3;
     n=3.067;K=1.769e-9;
@@ -13,10 +14,11 @@ else
     n=TES.n;K=TES.K;
 end
 
-TtesArray=0.2:-1e-4:0.04;
+TtesArray=0.2:-1e-3:0.04;
 %TbathArray=0.08:0.002:0.1;
-TbathArray=[0.04];%:0.005:0.08 0.082:0.002:0.1];
-I=0:1e-8:50e-6;%%%Pruebo step=1e-7 pero genera pequeño artefacto (no es suficiente) y el 1e-8 no alarga sustancialmente el calculo.
+%TbathArray=0.04;%
+TbathArray=[0.04:0.005:0.08 0.082:0.002:0.1];
+I=(0:1e-3:50)*1e-6;%%%Pruebo step=1e-7 pero genera pequeño artefacto (no es suficiente) y el 1e-8 no alarga sustancialmente el calculo.
 
 P=@(x,y) K*(x.^n-y.^n);
 for k=1:length(TbathArray)

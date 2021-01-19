@@ -17,7 +17,7 @@ else
     n=TES.n;K=TES.K;
 end
 
-Ib=[500:-1:0]*1e-6;
+Ib=[500:-1:35]*1e-6;
 %P=@(x,y) K*(x.^n-y.^n);
 
 %out(1)=K*(Tc^n-Tb^n)/(Ib(1)*Rsh*Rn/(RL+Rn))/Ic;
@@ -29,10 +29,13 @@ options = optimset( 'TolFun', 1.0e-15, 'TolX',1.0e-15,'jacobian','off','algorith
 ites=zeros(1,length(Ib));
 ttes=zeros(1,length(Ib));
 
+global Ites_f Ttes_f
 for i=1:length(Ib)%i=length(Ib):-1:1
      
-     it0=abs(out(1));
-     tt0=abs(out(2));
+     %it0=abs(out(1));
+     %tt0=abs(out(2));
+     it0=Ites_f(Ib(i));%%%global interp 
+     tt0=Ttes_f(Ib(i));
      y0down=[it0 tt0];     
      y0=y0down;
      
@@ -48,4 +51,5 @@ IV.Ttes=ttes;
 IV.Rtes=rtes;
 IV.Vtes=ites.*rtes;
 IV.Ptes=IV.Vtes.*ites;
+IV.ibias=Ib;
 IV.Tbath=Tb;
