@@ -446,7 +446,7 @@ for i=1:length(dirs)
 
 
         if(1)         
-            mphfrange=[2e2,1e3];
+            mphfrange=[2e2,1e3];%%%rango habitual 1e3.
             mjofrange=[5e3,1e5];
             faux=noisedata{1}(:,1);
             findx=find((faux>mphfrange(1) & faux<mphfrange(2)) | (faux>mjofrange(1) & faux<mjofrange(2)));

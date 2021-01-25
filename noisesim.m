@@ -74,7 +74,6 @@ else
     end
     %T0=OP.T0;
 
-
     L0=P0*alfa/(G*T0);
     n=TES.n;
     M=0;

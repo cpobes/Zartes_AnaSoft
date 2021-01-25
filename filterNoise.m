@@ -4,7 +4,7 @@ function filtNoise=filterNoise(noisedata,varargin)
 %%%o parametros.
 
 if nargin==1
-    option.model='default'
+    option.model='default';
     option.wmed=40;
 else
     option=varargin{1};

@@ -1,9 +1,7 @@
-function NEP=fitjohnson(M,f,PARAMETERS)
-%%%%Función para ajustar simultáneamente el ruido NEP experimental
-%%%%expresado en attoW con la Mph y la Mjo al modelo de IRwin!
-%%%%Ojo porque para sacar el NEP necesitamos la sI, que se saca del modelo,
-%%%%así que para cada modelo hay que pasarle el modelo correcto a
-%%%%noisesim.
+function pArHz=fitcurrentnoise(M,f,PARAMETERS)
+%%%%Función para ajustar simultáneamente el ruido experimental
+%%%%expresado en pArHz con la Mph y la Mjo al modelo de IRwin!
+
 
 Kb=1.38e-23;
 
@@ -27,7 +25,7 @@ TES=PARAMETERS.TES;
     R0=OP.R0;
     beta=(R0-Rs)/(R0+Rs);
     %T0=OP.T0;
-    Ts=OP.Tbath
+    Ts=OP.Tbath;
     P0=OP.P0;
     T0=TES.Ttes(P0,Ts);%%%Recalculamos T0 ya que los parámetros se calculan también con esa Ttes.
     G=TES.Gtes(T0);%%%Recalculamoss G0 ya que los parámetros se calculan también con esa Gtes.
@@ -48,8 +46,14 @@ F=(t^(n+2)+1)/2;%%%specular limit
 
 M=real(M);%forzamos valores reales.
 
+if isfield(circuit,'squid')
+    ssquid=circuit.ssquid.^2*ones(length(f),1);
+else
+    ssquid=(3e-12).^2*ones(length(f),1);
+end
 sI=-(1/(I0*R0))*(L/(tau_el*R0*L0)+(1-RL/R0)-L*tau*(2*pi*f).^2/(L0*R0)+1i*(2*pi*f)*L*tau*(1/tauI+1/tau_el)/(R0*L0)).^-1;
 stfn=4*Kb*T0^2*G*abs(sI).^2*F*(1+M(1)^2);
 stes=4*Kb*T0*I0^2*R0*(1+2*bI)*(1+4*pi^2*f.^2*tau^2).*abs(sI).^2/L0^2*(1+M(2)^2);
 ssh=4*Kb*Ts*I0^2*RL*(L0-1)^2*(1+4*pi^2*f.^2*tau^2/(1-L0)^2).*abs(sI).^2/L0^2; %Load resistor Noise
-NEP=1e18*sqrt(stes+stfn+ssh)./abs(sI);
+pArHz=1e12*sqrt(stfn+stes+ssh+ssquid);
+%NEP=1e18*sqrt(stes+stfn+ssh)./abs(sI);

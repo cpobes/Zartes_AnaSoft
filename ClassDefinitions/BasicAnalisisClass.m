@@ -26,6 +26,7 @@ classdef BasicAnalisisClass < handle
             obj.Zfitmodel=TES_data_str.analizeOptions.ZfitOpt.ThermalModel;
             obj.auxFitstruct=TES_data_str.P;%inicializo la auxFitstruct a la estructura original.(para bias positivos).
         end
+        
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%Plot functions
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -86,6 +87,7 @@ classdef BasicAnalisisClass < handle
             set(gca,'linewidth',2,'fontsize',12,'fontweight','bold')
             grid on
         end
+        
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%Get functions
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -288,8 +290,51 @@ classdef BasicAnalisisClass < handle
             %%% devolvemos array de estructuras con las Ztes.
             cd(olddir);
         end
-        %%%Implementar Idem para Noise Files.
-        
+        function Noises=GetNoiseData(obj,Temp,rps,varargin)
+            %%%Función que devuelve los ruidos a unos porcentajes concretos
+            %%%en un cell array. Se puede pasar '\HP_noise*'(default) o '\PXI_noise*'
+            %%%
+            olddir=pwd;
+            cd(obj.datadir);
+            %%%
+            circuit=obj.structure.circuit;
+            Tdir=GetDirfromTbath(Temp);
+            ivaux=obj.GetIV(Temp);
+            realRps=obj.GetActualRps(Temp,rps);
+            if nargin==3 str='\HP_noise*'; else str=varargin{1};end 
+            noisefiles=GetFilesFromRp(ivaux,Temp,realRps,str);
+           
+            Noises=loadnoise(0,Tdir,noisefiles);
+            %%%Para devolver directamente el ruido en A/Hz^0.5.
+            for i=1:length(Noises)
+                Noises{i}(:,2)=V2I(Noises{i}(:,2),circuit);
+            end
+            cd(olddir);
+        end
+        function SimNoise=GetNoiseModel(obj,Temp,rps,varargin)
+            %%%funcion para devolver el modelo de ruido en unos OPs
+            %%%determinados.
+            TES=obj.structure.TES;
+            circuit=obj.structure.circuit;
+            Ib=obj.GetIbias(Temp,rps);
+            IV=obj.GetIV(Temp);
+            parray=obj.GetFittedParameterByName(Temp,rps,'parray');%acepta varargin. Devuelve parrays en columnas.
+            if nargin==3
+                ThermalModel=obj.analizeOptions.ZfitOpt.ThermalModel;
+            else
+                ThermalModel=varargin{1};%para extraer otros modelos de ruido en esos puntos de operación
+                %%%hay que pasar string.
+            end
+            for i=1:length(rps)            
+                param=GetModelParameters(parray(:,i)',IV,Ib(i),TES,circuit);%acepta varargin
+                OP=setTESOPfromIb(Ib(i),IV,param);
+                OP.parray=parray(:,i)';%%%añadido para modelos a 2TB.
+                parameters.TES=TES;parameters.OP=OP;parameters.circuit=circuit;%%%movido de L391.
+                model=BuildThermalModel(ThermalModel,parameters);%%%lo estamos llamando 2 veces pq en la primera, OP no está definido.
+                SimNoise{i}=model.noise;%%%%El modelo de ruido se define en BuilThermalModel
+            end%for
+            
+        end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%Set functions
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -596,7 +641,44 @@ classdef BasicAnalisisClass < handle
             end%end_for_jj
             obj.SetAuxFitstruct(Pfit);
         end
-        
+        function NoiseFit(obj,Temp,rps,varargin)
+            %%%funcion para jugar con los ajustes de los espectros de ruido
+            if nargin==3 HW='\HP_noise*';else HW=varargin{1};end
+            Noises=obj.GetNoiseData(Temp,rps,HW);
+
+            TES=obj.structure.TES;
+            circuit=obj.structure.circuit;
+            Ib=obj.GetIbias(Temp,rps);
+            IV=obj.GetIV(Temp);
+            parray=obj.GetFittedParameterByName(Temp,rps,'parray');%acepta varargin. Devuelve parrays en columnas.
+            paux=obj.GetPstruct(Temp);
+            %%%
+            rtes=GetPparam(paux.p,'rp');
+            rps=rps(:)';%%%rps tiene que ser vector fila.
+            [~,jj]=min(abs(bsxfun(@minus, rtes', rps)));
+            jj=unique(jj,'stable');%Necesario stable, si no los ordena de menor a mayor independientemente de rps!
+            %actualrps=rtes(jj);
+            %%%
+            for i=1:length(rps)    
+                mphfrange=[2e2,7e2];%%%rango habitual 1e3.
+                mjofrange=[1e4,9e4];
+                faux=Noises{1}(:,1);
+                findx=find((faux>mphfrange(1) & faux<mphfrange(2)) | (faux>mjofrange(1) & faux<mjofrange(2)));
+                xdata=Noises{1}(findx,1);
+                ydata=filterNoise(1e12*Noises{i}(findx,2));%%%
+
+                param=GetModelParameters(parray(:,i)',IV,Ib(i),TES,circuit);%acepta varargin
+                OP=setTESOPfromIb(Ib(i),IV,param);
+                OP.parray=parray(:,i)';%%%añadido para modelos a 2TB.
+                parameters.TES=TES;parameters.OP=OP;parameters.circuit=circuit;
+                maux=lsqcurvefit(@(x,xdata) fitcurrentnoise(x,xdata,parameters),[0 0],xdata,ydata)
+                maux=real(maux);
+                paux.p(jj(i)).M=maux(2);
+                paux.p(jj(i)).Mph=maux(1);
+            end%for
+            obj.plotNoises(Temp,rps,paux);
+            obj.auxFitstruct=paux;
+        end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%Sim functions
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
