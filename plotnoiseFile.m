@@ -177,7 +177,13 @@ if iscell(file)
                 
                 %loglog(noise{i}(:,1),sgolayfilt(V2I(noise{i}(:,2)*1e12,circuit),3,41),'.-k'),hold on,grid on,%%%for noise in Current.  Multiplico 1e12 para pA/sqrt(Hz)!Ojo, tb en plotnoise!
                 if Mph==0
-                    totnoise=sqrt(auxnoise.sum.^2+auxnoise.squidarray.^2);
+                    tottes2=(auxnoise.ph.^2)+auxnoise.jo.^2+auxnoise.sh.^2;
+                    %%%esto es equivalente a auxnoise.sum pero si sustituyo .ph por .max
+                    %%%puedo ver el efecto de hacer F=1. Se ve que no es
+                    %%%suficiente en muchos casos, aunque puede ser por la
+                    %%%cantidad de picos. Algunos mínimos sí coinciden con
+                    %%%.max.
+                    totnoise=sqrt(tottes2+auxnoise.squidarray.^2);
                 else
                     %%%%%OJO, PARA modelos 2TB no existe noise.ph ya que
                     %%%%%hay 2 componentes de ph diferentes por tanto
@@ -196,7 +202,7 @@ if iscell(file)
                 if ~boolcomponents
                     %loglog(f,totnoise/totnoise(1));%%para pintar normalizados.
                     
-                    if OP.r0>=0.8 totnoise=NnoiseModel(circuit,Tbath*1e-3);end%%%Una prueba para pintar el modelo de ruido 'N' a alto %Rn.
+                    if OP.r0>=0.91 totnoise=NnoiseModel(circuit,Tbath*1e-3);end%%%Una prueba para pintar el modelo de ruido 'N' a alto %Rn.
                     totnoise(1)
                     if  Ib<OP.Ibiasmin totnoise=SnoiseModel(circuit,Tbath*1e-3);end %%%para pintar el modelo 'S' 
                     loglog(f,totnoise*1e12,'b');

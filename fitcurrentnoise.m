@@ -52,6 +52,7 @@ else
     ssquid=(3e-12).^2*ones(length(f),1);
 end
 sI=-(1/(I0*R0))*(L/(tau_el*R0*L0)+(1-RL/R0)-L*tau*(2*pi*f).^2/(L0*R0)+1i*(2*pi*f)*L*tau*(1/tauI+1/tau_el)/(R0*L0)).^-1;
+%F=1;M(1)=0;%%%para forzar Mph constante e igual al maximo de F.
 stfn=4*Kb*T0^2*G*abs(sI).^2*F*(1+M(1)^2);
 stes=4*Kb*T0*I0^2*R0*(1+2*bI)*(1+4*pi^2*f.^2*tau^2).*abs(sI).^2/L0^2*(1+M(2)^2);
 ssh=4*Kb*Ts*I0^2*RL*(L0-1)^2*(1+4*pi^2*f.^2*tau^2/(1-L0)^2).*abs(sI).^2/L0^2; %Load resistor Noise

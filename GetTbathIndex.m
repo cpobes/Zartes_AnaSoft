@@ -9,9 +9,11 @@ if Tbath<1 Tbath=Tbath*1e3;end%%%Asumimos que si Tbath<1 la estamos pasando en K
 if nargin==2 && ~isfield(varargin{1},'Tbath') %%%Pasamos toda la estructura de datos ZTESDATA
 %     IVset=getfield(varargin{1},'IVset');
 %     P=getfield(varargin{1},'P');
-    varargin{1};
+    %varargin{1}
     IVset=varargin{1}.('IVset');
     P=varargin{1}.('P');
+    %[IVset.Tbath]
+    %[P.Tbath]
 elseif nargin==3
     IVset=varargin{1};%%%
     P=varargin{2};

@@ -12,6 +12,8 @@ classdef BasicAnalisisClass < handle
         auxFitstruct=[];%%%Guardo los resultados de reanalisis en una nueva estructura para poder trabajar con ella.
         auxSingleFitStruct=[];
         fGlobalIndex=[];
+        mphfitrange=[];
+        mjofitrange=[];
         mcmcresult=[];
         mcmcchain=[];
     end
@@ -644,14 +646,15 @@ classdef BasicAnalisisClass < handle
         function NoiseFit(obj,Temp,rps,varargin)
             %%%funcion para jugar con los ajustes de los espectros de ruido
             if nargin==3 HW='\HP_noise*';else HW=varargin{1};end
-            Noises=obj.GetNoiseData(Temp,rps,HW);
-
             TES=obj.structure.TES;
             circuit=obj.structure.circuit;
-            Ib=obj.GetIbias(Temp,rps);
-            IV=obj.GetIV(Temp);
-            parray=obj.GetFittedParameterByName(Temp,rps,'parray');%acepta varargin. Devuelve parrays en columnas.
-            paux=obj.GetPstruct(Temp);
+            
+            for kk=1:length(Temp)
+            Noises=obj.GetNoiseData(Temp(kk),rps,HW);
+            Ib=obj.GetIbias(Temp(kk),rps);
+            IV=obj.GetIV(Temp(kk));
+            parray=obj.GetFittedParameterByName(Temp(kk),rps,'parray');%acepta varargin. Devuelve parrays en columnas.
+            paux=obj.GetPstruct(Temp(kk));
             %%%
             rtes=GetPparam(paux.p,'rp');
             rps=rps(:)';%%%rps tiene que ser vector fila.
@@ -660,8 +663,16 @@ classdef BasicAnalisisClass < handle
             %actualrps=rtes(jj);
             %%%
             for i=1:length(rps)    
-                mphfrange=[2e2,7e2];%%%rango habitual 1e3.
-                mjofrange=[1e4,9e4];
+                if isempty(obj.mphfitrange)
+                    mphfrange=[2e2,7e2];%%%rango habitual [2e2 1e3].
+                else
+                    mphfrange=obj.mphfitrange;
+                end
+                if isempty(obj.mjofitrange)
+                    mjofrange=[1e4,10e4];%%%rango habitual [1e4 1e5].
+                else
+                    mjofrange=obj.mjofitrange;
+                end
                 faux=Noises{1}(:,1);
                 findx=find((faux>mphfrange(1) & faux<mphfrange(2)) | (faux>mjofrange(1) & faux<mjofrange(2)));
                 xdata=Noises{1}(findx,1);
@@ -671,13 +682,15 @@ classdef BasicAnalisisClass < handle
                 OP=setTESOPfromIb(Ib(i),IV,param);
                 OP.parray=parray(:,i)';%%%añadido para modelos a 2TB.
                 parameters.TES=TES;parameters.OP=OP;parameters.circuit=circuit;
-                maux=lsqcurvefit(@(x,xdata) fitcurrentnoise(x,xdata,parameters),[0 0],xdata,ydata)
+                maux=lsqcurvefit(@(x,xdata) fitcurrentnoise(x,xdata,parameters),[0 0],xdata,ydata);
                 maux=real(maux);
                 paux.p(jj(i)).M=maux(2);
                 paux.p(jj(i)).Mph=maux(1);
-            end%for
-            obj.plotNoises(Temp,rps,paux);
-            obj.auxFitstruct=paux;
+            end%for_rps
+            %obj.plotNoises(Temp,rps,paux);
+            %obj.auxFitstruct=paux;
+            obj.auxFitstruct(kk)=paux;
+            end
         end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%Sim functions
