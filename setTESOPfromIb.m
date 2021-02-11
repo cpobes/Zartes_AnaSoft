@@ -56,6 +56,9 @@ if length(p)>1
     if (isfield(p,'Mph'))
         OP.Mph=ppval(spline([p.rp],real([p.Mph])),OP.r0);
     end
+    if (isfield(p,'Mph2'))
+        OP.Mph2=ppval(spline([p.rp],real([p.Mph2])),OP.r0);
+    end
     %OP.G0=OP.P0*OP.ai./(OP.L0*OP.T0);
     OP.G0=OP.C./OP.tau0;
 else
@@ -73,6 +76,10 @@ else
     end
     if (isfield(p,'Mph'))
         OP.Mph=p.Mph;
+    end
+    if (isfield(p,'Mph2'))
+        if isempty(p.Mph2) p.Mph2=0;end
+        OP.Mph2=p.Mph2;
     end
     OP.P=p;%%%%Para modelos a 2TB necesitamos parámetros que no están en el modelo simple
 end

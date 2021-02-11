@@ -19,11 +19,11 @@ olddir=pwd;
 if isfield(ZTESDATA,'analizeOptions')
     cd(ZTESDATA.analizeOptions.datadir)
 end
-isnumeric(Tbathstring) & Tbathstring<1
+
 if ischar(Tbathstring)
     Tbath=sscanf(Tbathstring,'%f');
 end
-if isnumeric(Tbathstring) & Tbathstring<1
+if isnumeric(Tbathstring) && Tbathstring<1
     Tbath=Tbathstring*1e3;
 else
     Tbath=Tbathstring;
