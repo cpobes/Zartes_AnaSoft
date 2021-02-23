@@ -590,10 +590,10 @@ classdef BasicAnalisisClass < handle
                     {'Zinf',zinf,0,0.1,zinf,0.5e-3}
                     {'Z0',z0,-1,0,z0,0.5e-3}
                     {'taueff',p(3),-1,1,p(3),2e-5}
-                    {'K1',p(4),-Inf,1,p(4),1}
-                    {'tau1',p(5),0,1,p(5),2e-5}
-                    {'K2',p(6),-Inf,1,p(6),0.1}
-                    {'tau2',p(7),0,1,p(7),2e-5}
+                    %{'K1',p(4),-Inf,1,p(4),1}
+                    %{'tau1',p(5),0,1,p(5),2e-5}
+                    %{'K2',p(6),-Inf,1,p(6),0.1}
+                    %{'tau2',p(7),0,1,p(7),2e-5}
                     };               
                 ssfunction=@(p,ydata)weight.*sqrt(sum((fitfunc(p,XDATA)-ydata).^2,2));
                 mcmcmodel.ssfun=ssfunction;%@ssFunct;
@@ -623,7 +623,8 @@ classdef BasicAnalisisClass < handle
                 Pfit(jj).p(i).wmin=obj.Getwmin(Temp(jj),actualRps(i),ZtesData(i));
                 Pfit(jj).residuo(i).ci=ci;
                 Pfit(jj).residuo(i).resN=resN;
-                Pfit(jj).residuo(i).d2=sum(((p0-p)./p0).^2);%%%Suma de diferencias relativas al cuadrado como medida del cambio en 'p'.
+                %[size(p0) size(p)]
+                Pfit(jj).residuo(i).d2=sum(((p0-p')./p0).^2);%%%Suma de diferencias relativas al cuadrado como medida del cambio en 'p'.
                 %Pfit(jj).rps(i)=obj.GetActualRps(Temp(jj),rps(i));
                 Pfit(jj).rps(i)=actualRps(i);
                 if Temp(jj)>1 Pfit(jj).Tbath=Temp(jj)*1e-3; else Pfit(jj).Tbath=Temp(jj);end;
