@@ -590,8 +590,8 @@ classdef BasicAnalisisClass < handle
                     {'Zinf',zinf,0,0.1,zinf,0.5e-3}
                     {'Z0',z0,-1,0,z0,0.5e-3}
                     {'taueff',p(3),-1,1,p(3),2e-5}
-                    %{'K1',p(4),-Inf,1,p(4),1}
-                    %{'tau1',p(5),0,1,p(5),2e-5}
+                    {'K1',p(4),-Inf,1,p(4),1}
+                    {'tau1',p(5),0,1,p(5),2e-5}
                     %{'K2',p(6),-Inf,1,p(6),0.1}
                     %{'tau2',p(7),0,1,p(7),2e-5}
                     };               
@@ -623,7 +623,6 @@ classdef BasicAnalisisClass < handle
                 Pfit(jj).p(i).wmin=obj.Getwmin(Temp(jj),actualRps(i),ZtesData(i));
                 Pfit(jj).residuo(i).ci=ci;
                 Pfit(jj).residuo(i).resN=resN;
-                %[size(p0) size(p)]
                 Pfit(jj).residuo(i).d2=sum(((p0-p')./p0).^2);%%%Suma de diferencias relativas al cuadrado como medida del cambio en 'p'.
                 %Pfit(jj).rps(i)=obj.GetActualRps(Temp(jj),rps(i));
                 Pfit(jj).rps(i)=actualRps(i);
@@ -663,6 +662,7 @@ classdef BasicAnalisisClass < handle
             jj=unique(jj,'stable');%Necesario stable, si no los ordena de menor a mayor independientemente de rps!
             %actualrps=rtes(jj);
             %%%
+            zaux=obj.GetZtesData(Temp(kk),rps);
             for i=1:length(rps)    
                 if isempty(obj.mphfitrange)
                     mphfrange=[2e2,7e2];%%%rango habitual [2e2 1e3].
@@ -677,20 +677,27 @@ classdef BasicAnalisisClass < handle
                 faux=Noises{1}(:,1);
                 findx=find((faux>mphfrange(1) & faux<mphfrange(2)) | (faux>mjofrange(1) & faux<mjofrange(2)));
                 xdata=Noises{1}(findx,1);
+                %size(Noises{i}),i
                 ydata=filterNoise(1e12*Noises{i}(findx,2));%%%
-
-                param=GetModelParameters(parray(:,i)',IV,Ib(i),TES,circuit);%acepta varargin
+                aux.model=obj.Zfitmodel;
+                param=GetModelParameters(parray(:,i)',IV,Ib(i),TES,circuit,aux);%acepta varargin
                 OP=setTESOPfromIb(Ib(i),IV,param);
                 OP.parray=parray(:,i)';%%%añadido para modelos a 2TB.
+                OP.ztes.data=zaux(i).tf;
+                OP.ztes.freqs=zaux(i).f;
                 parameters.TES=TES;parameters.OP=OP;parameters.circuit=circuit;
-                maux=lsqcurvefit(@(x,xdata) fitcurrentnoise(x,xdata,parameters),[0 0],xdata,ydata);
+                m0=[0 0];
+                if strcmp(obj.Zfitmodel,'2TB_intermediate') m0=[1 1 1];end
+                maux=lsqcurvefit(@(x,xdata) fitcurrentnoise(x,xdata,parameters,obj.Zfitmodel),m0,xdata,ydata);
                 maux=real(maux);
-                paux.p(jj(i)).M=maux(2);
+                paux.p(jj(i)).M=maux(end);
                 paux.p(jj(i)).Mph=maux(1);
+                if strcmp(obj.Zfitmodel,'2TB_intermediate') paux.p(jj(i)).Mph2=maux(2);end
             end%for_rps
             %obj.plotNoises(Temp,rps,paux);
             %obj.auxFitstruct=paux;
             obj.auxFitstruct(kk)=paux;
+            obj.auxSingleFitStruct=paux;
             end
         end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

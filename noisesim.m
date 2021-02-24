@@ -16,6 +16,10 @@ function noise=noisesim(model,varargin)
 gamma=0.5;
 Kb=1.38e-23;
 
+
+%f=1:1e6;
+f=logspace(0,6,1000);
+
 if nargin==1
     C=2.3e-15;%p220
     L=77e-9;%400e-9;%inductancia. arbitrario.
@@ -44,6 +48,12 @@ if nargin==1
 else
     TES=varargin{1};
     OP=varargin{2};
+    
+    %%%%test. Podemos pasar la Ztes experimental del OP como ztes.data
+    %%%%ztes.freqs.
+    if isfield(OP,'ztes') zexp=interp1(OP.ztes.freqs,OP.ztes.data,f);end
+    %%%%
+
     Circuit=varargin{3};
     %C=TES.OP.C;
     C=OP.C;
@@ -92,9 +102,6 @@ taueff=tau/(1+beta*L0);
 tauI=tau/(1-L0);
 tau_el=L/(RL+R0*(1+bI));
 
-%f=1:1e6;
-f=logspace(0,6,1000);
-
 switch model
     case 'wouter'
     %%%ecuaciones 2.25-2.27 Tesis de Wouter.
@@ -111,8 +118,9 @@ switch model
     p0=[OP.Zinf OP.Z0 OP.P.taueff];%%%Ojo a OP, no incluye taueff
     zdata=func(p0,f);%%%p0=[p1 p2 p3 p4 p5];!!!!!ojo al formato!
     ztes=zdata(1:end/2)+1i*zdata(end/2+1:end);
+    %ztes=zexp;
     zcirc=ztes+RL+1i*2*pi*f*L;
-    %sI=(ztes-R0*(1+bI))./(zcirc*V0*(2+bI));
+    sI=(ztes-R0*(1+bI))./(zcirc*V0*(2+bI));
                 end
     sI=-(1/(I0*R0))*(L/(tau_el*R0*L0)+(1-RL/R0)-L*tau*(2*pi*f).^2/(L0*R0)+1i*(2*pi*f)*L*tau*(1/tauI+1/tau_el)/(R0*L0)).^-1;%funcion de transferencia.
     
@@ -217,6 +225,8 @@ switch model
         tau_1=p0(5);
         zdata=func(p0,f);%%%p0=[p1 p2 p3 p4 p5];!!!!!ojo al formato!
         ztes=zdata(1:end/2)+1i*zdata(end/2+1:end);
+        %figure(14),plot(ztes,'m')
+        %ztes=zexp;%%%
         zcirc=ztes+RL+1i*2*pi*f*L;
         sI=(ztes-R0*(1+bI))./(zcirc*V0*(2+bI));
         w=2*pi*f;
@@ -237,7 +247,7 @@ switch model
         P2_t1=4*Kb*T0^2*g_t1*F_t1;
         stfn_1b=P2_1b*abs(sI).^2*g_t_b^2*1./(1+(w*tau_1).^2);%%%ruido térmico de bloque 1 al baño
         stfn_t1=P2_t1*abs(sI).^2.*((1-g_t_b)^2+(w*tau_1).^2)./(1+(w*tau_1).^2);%%%ruido termico TES-bloque1
-        stes=(4*Kb*T0*R0*(1+2*bI)).*abs(ztes+R0).^2./(R0^2*(2+bI).^2*abs(zcirc).^2);%%%ruido johnson
+        stes=(4*Kb*T0*R0*(1+2*bI)).*abs(ztes+R0).^2./(R0^2*(2+bI).^2*abs(zcirc).^2)*(1+M^2);%%%ruido johnson
         ssh=4*Kb*Ts*RL./abs(zcirc).^2;%%%johnson en la shunt
         
         NEP=sqrt(stfn_1b+stfn_t1+ssh+stes)./abs(sI);

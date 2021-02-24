@@ -131,11 +131,24 @@ if iscell(file)
     for i=1:N
         i
         file{i}
+        
         strcat(NoiseBaseName,'_%fuA*')
         Ib=sscanf(file{i},strcat(NoiseBaseName,'_%fuA*'))*1e-6 %%%HP_noise para ZTES18.!!!
         %length(p)
         indx=strcmp(AllfilesNoise,deblank(file{i}));%%%no funciona si el nombre del file tiene espacio en blanco.
+        %%%ojo, el AllfilesNoise sólo está definido cuando se llama la
+        %%%funcio´n con 7 parámetros.
         OP=setTESOPfromIb(Ib,IVstr,p(indx),circuit)
+        
+        %%%intentode pasar la ztes experimental para el modelo de ruido.
+        zfile=strrep(file{i},NoiseBaseName,'TF')
+        auxTF=importTF(strcat(wdir,'\',zfile));
+        tfs=importTF();
+        auxZ=GetZfromTF(auxTF,tfs,circuit);
+        OP.ztes.data=auxZ.tf;
+        OP.ztes.freqs=auxZ.f;
+        %%%%
+        
         %%OP.Tbath=1.5*OP.Tbath;%%%effect of Tbath error.Despreciable.
         [ncols,nrows]=SmartSplit(N);
 %         nrows=4;
@@ -159,7 +172,7 @@ if iscell(file)
         end
         
         if strfind(modelname,'2TB')
-            OP.parray=[p.Zinf p.Z0 p.taueff p.geff p.t_1];
+            OP.parray=[p(indx).Zinf p(indx).Z0 p(indx).taueff p(indx).geff p(indx).t_1];
         end
         auxnoise=noisesim(modelname,ZTES,OP,circuit,M);
         %auxnoise=noisesim('irwin',ZTES,OP,circuit,M);
@@ -177,20 +190,31 @@ if iscell(file)
                 
                 %loglog(noise{i}(:,1),sgolayfilt(V2I(noise{i}(:,2)*1e12,circuit),3,41),'.-k'),hold on,grid on,%%%for noise in Current.  Multiplico 1e12 para pA/sqrt(Hz)!Ojo, tb en plotnoise!
                 if Mph==0
-                    tottes2=(auxnoise.ph.^2)+auxnoise.jo.^2+auxnoise.sh.^2;
+                    %tottes2=(auxnoise.ph.^2)+auxnoise.jo.^2+auxnoise.sh.^2;
                     %%%esto es equivalente a auxnoise.sum pero si sustituyo .ph por .max
                     %%%puedo ver el efecto de hacer F=1. Se ve que no es
                     %%%suficiente en muchos casos, aunque puede ser por la
                     %%%cantidad de picos. Algunos mínimos sí coinciden con
-                    %%%.max.
+                    %%%.max.Pero ojo, porque sólo vale para 1TB.
+                    tottes2=auxnoise.sum.^2;
                     totnoise=sqrt(tottes2+auxnoise.squidarray.^2);
                 else
                     %%%%%OJO, PARA modelos 2TB no existe noise.ph ya que
                     %%%%%hay 2 componentes de ph diferentes por tanto
                     %%%%%totnoise no se puede definir así.
                     %totnoise=sqrt(auxnoise.max.^2+auxnoise.jo.^2+auxnoise.sh.^2+auxnoise.squidarray.^2);
-                    Mexph=OP.Mph;
-                    totnoise=sqrt((auxnoise.ph.^2)*(1+Mexph^2)+auxnoise.jo.^2+auxnoise.sh.^2+auxnoise.squidarray.^2);
+                    if strfind(modelname,'irwin')
+                        Mexph=OP.Mph;
+                        totnoise=sqrt((auxnoise.ph.^2)*(1+Mexph^2)+auxnoise.jo.^2+auxnoise.sh.^2+auxnoise.squidarray.^2);
+                    elseif strfind(modelname,'2TB')
+                        Mph1=OP.Mph;
+                        Mph2=OP.Mph2;
+                        %%%M(1) es el ph_tes-bloque1, M(2) es el
+                        %%%ph_bloque1-baño.
+                        
+                        totnoise=sqrt((auxnoise.ph_t1.^2)*(1+Mph1^2)+(auxnoise.ph_1b.^2)*(1+Mph2^2)+auxnoise.jo.^2+auxnoise.sh.^2+auxnoise.squidarray.^2);
+                        
+                    end
                 end
                 %%%normalization test
                 %ind=find(noise{i}(:,1)>100&noise{i}(:,1)<1000);
@@ -203,16 +227,34 @@ if iscell(file)
                     %loglog(f,totnoise/totnoise(1));%%para pintar normalizados.
                     
                     if OP.r0>=0.91 totnoise=NnoiseModel(circuit,Tbath*1e-3);end%%%Una prueba para pintar el modelo de ruido 'N' a alto %Rn.
-                    totnoise(1)
+                    %totnoise(1)
                     if  Ib<OP.Ibiasmin totnoise=SnoiseModel(circuit,Tbath*1e-3);end %%%para pintar el modelo 'S' 
                     loglog(f,totnoise*1e12,'b');
                     h=findobj(gca,'color','b');
                     %legend({'Experimental','STM'})
                     
                 else
-                    loglog(f,auxnoise.jo*1e12,f,auxnoise.ph*1e12,f,auxnoise.sh*1e12,f,totnoise*1e12);
+                    %%%Esto sólo vale para 1TB.
+                    i_jo=auxnoise.jo*1e12;
+                    i_sh=auxnoise.sh*1e12;
+                    fcomponentnames=fieldnames(auxnoise);
+                    kkk_ph=1;
+                    for iii_ph=1:length(fcomponentnames)
+                        if strfind(fcomponentnames{iii_ph},'ph') 
+                            i_ph(kkk_ph,:)=auxnoise.(fcomponentnames{iii_ph})*1e12;
+                            kkk_ph=kkk_ph+1;
+                        end
+                    end
+                    %loglog(f,auxnoise.jo*1e12,f,auxnoise.ph*1e12,f,auxnoise.sh*1e12,f,totnoise*1e12);
+                    if kkk_ph==2
+                        loglog(f,i_jo,f,i_ph,f,i_sh,f,totnoise*1e12);
+                        legend('experimental','exp\_filtered','jhonson','phonon','shunt','total');
+                    elseif kkk_ph==3
+                        loglog(f,i_jo,f,i_ph(1,:),f,i_ph(2,:),f,i_sh,f,totnoise*1e12);
+                        legend('experimental','exp\_filtered','jhonson','phonon\_1','phonon\_2','shunt','total');
+                    end
                     %legend('experimental','jhonson','phonon','shunt','total');
-                    legend('experimental','exp\_filtered','jhonson','phonon','shunt','total');
+                    %legend('experimental','exp\_filtered','jhonson','phonon','shunt','total');
                     h=findobj(gca,'displayname','total');
                 end
                 ylabel('pA/Hz^{0.5}','fontsize',12,'fontweight','bold')
@@ -220,7 +262,7 @@ if iscell(file)
             elseif (strcmpi(tipo,'nep'))
                 
                 sIaux=ppval(spline(f,auxnoise.sI),noise{i}(:,1));
-                NEP=sqrt((V2I(noise{i}(:,2),circuit).^2-auxnoise.squid.^2))./sIaux;
+                NEP=sqrt((V2I(noise{i}(:,2),circuit).^2-auxnoise.squid.^2))./abs(sIaux);
                 filtered_power_noise=medfilt1(NEP*1e18,medfilt_w);
                 loglog(noise{i}(:,1),(NEP*1e18),'.-r'),hold on,grid on,
                 loglog(noise{i}(:,1),filtered_power_noise,'.-k'),hold on,grid on,
@@ -236,6 +278,7 @@ if iscell(file)
                     loglog(f,totNEP*1e18,'b');hold on;grid on;
                     h=findobj(gca,'color','b');
                 else
+                    %%%Esto sólo vale para 1TB.
                     loglog(f,auxnoise.jo*1e18./auxnoise.sI,f,auxnoise.ph*1e18./auxnoise.sI,f,auxnoise.sh*1e18./auxnoise.sI,f,(totNEP*1e18));
                     %legend('experimental','jhonson','phonon','shunt','total');
                     legend('experimental','exp\_filtered','jhonson','phonon','shunt','total');
@@ -258,22 +301,6 @@ if iscell(file)
         %OP.Z0,OP.Zinf%debug
         %if abs(OP.Z0-OP.Zinf)<1.5e-3 set(get(findobj(gca,'type','axes'),'title'),'color','r');end
         if Ib<OP.Ibiasmin set(get(findobj(gca,'type','axes'),'title'),'color','r');end
-        
-         %%%obsolet0.
-%          if(0)
-%          sIaux=ppval(spline(f,auxnoise.sI),noise{i}(:,1));
-%          NEP=sqrt((V2I(noise{i}(:,2),circuit).^2-auxnoise.squid.^2))./sIaux;
-%          %figure
-%             loglog(noise{i}(:,1),NEP*1e18,'r'),hold on,grid on,%%%for noise in Power
-%          %   loglog(f,auxnoise.NEP*1e18,'b'),hold on,grid on,%%%for noise in Power
-%         
-%          %%resolucion experimental o teorica. Devolver un parametro u otro.
-%          expres(1,i)=OP.R0/ZTES.Rn;
-%          RES=2.35/sqrt(trapz(noise{i}(:,1),1./NEP.^2))/2/1.609e-19;
-%          expres(2,i)=RES;
-%          thres(1,i)=OP.R0/ZTES.Rn;
-%          thres(2,i)=auxnoise.Res;
-%          end
          
         %set(gca,'xlim',[100 1e5]);
         %set(gca,'ylim',[1e-11 1e-9]);
@@ -288,20 +315,20 @@ if iscell(file)
         print(fi,name,'-dpng','-r0');
          
         
-        %%%%Pruebas sobre la cotribución de cada frecuencia a la
-        %%%%Resolucion.
-        if strcmpi(tipo,'nep')&0
-            figure
-            %RESJ=sqrt(2*log(2)./trapz(f,1./medfilt1(totNEP,1).^2));%%%x=noisedata{1}(:,1);
-            RESJ=sqrt(2*log(2)./trapz(f,1./totNEP.^2))
-            %semilogx(f(1:end-1),((RESJ./totNEP(1:end-1)).^2/(2*log(2)).*diff(f))),hold on
-            semilogx(f(1:end-1),sqrt((2*log(2)./cumsum((1./totNEP(1:end-1).^2).*diff(f))))/1.609e-19),hold on
-            fx=noise{i}(:,1);
-            RESJ2=sqrt(2*log(2)./trapz(fx,1./NEP.^2))
-            %semilogx(fx(1:end-1),((RESJ2./NEP(1:end-1)).^2/(2*log(2)).*diff(fx)),'r')
-            semilogx(fx(1:end-1),sqrt((2*log(2)./cumsum(1./NEP(1:end-1).^2.*diff(fx))))/1.609e-19,'r')
-            %semilogx(fx(1:end-1),((RESJ2./medfilt1(NEP(1:end-1),20)).^2/(2*log(2)).*diff(fx)),'k')
-        end
+%         %%%%Pruebas sobre la cotribución de cada frecuencia a la
+%         %%%%Resolucion.
+%         if strcmpi(tipo,'nep')&0
+%             figure
+%             %RESJ=sqrt(2*log(2)./trapz(f,1./medfilt1(totNEP,1).^2));%%%x=noisedata{1}(:,1);
+%             RESJ=sqrt(2*log(2)./trapz(f,1./totNEP.^2))
+%             %semilogx(f(1:end-1),((RESJ./totNEP(1:end-1)).^2/(2*log(2)).*diff(f))),hold on
+%             semilogx(f(1:end-1),sqrt((2*log(2)./cumsum((1./totNEP(1:end-1).^2).*diff(f))))/1.609e-19),hold on
+%             fx=noise{i}(:,1);
+%             RESJ2=sqrt(2*log(2)./trapz(fx,1./NEP.^2))
+%             %semilogx(fx(1:end-1),((RESJ2./NEP(1:end-1)).^2/(2*log(2)).*diff(fx)),'r')
+%             semilogx(fx(1:end-1),sqrt((2*log(2)./cumsum(1./NEP(1:end-1).^2.*diff(fx))))/1.609e-19,'r')
+%             %semilogx(fx(1:end-1),((RESJ2./medfilt1(NEP(1:end-1),20)).^2/(2*log(2)).*diff(fx)),'k')
+%         end
     end%%%%end_for
 else
     
