@@ -678,7 +678,10 @@ classdef BasicAnalisisClass < handle
                 findx=find((faux>mphfrange(1) & faux<mphfrange(2)) | (faux>mjofrange(1) & faux<mjofrange(2)));
                 xdata=Noises{1}(findx,1);
                 %size(Noises{i}),i
-                ydata=filterNoise(1e12*Noises{i}(findx,2));%%%
+                optfilt.model='movingMean';
+                optfilt.wmed=5;
+                %rps(i)
+                ydata=filterNoise(1e12*Noises{i}(findx,2),optfilt);%%%
                 aux.model=obj.Zfitmodel;
                 param=GetModelParameters(parray(:,i)',IV,Ib(i),TES,circuit,aux);%acepta varargin
                 OP=setTESOPfromIb(Ib(i),IV,param);
@@ -688,7 +691,8 @@ classdef BasicAnalisisClass < handle
                 parameters.TES=TES;parameters.OP=OP;parameters.circuit=circuit;
                 m0=[0 0];
                 if strcmp(obj.Zfitmodel,'2TB_intermediate') m0=[1 1 1];end
-                maux=lsqcurvefit(@(x,xdata) fitcurrentnoise(x,xdata,parameters,obj.Zfitmodel),m0,xdata,ydata);
+                %size(xdata),size(ydata)
+                maux=lsqcurvefit(@(x,xdata) fitcurrentnoise(x,xdata,parameters,obj.Zfitmodel),m0,xdata(:),ydata(:));
                 maux=real(maux);
                 paux.p(jj(i)).M=maux(end);
                 paux.p(jj(i)).Mph=maux(1);

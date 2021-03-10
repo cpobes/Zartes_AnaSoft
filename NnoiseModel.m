@@ -34,6 +34,7 @@ if nargin==4%%%Intento de calcular también una contribución phonon.
     G=TES.Gtes(Ttes);
 else
     n=3;
+    G=100e-12;%%%arbitrario.
 end
 bb=n-1;
 t=Tbath/Ttes;
@@ -45,6 +46,7 @@ v2_tes=4*Kb*Ttes*Rtes;%ruido voltaje en el TES en estado normal.
 
 v2_tfn=sqrt(4*Kb*Ttes^2*G*F)*Rtes;%%%%ojo.
 i2_tfn=sqrt(4*Kb*Ttes^2*G*F)/Rtes;
+
 i_jo=sqrt(v2_sh+v2_tes+0*v2_tfn)./abs(Zcirc);%%%%He probado a incorporar el TFN, pero no salen valores que puedan explicar la diferencia th-ex.
 %%i_jo=sqrt(4*Kb*Tbath/(RTES))./sqrt(1+(tau*w).^2);%%%06-04-20.no elevaba al cuadrado tau*w!!!
 %i_jo=sqrt(4*Kb*Tbath/(RTES))./(1+tau*w);

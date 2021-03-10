@@ -20,4 +20,6 @@ switch option.model
     case 'minfilt+medfilt'
         ydata=colfilt(noisedata,[option.wmin 1],'sliding',@min);
         filtNoise=medfilt1(ydata,option.wmed);
+    case 'movingMean'
+        filtNoise=movingMean(noisedata,option.wmed);
 end
