@@ -332,8 +332,10 @@ classdef BasicAnalisisClass < handle
                 OP=setTESOPfromIb(Ib(i),IV,param);
                 OP.parray=parray(:,i)';%%%añadido para modelos a 2TB.
                 parameters.TES=TES;parameters.OP=OP;parameters.circuit=circuit;%%%movido de L391.
-                model=BuildThermalModel(ThermalModel,parameters);%%%lo estamos llamando 2 veces pq en la primera, OP no está definido.
-                SimNoise{i}=model.noise;%%%%El modelo de ruido se define en BuilThermalModel
+                %model=BuildThermalModel(ThermalModel,parameters);%%%lo estamos llamando 2 veces pq en la primera, OP no está definido.
+                %SimNoise{i}=model.noise;%%%%El modelo de ruido se define en BuilThermalModel
+                %prueba a definir el modelo de ruido con una clase.
+                SimNoise(i)=NoiseThermalModelClass(parameters);
             end%for
             
         end
