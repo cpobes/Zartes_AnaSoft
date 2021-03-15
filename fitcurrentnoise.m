@@ -48,16 +48,19 @@ end
 
     L0=P0*alfa/(G*T0);
     n=TES.n;
-    if isfield(Circuit,'Nsquid') Nsquid=Circuit.Nsquid;else Nsquid=3e-12;end
+    %if isfield(Circuit,'Nsquid') Nsquid=Circuit.Nsquid;else Nsquid=3e-12;end
     if abs(OP.Z0-OP.Zinf)<1.5e-3, 
         %R0=0; L0=0;V0=0;P0=0;
         I0=(Rs/RL)*OP.ibias;
     end
-    if isfield(circuit,'squid')
-        ssquid=circuit.ssquid.^2*ones(length(f),1);
-    else
-        ssquid=(3e-12).^2*ones(length(f),1);
-    end
+     if isfield(Circuit,'squid')
+         ssquid=Circuit.squid.^2*ones(length(f),1);
+     else
+         ssquid=(3e-12).^2*ones(length(f),1);
+     end
+     %if isfield('Circuit','circuitnoise')
+     %    ssquid=Circuit.circuitnoise(:,2);
+     %end
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 

@@ -180,9 +180,12 @@ if iscell(file)
         f=logspace(0,6,1000);
         %si0(i)=auxnoise.sI(1);
         %si0=auxnoise;%debug,para N=1 ver la SI.
-        medfilt_w=20;
+        %medfilt_w=20;
+        optfilt.model='movingMean';
+        optfilt.wmed=5;
             if(strcmp(tipo,'current'))
-                 filtered_current_noise=medfilt1(V2I(noise{i}(:,2),circuit)*1e12,medfilt_w);
+                 %filtered_current_noise=medfilt1(V2I(noise{i}(:,2),circuit)*1e12,medfilt_w);
+                 filtered_current_noise=filterNoise(V2I(noise{i}(:,2),circuit)*1e12,optfilt);
                  %filtered_current_noise=colfilt(V2I(noise{i}(:,2),circuit)*1e12,[10 1],'sliding',@min);
                  %filtered_current_noise=colfilt(V2I(noise{i}(:,2),circuit)*1e12,[10 1],'sliding',@mean);
                  %filtered_current_noise=medfilt1(filtered_current_noise,40);
@@ -204,9 +207,15 @@ if iscell(file)
                     %%%%%hay 2 componentes de ph diferentes por tanto
                     %%%%%totnoise no se puede definir así.
                     %totnoise=sqrt(auxnoise.max.^2+auxnoise.jo.^2+auxnoise.sh.^2+auxnoise.squidarray.^2);
+                    
                     if strfind(modelname,'irwin')
                         Mexph=OP.Mph;
-                        totnoise=sqrt((auxnoise.ph.^2)*(1+Mexph^2)+auxnoise.jo.^2+auxnoise.sh.^2+auxnoise.squidarray.^2);
+                        circuitnoise=auxnoise.squidarray;
+                        if isfield(circuit,'circuitnoise') 
+                            cn=circuit.circuitnoise;
+                            circuitnoise=interp1(cn(:,1),cn(:,2),f);
+                        end
+                        totnoise=sqrt((auxnoise.ph.^2)*(1+Mexph^2)+auxnoise.jo.^2+auxnoise.sh.^2+circuitnoise.^2);
                     elseif strfind(modelname,'2TB')
                         Mph1=OP.Mph;
                         Mph2=OP.Mph2;
@@ -290,7 +299,7 @@ if iscell(file)
             xlabel('\nu (Hz)','fontsize',12,'fontweight','bold')
             
             
-        axis([1e1 1e5 2 1e3])%% axis([1e1 1e5 1 1e4])
+        axis([1e1 1e5 1e1 1e3])%% axis([1e1 1e5 1 1e4])
 
         %h=get(gca,'children')
         set(h(1),'linewidth',3);

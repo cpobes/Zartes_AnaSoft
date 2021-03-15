@@ -8,15 +8,27 @@ else
     skip=varargin{1};
 end
 
-if nargin>1
-    path=varargin{2};
-    file=varargin{3};
-    %iscell(file)
-else
-    [file,path]=uigetfile('*noise*','*','Multiselect','on');%%%HP_noise*
-    %%%C:\Users\Carlos\Desktop\ATHENA\medidas\TES\2016\*
-    %iscell(file)
+switch nargin
+    case {0, 1}
+        [file,path]=uigetfile('*noise*','*','Multiselect','on');%%%HP_noise*
+    case 2
+        [x,y,z]=fileparts(varargin{2});
+        path=x;
+        file=[y z];
+    case 3
+        path=varargin{2};
+        file=varargin{3};
+        
 end
+% if nargin>1
+%     path=varargin{2};
+%     file=varargin{3};
+%     %iscell(file)
+% else
+%     [file,path]=uigetfile('*noise*','*','Multiselect','on');%%%HP_noise*
+%     %%%C:\Users\Carlos\Desktop\ATHENA\medidas\TES\2016\*
+%     %iscell(file)
+% end
 
 if ~iscell(file)
     [i,j]=size(file);
