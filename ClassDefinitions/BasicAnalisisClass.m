@@ -678,7 +678,10 @@ classdef BasicAnalisisClass < handle
                 findx=find((faux>mphfrange(1) & faux<mphfrange(2)) | (faux>mjofrange(1) & faux<mjofrange(2)));
                 xdata=Noises{1}(findx,1);
                 %size(Noises{i}),i
-                ydata=filterNoise(1e12*Noises{i}(findx,2));%%%
+                noisefilteropt.model='minfilt+medfilt';%%%default, medfilt, minfilt
+                noisefilteropt.wmed=40;
+                noisefilteropt.wmin=20;
+                ydata=filterNoise(1e12*Noises{i}(findx,2),noisefilteropt);%%%
                 aux.model=obj.Zfitmodel;
                 param=GetModelParameters(parray(:,i)',IV,Ib(i),TES,circuit,aux);%acepta varargin
                 OP=setTESOPfromIb(Ib(i),IV,param);
