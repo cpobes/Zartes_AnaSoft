@@ -5,7 +5,11 @@ classdef NoiseThermalModelClass < handle
         %%%Basic Properties
         fname='1TB';
         fNumberOfBlocks=1;
-        fNumberOfComponents=3;
+        fNumberOfLinks=1;
+        fLinksList={'TES-B'}; %%%Definición del modelo de bloques a través de la lista con el tipo de links
+        %%%opciones: 'TES-B', 'TES-H', 'TES-I', 'I-B'. Todos los modelos se
+        %%%construyen como combinaciones de ellos.
+        fNumberOfComponents=3;%%Numero de componentes de ruido sin contar el circuitnoise.
         fOperatingPoint=[];
         fCircuit=[];
         fTES=[];
@@ -33,16 +37,18 @@ classdef NoiseThermalModelClass < handle
             %%%alteramos el orden respecto a BuildThermalModel() function.
             %%%Obligamos a pasar OP, TES y circuit, que son necesarios, y
             %%%opcionalmente el nombre del modelo.
+            nargin
             if nargin==2
                 obj.fname=varargin{1};
+                obj.ParseModelName(varargin{1});%%%Funcion para actualizar el fLinksList
             end
             obj.fOperatingPoint=PARAMETERS.OP;%%%Si definimos OP como una clase habrá que cambiar esto.
             obj.fCircuit=PARAMETERS.circuit;
             obj.fTES=PARAMETERS.TES;
             s=numel(PARAMETERS.OP.parray);
             obj.fNumberOfBlocks=(s-1)/2;
-            obj.fNumberOfComponents=obj.fNumberOfBlocks+2;
-            if strcmp(obj.fname,'2TB_parallel') obj.fNumberOfComponents=5;end
+            obj.fNumberOfLinks=numel(obj.fLinksList);
+            obj.fNumberOfComponents=obj.fNumberOfLinks+2;           
             obj.BuildZtesfunction();
             obj.BuildsIfunction();
             obj.BuildRshNoisefunction();
@@ -50,12 +56,25 @@ classdef NoiseThermalModelClass < handle
             obj.BuildPhononNoiseComponents();
             obj.GetTotalCurrentNoise()
         end
+        function list=ParseModelName(obj,modelname)
+            switch modelname
+                case {'default' 'irwin'}
+                    list={'TES-B'};
+                case '2TB_hanging'
+                    list={'TES-B' 'TES-H'};
+                case '2TB_intermediate'
+                    list={'TES-I' 'I-B'};
+                case '2TB_parallel'
+                    list={'TES-B' 'TES-I' 'I-B'};
+            end
+            obj.fLinksList=list;
+        end
         function fZtesHandler=BuildZtesfunction(obj)
             if obj.fNumberOfBlocks==1
                 fH=@(p,f)(p(1)+(p(2)-p(1)).*(1-1i*(2*pi*f)*p(3)).^-1);
             elseif obj.fNumberOfBlocks==2
                 fH=@(p,f)(p(1)+(p(2)-p(1)).*(1+p(4)).*(1-1i*(2*pi*f)*p(3)+p(4)./(1+1i*(2*pi*f)*p(5))).^-1);
-            elseif obj.fNumberOfBlocks>2
+            elseif obj.fNumberOfBlocks>2%%%Generalizar para cualquier p size.
                 warning('modelo no implementado')
             end
             p0=obj.fOperatingPoint.parray;
@@ -175,14 +194,40 @@ classdef NoiseThermalModelClass < handle
             %%%Por ejemplo, el H para 1TB es B_H_Term(tau,1,1). Devolvemos
             %%%de nuevo handle a función de la frecuencia.
         end
-        function H=GetModelDependent_H_Term(obj,model)
+        function H=GetModelDependent_H_Term(obj,model,varargin)
             %%%Esta función puede devolver el término H específico para
             %%%cada Link en función del par de bloques a considerar. Pero
             %%%faltará combinar según el modelo los distintos términos.
+            
+            %%%Hay que llamarla con opt.tau y opt.g2, aunque para TES-B no
+            %%%hace falta.
+            
+            %%%Hasta 3TB (al menos los modelos considerados por Maasilta,
+            %%%existen sólo 4 tipos distintos de Link, que podemos definir
+            %%% (usando D=(1+(w*tau)^2) como:
+            %%%-- TES-Baño: H=1
+            %%%-- TES-Hanging: H=(wtau)^2/D(w)
+            %%%-- TES-Intermediate: H=(g2+(w*tau)^2)/D
+            %%%--Intermediate-Baño: H=g2*1/D
+            %%% donde g2 es un cociente adimensional de conductancias al
+            %%% cuadrado dependiennte del modelo.
+            
+            %%%Recordar que llamamos H_Tetm(tau,a,b)
             switch model
-                case 'default'
+                case 'TES-B'
                     H=obj.BuildGeneral_H_Term(0,1,1);
                     %H=@(f)1
+                case 'TES-H'
+                    tau=varargin{1}.tau;
+                    H=obj.BuildGeneral_H_Term(tau,0,1);
+                case 'TES-I'
+                    tau=varargin{1}.tau;
+                    g2=varargin{1}.g2;
+                    H=obj.BuildGeneral_H_Term(tau,g2,1);
+                case 'I-B'
+                    tau=varargin{1}.tau;
+                    g2=varargin{1}.g2;
+                    H=obj.BuildGeneral_H_Term(tau,g2,0);
             end
         end
     end

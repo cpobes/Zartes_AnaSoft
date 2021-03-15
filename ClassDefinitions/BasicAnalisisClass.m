@@ -335,7 +335,7 @@ classdef BasicAnalisisClass < handle
                 %model=BuildThermalModel(ThermalModel,parameters);%%%lo estamos llamando 2 veces pq en la primera, OP no está definido.
                 %SimNoise{i}=model.noise;%%%%El modelo de ruido se define en BuilThermalModel
                 %prueba a definir el modelo de ruido con una clase.
-                SimNoise(i)=NoiseThermalModelClass(parameters);
+                SimNoise(i)=NoiseThermalModelClass(parameters,ThermalModel);
             end%for
             
         end
