@@ -105,7 +105,7 @@ classdef NoiseThermalModelClass < handle
         function fPhononNoiseHandlerArray=BuildPhononNoiseComponents(obj)
             Kb=obj.Kb;
             for i=1:obj.fNumberOfComponents-2
-                fPhononNoiseHandlerArray{i}=@(f)f;
+                fPhononNoiseHandlerArray{i}=@(f)0;
             end
             obj.fPhononNoiseHandlerArray=fPhononNoiseHandlerArray;
         end
@@ -123,7 +123,7 @@ classdef NoiseThermalModelClass < handle
             sphSum=@(f,Mph)0;%%%Initialization
             %%%Falta implementar bien las componenetes phonon. ya no da
             %%%error pero salen mal.
-            for i=1:0%obj.fNumberOfComponents-2
+            for i=1:obj.fNumberOfComponents-2
 %                 if obj.boolAddMphononArray(i)
 %                     Mph(i)=obj.fOperatingPoint.Mph(i);
 %                 else
@@ -141,6 +141,49 @@ classdef NoiseThermalModelClass < handle
             end
             fTotalCurrentNoiseHandler=@(f,Mjo,Mph)sqrt(stot(f,Mjo,Mph)+circuitnoise(f).^2);
             obj.fTotalCurrentNoiseModel=fTotalCurrentNoiseHandler;
+        end
+        
+        function P2=BuildGeneralLinkPowerSpectrumNoise(obj,T0,T1,G0,n0)
+            %%%Todos los ruidos phonon parten de una expresión general para
+            %%%el espectro de potencias del ruido términco entre dos
+            %%%bloques a temperatura T0 y T1. La expresión genreal es la
+            %%%(18) del artículo de Maasilta, que desarrollando, y
+            %%%asumiendo que el mecanismo de conducción es el mismo en los
+            %%%dos extremos del link térmico, se puede convertir en la
+            %%%expresión phonon de 1TB. Pero según se pasen unos valores u
+            %%%otros de Ts, G y n, esta función general se puede usar para
+            %%%todos los modelos. Después se combina con la |sI| y con una
+            %%%parte dependiente de 'w' y del link concreto, que es la que
+            %%%hay que particularizar según el modelo. Esto va a ser válido
+            %%%también para los dos modelos 3TB que considera Maasilta, el
+            %%%2H y el IH.
+            
+            t=T1/T0;
+            F=(1+t^(n0+1))/2;
+            P2=@(f) 4*obj.Kb*T0^2*G0*F; %%%Notar que este término es constante en frecuencia, la dependencia en freq la dan los otros términos.
+            %%%Devolvemos un handle a funcion aunque sea constante para
+            %%%usarla en combinación con el resto de términos.
+        end
+        function H=BuildGeneral_H_Term(obj,tau,a,b)
+            %%%Este término es general para construir cualquier
+            %%%contribución phonon. El ruido en corriente phonon específico
+            %%%será sph=P2*|sI(w)|^2*H(w), donde el H(w) hay que
+            %%%construirlo de manera específica para cada modelo a partir
+            %%%de esta función, según los valores de a y b.
+            
+            H=@(f) (a+b*(2*pi*f*tau).^2)./(1+(2*pi*f*tau).^2);
+            %%%Por ejemplo, el H para 1TB es B_H_Term(tau,1,1). Devolvemos
+            %%%de nuevo handle a función de la frecuencia.
+        end
+        function H=GetModelDependent_H_Term(obj,model)
+            %%%Esta función puede devolver el término H específico para
+            %%%cada Link en función del par de bloques a considerar. Pero
+            %%%faltará combinar según el modelo los distintos términos.
+            switch model
+                case 'default'
+                    H=obj.BuildGeneral_H_Term(0,1,1);
+                    %H=@(f)1
+            end
         end
     end
 end
