@@ -15,11 +15,13 @@ colordir=GetCloudDataDir();%%%La variable colores está en el directorio raiz pri
 
 olddir=pwd;
 
+try %%%en realidad no necesitamos aqui 'colores' para nada y en LowTPC da error.
 cd(colordir)%%%Cargamos automaticamente la estructura colores para trabajar con ella
 %evalin('caller','load(''colores.mat'')');
 load('colores.mat');
 cd(olddir)
-
+catch
+end
 datadir=[];
 circuit=[];
 
