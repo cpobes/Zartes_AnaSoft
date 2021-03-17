@@ -6,10 +6,12 @@ classdef NoiseDataClass < handle
         freqs=logspace(0,6,1000);
         rawVoltage=[];
         CurrentNoise=[];
-        %NEP=[];%%%El NEP requiere de la sI y por tanto de un modelo.
-        circuit;
+        NEP=[];%%%El NEP requiere de la sI y por tanto de un modelo.
+        fOperatingPoint;
+        fTES;
+        fCircuit;
         FilteredVoltageData=[];
-        
+        NoiseModelClass=[];
         %filter options
         filter_method='movingMean'; %a de finir en la funcion filterNoise().
         
@@ -24,7 +26,8 @@ classdef NoiseDataClass < handle
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%Constructor
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        function obj=NoiseDataClass(filename,circuit)
+        function obj=NoiseDataClass(filename,PARAMETERS)
+            circuit=PARAMETERS.circuit;
             if isempty(filename)
                 [noise,file,path]=loadnoise(0);
             else
@@ -36,8 +39,10 @@ classdef NoiseDataClass < handle
             obj.freqs=noise(:,1);
             obj.rawVoltage=noise(:,2);
             obj.CurrentNoise=V2I(noise(:,2),circuit);
-            %obj.NEP;
-            obj.circuit=circuit;
+
+            obj.fCircuit=circuit;
+            obj.fTES=PARAMETERS.TES;
+            obj.fOperatingPoint=PARAMETERS.OP;
         end
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -68,8 +73,34 @@ classdef NoiseDataClass < handle
             if obj.boolShowFilteredData
                 hold on
                 obj.FilterNoise()
-                loglog(obj.freqs,scale*V2I(obj.FilteredVoltageData,obj.circuit),'.-k');
+                loglog(obj.freqs,scale*V2I(obj.FilteredVoltageData,obj.fCircuit),'.-k');
             end
         end
+        
+        %%%%%%%%%%%%%%%
+        %%%Setters
+        %%%%%%%%%%%%%%%
+        function  SetNoiseModel(obj,model)
+            parameters.OP=obj.fOperatingPoint;
+            parameters.TES=obj.fTES;
+            parameters.circuit=obj.fCircuit;
+            obj.NoiseModelClass=NoiseThermalModelClass(parameters,model);
+            if isfield(obj.fCircuit,'circuitnoise')
+                circuitnoise=obj.fCircuit.circuitnoise;
+            else
+                circuitnoise=3e-12;
+            end
+            ss=obj.CurrentNoise.^2-circuitnoise.^2;
+            sI=obj.NoiseModelClass.fsIHandel(obj.freqs);
+            obj.NEP=sqrt(ss)./abs(sI);
+        end
+        %%%%%%%%%%%%%%%
+        %%%Calculations
+        %%%%%%%%%%%%%%%
+        function Res=GetBaselineResolution(obj)
+            %%%%%%%               
+            Res=2.35/sqrt(trapz(f,1./obj.NEP.^2))/2/1.609e-19;
+        end
+        
     end %%%end methods
 end

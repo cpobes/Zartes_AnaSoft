@@ -27,6 +27,12 @@ classdef NoiseThermalModelClass < handle
         boolAddMphononArray=[1 1 1];
         
         %%%Plotting Properties
+        boolPlotComponents=0;
+        PlotCurrentScale=1e12;%%%Para pintar en picoA/raizHz.
+        PlotNEPScale=1e18;%%%Para pintar en aW/raizHz.
+        
+        %%%Calculation Properties
+        maxResolutionFrequency=Inf;%%%(use 1e5 for experimental comparison, Inf for theoretical Limit.
     end
     
     methods
@@ -37,7 +43,7 @@ classdef NoiseThermalModelClass < handle
             %%%alteramos el orden respecto a BuildThermalModel() function.
             %%%Obligamos a pasar OP, TES y circuit, que son necesarios, y
             %%%opcionalmente el nombre del modelo.
-            nargin
+            
             if nargin==2
                 obj.fname=varargin{1};
                 obj.ParseModelName(varargin{1});%%%Funcion para actualizar el fLinksList
@@ -70,16 +76,30 @@ classdef NoiseThermalModelClass < handle
             obj.fLinksList=list;
         end
         function fZtesHandler=BuildZtesfunction(obj)
-            if obj.fNumberOfBlocks==1
-                fH=@(p,f)(p(1)+(p(2)-p(1)).*(1-1i*(2*pi*f)*p(3)).^-1);
-            elseif obj.fNumberOfBlocks==2
-                fH=@(p,f)(p(1)+(p(2)-p(1)).*(1+p(4)).*(1-1i*(2*pi*f)*p(3)+p(4)./(1+1i*(2*pi*f)*p(5))).^-1);
-            elseif obj.fNumberOfBlocks>2%%%Generalizar para cualquier p size.
-                warning('modelo no implementado')
-            end
-            p0=obj.fOperatingPoint.parray;
-            fZtesHandler=@(f)fH(p0,f);
-            obj.fZtesHandler=fZtesHandler;
+%             if obj.fNumberOfBlocks==1
+%                 fH=@(p,f)(p(1)+(p(2)-p(1)).*(1-1i*(2*pi*f)*p(3)).^-1);
+%             elseif obj.fNumberOfBlocks==2
+%                 fH=@(p,f)(p(1)+(p(2)-p(1)).*(1+p(4)).*(1-1i*(2*pi*f)*p(3)+p(4)./(1+1i*(2*pi*f)*p(5))).^-1);
+%             elseif obj.fNumberOfBlocks>2%%%Generalizar para cualquier p size.
+%                 warning('modelo no implementado')
+%             end
+%             p0=obj.fOperatingPoint.parray;
+%             fZtesHandler=@(f)fH(p0,f);
+%             obj.fZtesHandler=fZtesHandler;
+
+                %%%%Version generalizable
+                Num=@(p,f) 1;
+                for i=1:obj.fNumberOfBlocks-1
+                    Num=@(p,f) Num(p,f)+p(i+3);
+                end
+                Den=@(p,f) 1-1i*(2*pi*f)*p(3);
+                for i=1:obj.fNumberOfBlocks-1
+                    Den=@(p,f) Den(p,f)+p(i+3)./(1+1i*(2*pi*f)*p(i+4));
+                end
+                fH=@(p,f) p(1)+(p(2)-p(1)).*Num(p,f)./Den(p,f);
+                p0=obj.fOperatingPoint.parray;
+                fZtesHandler=@(f)fH(p0,f);
+                obj.fZtesHandler=fZtesHandler;
         end
         function ZcircuitHandler=BuildZcircuitHandler(obj)
             RL=obj.fCircuit.Rsh+obj.fCircuit.Rpar;
@@ -123,34 +143,26 @@ classdef NoiseThermalModelClass < handle
         end
         function fPhononNoiseHandlerArray=BuildPhononNoiseComponents(obj)
             Kb=obj.Kb;
-            for i=1:obj.fNumberOfComponents-2
-                fPhononNoiseHandlerArray{i}=@(f)0;
+            sI=obj.BuildsIfunction();
+            for i=1:obj.fNumberOfLinks
+                linkmodel=obj.fLinksList{i};
+                LinkParameters=obj.ParseLinkParameters(linkmodel);
+                P2=obj.BuildGeneralLinkPowerSpectrumNoise(LinkParameters);
+                H=obj.GetModelDependent_H_Term(linkmodel,LinkParameters);
+                fPhononNoiseHandlerArray{i}=@(f) P2(f).*abs(sI(f)).^2.*H(f);
             end
             obj.fPhononNoiseHandlerArray=fPhononNoiseHandlerArray;
         end
         
         function fTotalCurrentNoiseHandler=GetTotalCurrentNoise(obj)
-%             if obj.boolAddMjohnson
-%                 obj.fOperatingPoint.P
-%                 Mjo=obj.fOperatingPoint.M;
-%             else
-%                 Mjo=0;
-%             end
             ssh=obj.BuildRshNoisefunction();
             stes=obj.BuildJohnsonNoisefunction();
             sjo=@(f,Mjo)ssh(f)+stes(f)*(1+Mjo^2);%%%Definimos el Mjo tambien como parametro para poder hacer fit.
+            
             sphSum=@(f,Mph)0;%%%Initialization
-            %%%Falta implementar bien las componenetes phonon. ya no da
-            %%%error pero salen mal.
-            for i=1:obj.fNumberOfComponents-2
-%                 if obj.boolAddMphononArray(i)
-%                     Mph(i)=obj.fOperatingPoint.Mph(i);
-%                 else
-%                     Mph(i)=0;
-%                 end
-                
+            for i=1:obj.fNumberOfLinks
                 sph=obj.fPhononNoiseHandlerArray{i};
-                sphSum=@(f,Mph)sphSum(f,Mph)+sph(f)*(1+Mph^2);%%%%!
+                sphSum=@(f,Mph)sphSum(f,Mph)+sph(f)*(1+Mph(i)^2);%%% Mph es un array con los Mph. Ojo al orden.
             end
             stot=@(f,Mjo,Mph) sjo(f,Mjo)+sphSum(f,Mph);
             if isfield(obj.fCircuit,'circuitnoise') && obj.boolUseExperimentalCircuitNoise
@@ -161,8 +173,22 @@ classdef NoiseThermalModelClass < handle
             fTotalCurrentNoiseHandler=@(f,Mjo,Mph)sqrt(stot(f,Mjo,Mph)+circuitnoise(f).^2);
             obj.fTotalCurrentNoiseModel=fTotalCurrentNoiseHandler;
         end
+        function fTotalNEPHandler=GetTotalNEPNoise(obj)
+            ssh=obj.BuildRshNoisefunction();
+            stes=obj.BuildJohnsonNoisefunction();
+            sjo=@(f,Mjo)ssh(f)+stes(f)*(1+Mjo^2);%%%Definimos el Mjo tambien como parametro para poder hacer fit.
+            
+            sphSum=@(f,Mph)0;%%%Initialization
+            for i=1:obj.fNumberOfLinks
+                sph=obj.fPhononNoiseHandlerArray{i};
+                sphSum=@(f,Mph)sphSum(f,Mph)+sph(f)*(1+Mph(i)^2);%%% Mph es un array con los Mph. Ojo al orden.
+            end
+            stot=@(f,Mjo,Mph) sjo(f,Mjo)+sphSum(f,Mph);
+            sI=obj.fsIHandler;
+            fTotalNEPHandler=@(f,Mjo,Mph)sqrt(stot(f,Mjo,Mph))./abs(sI(f));
+        end
         
-        function P2=BuildGeneralLinkPowerSpectrumNoise(obj,T0,T1,G0,n0)
+        function P2=BuildGeneralLinkPowerSpectrumNoise(obj,LinkParameters)
             %%%Todos los ruidos phonon parten de una expresión general para
             %%%el espectro de potencias del ruido términco entre dos
             %%%bloques a temperatura T0 y T1. La expresión genreal es la
@@ -176,7 +202,10 @@ classdef NoiseThermalModelClass < handle
             %%%hay que particularizar según el modelo. Esto va a ser válido
             %%%también para los dos modelos 3TB que considera Maasilta, el
             %%%2H y el IH.
-            
+            T0=LinkParameters.T0;
+            T1=LinkParameters.T1;
+            G0=LinkParameters.G0;
+            n0=LinkParameters.n0;
             t=T1/T0;
             F=(1+t^(n0+1))/2;
             P2=@(f) 4*obj.Kb*T0^2*G0*F; %%%Notar que este término es constante en frecuencia, la dependencia en freq la dan los otros términos.
@@ -229,6 +258,134 @@ classdef NoiseThermalModelClass < handle
                     g2=varargin{1}.g2;
                     H=obj.BuildGeneral_H_Term(tau,g2,0);
             end
+        end
+        function LinkParameters=ParseLinkParameters(obj,LinkModel)
+            %%%%Función para extraer los parámetros específicos que
+            %%%%permiten construir las componentes phonon a partir del tipo
+            %%%%de link y del OP.
+            
+            OP=obj.fOperatingPoint;
+            TES=obj.fTES;
+            P0=OP.P0;
+            Tbath=OP.Tbath;
+            p=OP.parray;
+            if isfield(TES,'Ttes')
+                Ttes=TES.Ttes(P0,Tbath);
+            end
+            if isfield(TES,'Gtes')
+                Gtes=TES.Gtes(Ttes);
+            end
+            
+            %%%Falta verificar que estas asignaciones conducen a las
+            %%%componentes correctas para cada uno de los modelos 2TB, pero
+            %%%se ejecuta ya sin error y conduce a modelos razonables.
+            switch LinkModel
+                case 'TES-B'
+                    %%%P2 parameters
+                    T0=Ttes;
+                    T1=OP.Tbath;
+                    G0=Gtes;
+                    n0=TES.n;
+                    %%%H parameters
+                    tau=OP.C/G0;%?
+                    g2=0;
+                case 'TES-H'
+                    %%%P2 parameters
+                    T0=Ttes;
+                    T1=T0;
+                    G0=OP.g_1;%?
+                    n0=TES.n;%da igual
+                    %%%H parameters
+                    tau=p(5);%?
+                    g2=0;
+                case 'TES-I'
+                    %%%P2 parameters
+                    T0=Ttes;
+                    T1=OP.P.T1;
+                    G0=OP.P.g_t1_0;
+                    n0=TES.n;
+                    %%%H parameters
+                    tau=p(5);
+                    g2=(1-OP.P.a).^2;
+                case 'I-B'
+                    %%%P2 parameters
+                    T0=OP.P.T1;
+                    T1=Tbath;
+                    G0=OP.P.g_1b;
+                    n0=TES.n;%%%Aqui hacemos la hipótesis de que m=n.
+                    %%%H parameters
+                    tau=p(5);
+                    g2=OP.P.a.^2;
+            end
+        LinkParameters.T0=T0;
+        LinkParameters.T1=T1;
+        LinkParameters.G0=G0;
+        LinkParameters.n0=n0;
+        LinkParameters.tau=tau;
+        LinkParameters.g2=g2;
+        end
+    
+        %%%%%%%%%%%%%%%%%%%%%
+        %%% Plotter Functions
+        %%%%%%%%%%%%%%%%%%%%%        
+        function PlotNoiseModel(obj,varargin)
+            options=BuildNoiseOptions();
+            if nargin>1
+                options=varargin{1};
+            end
+            if obj.boolAddMjohnson && isfield(obj.fOperatingPoint.P,'M')
+                Mjo=obj.fOperatingPoint.P.M;
+            else
+                Mjo=0;
+            end
+            for i=1:length(obj.boolAddMphononArray)
+                if obj.boolAddMphononArray(i) && isfield(obj.fOperatingPoint.P,'Mph')
+                Mph(i)=obj.fOperatingPoint.P.Mph(i);
+                else
+                Mph(i)=0;
+                end
+            end
+            
+            f=logspace(0,5,1000);
+            if strcmpi(options.tipo,'current')
+                func=obj.fTotalCurrentNoiseModel;
+                scale=obj.PlotCurrentScale;
+                legendstring={'Total Current Nosie'};
+            elseif strcmpi(options.tipo,'nep')
+                func=obj.GetTotalNEPNoise();
+                scale=obj.PlotNEPScale;
+                obj.boolPlotComponents=0;%%%De moomento no pintamos componentes para NEP.
+                legendstring={'Total NEP'};
+            end
+            if obj.boolPlotComponents
+                fh{1}=obj.BuildRshNoisefunction();                
+                fh{2}=obj.BuildJohnsonNoisefunction();
+                for i=1:obj.fNumberOfLinks
+                    fh{2+i}=obj.fPhononNoiseHandlerArray{i};
+                end
+                for i=1:obj.fNumberOfComponents                    
+                    loglog(f,scale*sqrt(fh{i}(f)),'-'),hold on;
+                end
+                legendstring=([{'R_{sh}' 'Johnson_{TES}'} obj.fLinksList {'Total Current Noise'}]);
+            end
+            loglog(f,scale*func(f,Mjo,Mph),'.-'),grid on;
+            
+            %%%Formatting.
+            legend(legendstring);
+            ylim([1 1e2])
+            set(gca,'fontsize',12)
+        end
+        
+        %%%%%%%%%%%%%%%%
+        %%%Calculations
+        %%%%%%%%%%%%%%%%
+        function Res = GetModelResolution(obj)
+            %%%Cálculo de la resolución teórica sin incluir Ms.
+            fmax=obj.maxResolutionFrequency;
+            nep=obj.GetTotalNEPNoise();
+            integrand=@(f) 1./nep(f,0,[0 0]).^2;
+            aux=integral(integrand,0,fmax);
+            Res=2.35/sqrt(aux)/2/1.609e-19;
         end
     end
 end

@@ -6,6 +6,9 @@ classdef BasicAnalisisClass < handle
         datadir=[];
         structure=[];%%%Estructura global, incluye las IVset, TES, P, etc.
         analizeOptions=[];
+        fTES=[];
+        fCircuit=[];
+        fOperatingPoint=[];
         NoisePlotOptions=BuildNoiseOptions;
         Zfitmodel=[];%%%El modelo con el que se analizaron los datos.
         Zfitboolplot=0;%%%booleano por si quiero pintar o no los resultados del reanálisis.
@@ -27,6 +30,8 @@ classdef BasicAnalisisClass < handle
             obj.analizeOptions=TES_data_str.analizeOptions;
             obj.Zfitmodel=TES_data_str.analizeOptions.ZfitOpt.ThermalModel;
             obj.auxFitstruct=TES_data_str.P;%inicializo la auxFitstruct a la estructura original.(para bias positivos).
+            obj.fCircuit=obj.structure.circuit;
+            obj.fTES=obj.structure.TES;
         end
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -99,6 +104,21 @@ classdef BasicAnalisisClass < handle
         function Rn=GetRn(obj)
            Rn=obj.structure.TES.Rn; 
         end
+        function OP= GetSingleOperatingPoint(obj,Temp,rp)
+            paux=obj.GetPstruct(Temp);
+            actualRp=obj.GetActualRps(Temp,rp,paux);
+            rtes=GetPparam(paux.p,'rp');
+            ivaux=obj.GetIV(Temp);
+            Ibias=obj.GetIbias(Temp,rp);
+            [~,jj]=min(abs(bsxfun(@minus, rtes', actualRp)));
+            jj=unique(jj,'stable');
+            opt.model=obj.Zfitmodel;
+            param=GetModelParameters(paux.p(jj).parray,ivaux,Ibias,obj.fTES,obj.fCircuit,opt);
+            OP=setTESOPfromIb(Ibias,ivaux,param);%setTESOPfromIb
+            OP.parray=paux.p(jj).parray;
+            obj.fOperatingPoint=OP;
+        end
+        
         function param=GetFittedParameterByName(obj,Temp,rps,name,varargin)
             if nargin==4%isempty(varargin)
                 paux=obj.GetPstruct(Temp);
@@ -189,6 +209,8 @@ classdef BasicAnalisisClass < handle
                 Ib=BuildIbiasFromRp(IVmeasure,Rpreal)*1e-6;%%%Ojo, BuildIbias devuelve uA.
                 %modelname
                 param=GetModelParameters(pfit,IVmeasure,Ib,TES,Circuit,modelname);
+                OP=setTESOPfromIb(Ib,IVmeasure,param,varargin);
+                obj.fOperatingPoint=OP;
         end
         function Pstruct=BuildNewPstruct(obj,pold,varargin)
             %%%%usamos la funcion GetParameterFromFit para crear una nueva
@@ -313,6 +335,25 @@ classdef BasicAnalisisClass < handle
             end
             cd(olddir);
         end
+        function Noise=GetSingleNoiseClass(obj,Temp,rp,varargin)
+            %%%
+            olddir=pwd;
+            cd(obj.datadir);
+            %%%
+            
+            ivaux=obj.GetIV(Temp);
+            realRps=obj.GetActualRps(Temp,rp);
+            if nargin==3 str='\HP_noise*'; else str=varargin{1};end 
+            noisefile=GetFilesFromRp(ivaux,Temp,realRps,str);
+            Tdir=GetDirfromTbath(Temp);
+            fullname=strcat(Tdir,'\',noisefile);
+            OP=obj.GetSingleOperatingPoint(Temp,rp);
+            parameters.OP=OP;
+            parameters.TES=obj.fTES;
+            parameters.circuit=obj.fCircuit;
+            Noise=NoiseDataClass(fullname{1},parameters);
+            cd(olddir);
+        end
         function SimNoise=GetNoiseModel(obj,Temp,rps,varargin)
             %%%funcion para devolver el modelo de ruido en unos OPs
             %%%determinados.
@@ -327,8 +368,9 @@ classdef BasicAnalisisClass < handle
                 ThermalModel=varargin{1};%para extraer otros modelos de ruido en esos puntos de operación
                 %%%hay que pasar string.
             end
-            for i=1:length(rps)            
-                param=GetModelParameters(parray(:,i)',IV,Ib(i),TES,circuit);%acepta varargin
+            for i=1:length(rps)
+                opt.model=ThermalModel;
+                param=GetModelParameters(parray(:,i)',IV,Ib(i),TES,circuit,opt);%acepta varargin
                 OP=setTESOPfromIb(Ib(i),IV,param);
                 OP.parray=parray(:,i)';%%%añadido para modelos a 2TB.
                 parameters.TES=TES;parameters.OP=OP;parameters.circuit=circuit;%%%movido de L391.
@@ -339,6 +381,8 @@ classdef BasicAnalisisClass < handle
             end%for
             
         end
+        
+        
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%Set functions
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
