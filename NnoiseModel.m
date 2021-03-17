@@ -44,6 +44,7 @@ Zcirc=RL+Rtes+1i*w*circuit.L;% impedancia del circuito.
 v2_sh=4*Kb*Tbath*RL; % ruido voltaje Rsh (mas parasita).
 v2_tes=4*Kb*Ttes*Rtes;%ruido voltaje en el TES en estado normal.
 
+G=0;
 v2_tfn=sqrt(4*Kb*Ttes^2*G*F)*Rtes;%%%%ojo.
 i2_tfn=sqrt(4*Kb*Ttes^2*G*F)/Rtes;
 
