@@ -104,7 +104,7 @@ classdef BasicAnalisisClass < handle
         function Rn=GetRn(obj)
            Rn=obj.structure.TES.Rn; 
         end
-        function OP= GetSingleOperatingPoint(obj,Temp,rp)
+        function OP=GetSingleOperatingPoint(obj,Temp,rp)
             paux=obj.GetPstruct(Temp);
             actualRp=obj.GetActualRps(Temp,rp,paux);
             rtes=GetPparam(paux.p,'rp');
@@ -725,9 +725,9 @@ classdef BasicAnalisisClass < handle
                 xdata=Noises{1}(findx,1);
                 %size(Noises{i}),i
 
-                noisefilteropt.model='movingMean';%%%'minfilt+medfilt';%%%default, medfilt, minfilt
-                noisefilteropt.wmed=5;
-                %noisefilteropt.wmin=20;
+                noisefilteropt.model='minfilt+medfilt';%%%'minfilt+medfilt';%%%default, medfilt, minfilt,''movingMean'
+                noisefilteropt.wmed=20;
+                noisefilteropt.wmin=5;
                 %rps(i)
                 ydata=filterNoise(1e12*Noises{i}(findx,2),noisefilteropt);%%%
 
@@ -738,13 +738,15 @@ classdef BasicAnalisisClass < handle
                 OP.ztes.data=zaux(i).tf;
                 OP.ztes.freqs=zaux(i).f;
                 parameters.TES=TES;parameters.OP=OP;parameters.circuit=circuit;
-                m0=[0 0];
-                if strcmp(obj.Zfitmodel,'2TB_intermediate') m0=[1 1 1];end
+                m0=[0 0];LB=[0 0];
+                if strcmp(obj.Zfitmodel,'2TB_intermediate') m0=[1 1 1];LB=[0 0 0];end
+                
                 %size(xdata),size(ydata)
-                maux=lsqcurvefit(@(x,xdata) fitcurrentnoise(x,xdata,parameters,obj.Zfitmodel),m0,xdata(:),ydata(:));
+                maux=lsqcurvefit(@(x,xdata) fitcurrentnoise(x,xdata,parameters,obj.Zfitmodel),m0,xdata(:),ydata(:),LB);
                 maux=real(maux);
                 paux.p(jj(i)).M=maux(end);
                 paux.p(jj(i)).Mph=maux(1);
+                paux.p(jj(i)).Marray=maux;
                 if strcmp(obj.Zfitmodel,'2TB_intermediate') paux.p(jj(i)).Mph2=maux(2);end
             end%for_rps
             %obj.plotNoises(Temp,rps,paux);
@@ -753,6 +755,8 @@ classdef BasicAnalisisClass < handle
             obj.auxSingleFitStruct=paux;
             end
         end
+        
+        
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%Sim functions
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -788,6 +792,7 @@ classdef BasicAnalisisClass < handle
             end
             %[pulso,t]=step(TF);
         end
+        
     end %end public methods
     
 %     methods (Access=private)

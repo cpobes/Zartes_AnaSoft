@@ -55,7 +55,8 @@ classdef NoiseDataClass < handle
                 method=varargin{1};
             end
             filtopt.model=method;
-            filtopt.wmed=5;%%%
+            filtopt.wmed=20;%%%
+            filtopt.wmin=6;
             filtered_data=filterNoise(obj.rawVoltage,filtopt);
             obj.FilteredVoltageData=filtered_data;
         end
@@ -72,7 +73,7 @@ classdef NoiseDataClass < handle
             grid on
             if obj.boolShowFilteredData
                 hold on
-                obj.FilterNoise()
+                %obj.FilterNoise()
                 loglog(obj.freqs,scale*V2I(obj.FilteredVoltageData,obj.fCircuit),'.-k');
             end
         end
