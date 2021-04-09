@@ -15,6 +15,10 @@ classdef NoiseDataClass < handle
         %filter options
         filter_method='movingMean'; %a de finir en la funcion filterNoise().
         
+        %handles
+        fCurrentDataHandle=[];
+        fNEPHandle=[];
+        
         %plotoptions
         plottype='current';%options: 'current', 'nep'
         units='pA';%options: 'pA, fW, A, W' /raizHz.
@@ -39,6 +43,7 @@ classdef NoiseDataClass < handle
             obj.freqs=noise(:,1);
             obj.rawVoltage=noise(:,2);
             obj.CurrentNoise=V2I(noise(:,2),circuit);
+            obj.fCurrentDataHandle=@(f) interp1(obj.freqs,obj.CurrentNoise,f);
 
             obj.fCircuit=circuit;
             obj.fTES=PARAMETERS.TES;
@@ -91,9 +96,19 @@ classdef NoiseDataClass < handle
             else
                 circuitnoise=3e-12;
             end
-            ss=obj.CurrentNoise.^2-circuitnoise.^2;
-            sI=obj.NoiseModelClass.fsIHandel(obj.freqs);
-            obj.NEP=sqrt(ss)./abs(sI);
+%             ss=obj.CurrentNoise.^2-circuitnoise.^2;
+%             sI=obj.NoiseModelClass.fsIHandel(obj.freqs);
+%             obj.NEP=sqrt(ss)./abs(sI);
+            
+            if isfield(obj.fCircuit.circuitnoiseHandle)
+                cnHandle=obj.fCircuit.circuitnoiseHandle;
+            elseif length(circuitnoise==1)
+                cnHandle=@(f) circuitnoise;
+            else
+                cnHandle=@(f) interp1(obj.freqs,circuitnoise,f);
+            end
+            obj.fNEPHandlendle=@(f) sqrt(obj.fCurrentDataHandle(f).^2-cnHandle(f).^2)./abs(obj.NoiseModelClass.fsIHandel(f));
+            obj.NEP=obj.fNEPHandle(obj.freqs);
         end
         %%%%%%%%%%%%%%%
         %%%Calculations
