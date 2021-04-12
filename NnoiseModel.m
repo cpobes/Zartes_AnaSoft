@@ -3,10 +3,6 @@ function N=NnoiseModel(circuit, Tbath, varargin)
 %%%superconductor
 
 Kb=1.38e-23;
-
-invMin=circuit.invMin;
-invMf=circuit.invMf;
-Rf=circuit.Rf;
 RL=circuit.Rsh+circuit.Rpar;
 RN=circuit.Rn;
 
@@ -16,7 +12,7 @@ else
     i_squid=3e-12;
 end
 
-tau=circuit.L/(RL+RN);
+%tau=circuit.L/(RL+RN);
 f=logspace(0,6,1000);
 w=2*pi*f;
 

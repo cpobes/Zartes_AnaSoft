@@ -2,10 +2,6 @@ function N=SnoiseModel(circuit, Tbath,varargin)
 %%%Función para devolver el modelo de ruido total en estado normal o
 %%%superconductor en unidades de A/sqrt(Hz).
 Kb=1.38e-23;
-
-invMin=circuit.invMin;
-invMf=circuit.invMf;
-Rf=circuit.Rf;
 RL=circuit.Rsh+circuit.Rpar;
 
 if isfield(circuit,'squid')
@@ -14,7 +10,7 @@ else
     i_squid=3e-12;
 end
 
-tau=circuit.L/RL;
+%tau=circuit.L/RL;
 f=logspace(0,6,1000);
 w=2*pi*f;
 
