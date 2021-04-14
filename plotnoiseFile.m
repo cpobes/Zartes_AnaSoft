@@ -107,6 +107,7 @@ if nargin==7 %%%%Se puede pasar también tanto el directorio, como los ficheros, 
     IVstr=IVset(Tind);
     [~,Tind]=min(abs([P.Tbath]*1e3-Tbath));
     p=P(Tind).p;
+    NoiseBaseName=option.NoiseBaseName;
     AllfilesNoise=ListInBiasOrder(strcat(wdir,'\',NoiseBaseName,'*'),'descend');
 end
 
@@ -140,7 +141,7 @@ if iscell(file)
         %%%funcio´n con 7 parámetros.
         OP=setTESOPfromIb(Ib,IVstr,p(indx),circuit)
         
-        %%%intentode pasar la ztes experimental para el modelo de ruido.
+        %%%intento de pasar la ztes experimental para el modelo de ruido.
         zfile=strrep(file{i},NoiseBaseName,'TF')
         auxTF=importTF(strcat(wdir,'\',zfile));
         tfs=importTF();
@@ -181,8 +182,10 @@ if iscell(file)
         %si0(i)=auxnoise.sI(1);
         %si0=auxnoise;%debug,para N=1 ver la SI.
         %medfilt_w=20;
-        optfilt.model='movingMean';
-        optfilt.wmed=5;
+        optfilt.model='quantile';%'movingMean';%'minfilt+medfilt';%
+        optfilt.wmed=200;
+        optfilt.wmin=200;
+        optfilt.perc=0.2;
             if(strcmp(tipo,'current'))
                  %filtered_current_noise=medfilt1(V2I(noise{i}(:,2),circuit)*1e12,medfilt_w);
                  filtered_current_noise=filterNoise(V2I(noise{i}(:,2),circuit)*1e12,optfilt);

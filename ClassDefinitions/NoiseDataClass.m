@@ -12,8 +12,11 @@ classdef NoiseDataClass < handle
         fCircuit;
         FilteredVoltageData=[];
         NoiseModelClass=[];
+        
         %filter options
-        filter_method='movingMean'; %a de finir en la funcion filterNoise().
+        filter_options=[];%.method='movingMean'; %a definir en la funcion filterNoise().
+        %filter_options.wmed=20;
+        %filter_options.wmin=5;
         
         %handles
         fCurrentDataHandle=[];
@@ -44,10 +47,14 @@ classdef NoiseDataClass < handle
             obj.rawVoltage=noise(:,2);
             obj.CurrentNoise=V2I(noise(:,2),circuit);
             obj.fCurrentDataHandle=@(f) interp1(obj.freqs,obj.CurrentNoise,f);
-
+            obj.FilteredVoltageData=obj.rawVoltage;%No default filtering.
             obj.fCircuit=circuit;
             obj.fTES=PARAMETERS.TES;
             obj.fOperatingPoint=PARAMETERS.OP;
+            
+            obj.filter_options.method='movingmean';
+            obj.filter_options.wmed=20;
+            obj.filter_options.wmin=5;
         end
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -55,13 +62,18 @@ classdef NoiseDataClass < handle
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function filtered_data=FilterNoise(obj,varargin)
             if nargin==1
-                method=obj.filter_method;
+                method=obj.filter_options.method;
+                wmed=obj.filter_options.wmed;
+                wmin=obj.filter_options.wmin;
             else
-                method=varargin{1};
+                optdata=varargin{1};
+                method=optdata.method;
+                wmed=optdata.wmed;
+                wmin=optdata.wmin;
             end
             filtopt.model=method;
-            filtopt.wmed=20;%%%
-            filtopt.wmin=6;
+            filtopt.wmed=wmed;
+            filtopt.wmin=wmin;
             filtered_data=filterNoise(obj.rawVoltage,filtopt);
             obj.FilteredVoltageData=filtered_data;
         end

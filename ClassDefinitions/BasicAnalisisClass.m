@@ -12,11 +12,14 @@ classdef BasicAnalisisClass < handle
         NoisePlotOptions=BuildNoiseOptions;
         Zfitmodel=[];%%%El modelo con el que se analizaron los datos.
         Zfitboolplot=0;%%%booleano por si quiero pintar o no los resultados del reanálisis.
+        
         auxFitstruct=[];%%%Guardo los resultados de reanalisis en una nueva estructura para poder trabajar con ella.
         auxSingleFitStruct=[];
+        
         fGlobalIndex=[];
         mphfitrange=[];
         mjofitrange=[];
+        NoiseFilterOptions=[];
         mcmcresult=[];
         mcmcchain=[];
     end
@@ -724,10 +727,15 @@ classdef BasicAnalisisClass < handle
                 findx=find((faux>mphfrange(1) & faux<mphfrange(2)) | (faux>mjofrange(1) & faux<mjofrange(2)));
                 xdata=Noises{1}(findx,1);
                 %size(Noises{i}),i
-
-                noisefilteropt.model='minfilt+medfilt';%%%'minfilt+medfilt';%%%default, medfilt, minfilt,''movingMean'
-                noisefilteropt.wmed=20;
-                noisefilteropt.wmin=5;
+                
+                %%%Filtramos ruido
+                if isempty(obj.NoiseFilterOptions)
+                    noisefilteropt.model='movingMean';%%%'minfilt+medfilt';%%%default, medfilt, minfilt,''movingMean'
+                    noisefilteropt.wmed=20;
+                    noisefilteropt.wmin=6;
+                else
+                    noisefilteropt=obj.NoiseFilterOptions;
+                end
                 %rps(i)
                 ydata=filterNoise(1e12*Noises{i}(findx,2),noisefilteropt);%%%
 

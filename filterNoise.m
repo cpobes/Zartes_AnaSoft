@@ -22,4 +22,8 @@ switch option.model
         filtNoise=medfilt1(ydata,option.wmed);
     case 'movingMean'
         filtNoise=movingMean(noisedata,option.wmed);
+    case 'quantile'
+        fh=@(data)quantile(data,option.perc);
+        filtNoise=colfilt(noisedata,[option.wmed 1],'sliding',fh);    
+      
 end
