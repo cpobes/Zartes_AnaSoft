@@ -182,9 +182,9 @@ if iscell(file)
         %si0(i)=auxnoise.sI(1);
         %si0=auxnoise;%debug,para N=1 ver la SI.
         %medfilt_w=20;
-        optfilt.model='quantile';%'movingMean';%'minfilt+medfilt';%
-        optfilt.wmed=200;
-        optfilt.wmin=200;
+        optfilt.model='movingMean';%'quantile';%'movingMean';%'minfilt+medfilt';%
+        optfilt.wmed=20;%200;
+        optfilt.wmin=6;%200;
         optfilt.perc=0.2;
             if(strcmp(tipo,'current'))
                  %filtered_current_noise=medfilt1(V2I(noise{i}(:,2),circuit)*1e12,medfilt_w);

@@ -46,7 +46,9 @@ classdef NoiseDataClass < handle
             obj.freqs=noise(:,1);
             obj.rawVoltage=noise(:,2);
             obj.CurrentNoise=V2I(noise(:,2),circuit);
-            obj.fCurrentDataHandle=@(f) interp1(obj.freqs,obj.CurrentNoise,f);
+            current=obj.CurrentNoise;
+            %obj.fCurrentDataHandle=@(f) interp1(obj.freqs,obj.CurrentNoise,f);
+            obj.fCurrentDataHandle=@(f) interp1(noise(:,1),current,f);
             obj.FilteredVoltageData=obj.rawVoltage;%No default filtering.
             obj.fCircuit=circuit;
             obj.fTES=PARAMETERS.TES;
@@ -112,22 +114,36 @@ classdef NoiseDataClass < handle
 %             sI=obj.NoiseModelClass.fsIHandel(obj.freqs);
 %             obj.NEP=sqrt(ss)./abs(sI);
             
-            if isfield(obj.fCircuit.circuitnoiseHandle)
+            if isfield(obj.fCircuit,'circuitnoiseHandle')
                 cnHandle=obj.fCircuit.circuitnoiseHandle;
             elseif length(circuitnoise==1)
                 cnHandle=@(f) circuitnoise;
             else
                 cnHandle=@(f) interp1(obj.freqs,circuitnoise,f);
             end
-            obj.fNEPHandlendle=@(f) sqrt(obj.fCurrentDataHandle(f).^2-cnHandle(f).^2)./abs(obj.NoiseModelClass.fsIHandel(f));
+            obj.fNEPHandle=@(f) sqrt(obj.fCurrentDataHandle(f).^2-cnHandle(f).^2)./abs(obj.NoiseModelClass.fsIHandler(f));
             obj.NEP=obj.fNEPHandle(obj.freqs);
         end
         %%%%%%%%%%%%%%%
         %%%Calculations
         %%%%%%%%%%%%%%%
+        function Res=GetPartialBaselineResolution(obj,fmax)
+            %%%Ojo, para fmax>1e4 da warning de posible falta de precisión.
+            %%%ejecuto un for para ver la evolucióny tarda bastante. con
+            %%%fmax>1e6 da NaN.
+            if ~isempty(obj.fNEPHandle)
+                fh=@(f) 1./obj.fNEPHandle(f).^2;
+                auxint=integral(fh,0,fmax);
+                Res=sqrt(2*log(2)./auxint)/1.609e-19;
+            else
+                ind=find(obj.freqs<fmax);
+                Res=sqrt(2*log(2))/sqrt(trapz(obj.freqs(ind),1./obj.NEP(ind).^2))/1.609e-19;
+            end
+            
+        end
         function Res=GetBaselineResolution(obj)
             %%%%%%%               
-            Res=2.35/sqrt(trapz(f,1./obj.NEP.^2))/2/1.609e-19;
+            Res=sqrt(2*log(2))/sqrt(trapz(obj.freqs,1./obj.NEP.^2))/1.609e-19;
         end
         
     end %%%end methods

@@ -20,11 +20,11 @@ TtesArray=0.04:1e-5:0.2;
 %I=0:1e-7:50e-6;
 Ibias=(500:-1:0)*1e-6;
 P=@(x,y) K*(x.^n-y.^n);
-Parray=(1e-1:1e-1:2)*1e-12;%%%%Array de valores de potencia a explorar.
+Parray=(1e-1:2e-1:5)*1e-12;%%%%Array de valores de potencia a explorar.
 for i=1:length(Parray)
     i
     Pw=Parray(i);
-    ItesPc=(Ibias*Rsh-sqrt((Ibias*Rsh).^2-4*RL*Pw))/(2*RL);
+    ItesPc=(Ibias*Rsh+sqrt((Ibias*Rsh).^2-4*RL*Pw))/(2*RL);%%%signo?
     ItesPc(imag(ItesPc)~=0)=0;
     Itmin=sqrt(Pw/Rn);
     ItesPc(ItesPc<Itmin)=Itmin;
@@ -35,7 +35,7 @@ for i=1:length(Parray)
         %TtesPc(ind2)=fsolve(f,0.12); %%%El fsolve da error para algunos
         %puntos.
         
-        mini=abs(GompertzRTI(TtesArray,ItesPc(ind2))-RtesPc(ind2));
+        mini=min(abs(GompertzRTI(TtesArray,ItesPc(ind2))-RtesPc(ind2)));
         [~,jj]=find(GompertzRTI(TtesArray,ItesPc(ind2))-RtesPc(ind2)==mini);
         if ~isempty(jj) TtesPc(ind2)=TtesArray(jj(1)); else TtesPc(ind2)=0;end
         
