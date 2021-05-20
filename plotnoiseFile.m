@@ -142,7 +142,12 @@ if iscell(file)
         OP=setTESOPfromIb(Ib,IVstr,p(indx),circuit)
         
         %%%intento de pasar la ztes experimental para el modelo de ruido.
-        zfile=strrep(file{i},NoiseBaseName,'TF')
+        if isempty(strfind(NoiseBaseName,'PXI'))
+            zfile=strrep(file{i},NoiseBaseName,'TF')
+        else
+            zfile=strrep(file{i},NoiseBaseName,'PXI_TF')
+        end
+        
         auxTF=importTF(strcat(wdir,'\',zfile));
         tfs=importTF();
         auxZ=GetZfromTF(auxTF,tfs,circuit);
@@ -185,6 +190,7 @@ if iscell(file)
         optfilt.model='movingMean';%'quantile';%'movingMean';%'minfilt+medfilt';%
         optfilt.wmed=20;%200;
         optfilt.wmin=6;%200;
+        optfilt.thr=10;%%%porcentaje para el movingMean.
         optfilt.perc=0.2;
             if(strcmp(tipo,'current'))
                  %filtered_current_noise=medfilt1(V2I(noise{i}(:,2),circuit)*1e12,medfilt_w);
