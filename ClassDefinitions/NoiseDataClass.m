@@ -19,6 +19,7 @@ classdef NoiseDataClass < handle
         %filter_options.wmin=5;
         
         %handles
+        fRawVoltageDataHandle=[];
         fCurrentDataHandle=[];
         fNEPHandle=[];
         
@@ -47,6 +48,7 @@ classdef NoiseDataClass < handle
             obj.rawVoltage=noise(:,2);
             obj.CurrentNoise=V2I(noise(:,2),circuit);
             current=obj.CurrentNoise;
+            obj.fRawVoltageDataHandle=@(f) interp1(noise(:,1),noise(:,2),f);
             %obj.fCurrentDataHandle=@(f) interp1(obj.freqs,obj.CurrentNoise,f);
             obj.fCurrentDataHandle=@(f) interp1(noise(:,1),current,f);
             obj.FilteredVoltageData=obj.rawVoltage;%No default filtering.
@@ -54,9 +56,10 @@ classdef NoiseDataClass < handle
             obj.fTES=PARAMETERS.TES;
             obj.fOperatingPoint=PARAMETERS.OP;
             
-            obj.filter_options.method='movingmean';
+            obj.filter_options.model='movingMean';
             obj.filter_options.wmed=20;
             obj.filter_options.wmin=5;
+            obj.filter_options.thr=25;
         end
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -64,19 +67,22 @@ classdef NoiseDataClass < handle
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function filtered_data=FilterNoise(obj,varargin)
             if nargin==1
-                method=obj.filter_options.method;
-                wmed=obj.filter_options.wmed;
-                wmin=obj.filter_options.wmin;
+                %%%method=obj.filter_options.method;
+                %%%wmed=obj.filter_options.wmed;
+                %%%wmin=obj.filter_options.wmin;
+                filtopt=obj.filter_options;
             else
-                optdata=varargin{1};
-                method=optdata.method;
-                wmed=optdata.wmed;
-                wmin=optdata.wmin;
+                %optdata=varargin{1};
+                %method=optdata.method;
+                %wmed=optdata.wmed;
+                %wmin=optdata.wmin;
+                filtopt=varargin{1};
             end
-            filtopt.model=method;
-            filtopt.wmed=wmed;
-            filtopt.wmin=wmin;
-            filtered_data=filterNoise(obj.rawVoltage,filtopt);
+%             filtopt.model=method;
+%             filtopt.wmed=wmed;
+%             filtopt.wmin=wmin;
+            rawData2filter=obj.fRawVoltageDataHandle(obj.freqs);%%%
+            filtered_data=filterNoise(rawData2filter,filtopt);
             obj.FilteredVoltageData=filtered_data;
         end
         
@@ -88,7 +94,7 @@ classdef NoiseDataClass < handle
             if strcmp(obj.units,'pA')
                 scale=1e12;
             end
-            loglog(obj.freqs,scale*obj.CurrentNoise,'.-')
+            loglog(obj.freqs,scale*obj.fCurrentDataHandle(obj.freqs),'.-')
             grid on
             if obj.boolShowFilteredData
                 hold on
