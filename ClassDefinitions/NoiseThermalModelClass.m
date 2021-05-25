@@ -72,6 +72,12 @@ classdef NoiseThermalModelClass < handle
                     list={'TES-I' 'I-B'};
                 case '2TB_parallel'
                     list={'TES-B' 'TES-I' 'I-B'};
+                case '3TB_2H'
+                    error('3TB not implemented yet');
+                case '3TB_IH'
+                    error('3TB not implemented yet');
+                otherwise
+                    error('bad thermal model name')
             end
             obj.fLinksList=list;
         end
