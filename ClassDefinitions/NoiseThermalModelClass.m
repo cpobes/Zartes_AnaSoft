@@ -90,11 +90,11 @@ classdef NoiseThermalModelClass < handle
                 %%%%Version generalizable
                 Num=@(p,f) 1;
                 for i=1:obj.fNumberOfBlocks-1
-                    Num=@(p,f) Num(p,f)+p(i+3);
+                    Num=@(p,f) Num(p,f)+p(2*(i+1));
                 end
                 Den=@(p,f) 1-1i*(2*pi*f)*p(3);
                 for i=1:obj.fNumberOfBlocks-1
-                    Den=@(p,f) Den(p,f)+p(i+3)./(1+1i*(2*pi*f)*p(i+4));
+                    Den=@(p,f) Den(p,f)+p(2*(i+1))./(1+1i*(2*pi*f)*p(2*i+3));
                 end
                 fH=@(p,f) p(1)+(p(2)-p(1)).*Num(p,f)./Den(p,f);
                 p0=obj.fOperatingPoint.parray;
@@ -237,11 +237,11 @@ classdef NoiseThermalModelClass < handle
             %%%-- TES-Baño: H=1
             %%%-- TES-Hanging: H=(wtau)^2/D(w)
             %%%-- TES-Intermediate: H=(g2+(w*tau)^2)/D
-            %%%--Intermediate-Baño: H=g2*1/D
+            %%%-- Intermediate-Baño: H=g2*1/D
             %%% donde g2 es un cociente adimensional de conductancias al
             %%% cuadrado dependiennte del modelo.
             
-            %%%Recordar que llamamos H_Tetm(tau,a,b)
+            %%%Recordar que llamamos H_Term(tau,a,b)
             switch model
                 case 'TES-B'
                     H=obj.BuildGeneral_H_Term(0,1,1);
@@ -385,7 +385,7 @@ classdef NoiseThermalModelClass < handle
             nep=obj.GetTotalNEPNoise();
             integrand=@(f) 1./nep(f,0,[0 0]).^2;
             aux=integral(integrand,0,fmax);
-            Res=2.35/sqrt(aux)/2/1.609e-19;
+            Res=2.355/sqrt(aux)/2/1.609e-19;
         end
     end
 end
