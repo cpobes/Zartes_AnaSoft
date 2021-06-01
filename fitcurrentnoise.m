@@ -73,7 +73,7 @@ if strcmp(model,'default')
     tau_el=L/(RL+R0*(1+bI));
     
     t=Ts/T0;
-    F=(t^(n+2)+1)/2;%%%specular limit
+    F=(t^(n+1)+1)/2;%%%specular limit
     
     sI=-(1/(I0*R0))*(L/(tau_el*R0*L0)+(1-RL/R0)-L*tau*(2*pi*f).^2/(L0*R0)+1i*(2*pi*f)*L*tau*(1/tauI+1/tau_el)/(R0*L0)).^-1;
     
