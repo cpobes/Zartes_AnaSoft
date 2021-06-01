@@ -8,6 +8,12 @@ classdef ModelDependetOperatingPointClass < GeneralDynamicOperatingPointClass
         fTarray=[];%%%Array con las temperaturas de cada bloque. Idem.
         fLinksList={};
         fGarray=[];
+        
+        %%%Noise Fit parameters
+        fMjohnson=0;
+        fMphononArray=[];
+        fThResolution=0;
+        fExResolution=0;
     end
     
     methods
@@ -106,6 +112,22 @@ classdef ModelDependetOperatingPointClass < GeneralDynamicOperatingPointClass
             end
             obj.fLinksList=list;
         end%%%Función copiada de NoiseThermalModel. Redundante?
+        
+        %%%Setters
+        function SetMjohnson(obj,Mjo)
+            obj.fMjohnson=Mjo;
+        end
+        function SetMphonon(obj,MphArray)
+            for i=1:length(obj.fLinksList)
+                obj.fMphononArray(i)=MphArray(i);
+            end
+        end
+        function SetThResolution(obj,ThRes)
+            obj.fThResolution=ThRes;
+        end
+        function SetExResolution(obj,ExRes)
+            obj.fExResolution=ExRes;
+        end
     end
 
 end

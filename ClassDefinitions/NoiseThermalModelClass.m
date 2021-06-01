@@ -20,6 +20,12 @@ classdef NoiseThermalModelClass < handle
         fJohnsonNoiseHandler=@(x)x;
         fPhononNoiseHandlerArray=[];
         fTotalCurrentNoiseModel=@(x)x;
+        fJohnsonExcessModel='default';%also 'RSJ' or '2F'.
+        
+        fMjohnson=0;%%%Los defino aquí para poder jugar con ellos, actuaizarlos tras fit, y usarlos en plot.
+        fMphononArray=0;
+        fThResolution=0;
+        
         %%%boolean parameters
         boolUseExperimentalZtes=0;
         boolUseExperimentalCircuitNoise=0;
@@ -61,6 +67,21 @@ classdef NoiseThermalModelClass < handle
             obj.BuildJohnsonNoisefunction();
             obj.BuildPhononNoiseComponents();
             obj.GetTotalCurrentNoise()
+            obj.GetModelResolution();
+            
+            %actualizo Ms
+            if isfield(obj.fOperatingPoint.P,'M')
+                obj.fMjohnson=obj.fOperatingPoint.P.M;
+            else
+                obj.fMjohnson=0;
+            end
+            for i=1:length(obj.boolAddMphononArray)
+                if isfield(obj.fOperatingPoint.P,'Mph')
+                    obj.fMphononArray(i)=obj.fOperatingPoint.P.Mph(i);
+                else
+                    obj.fMphononArray(i)=0;
+                end
+            end
         end
         function list=ParseModelName(obj,modelname)
             switch modelname
@@ -144,7 +165,23 @@ classdef NoiseThermalModelClass < handle
             T0=obj.fOperatingPoint.T0;
             R0=obj.fOperatingPoint.R0;
             bI=obj.fOperatingPoint.bi;
-            fJohnsonNoiseHandler=@(f)(4*Kb*T0*R0*(1+2*bI)).*abs(ztes(f)+R0).^2./(R0^2*(2+bI).^2*abs(zcirc(f)).^2);%%%ruido johnson
+            Vjo0=4*Kb*T0*R0;
+            switch obj.fJohnsonExcessModel
+                case 'default'
+                    Jfactor=(1+2*bI);%%%Original Irwin Non-equilibrium factor.
+            %%%Other factors from https://arxiv.org/pdf/1907.11343.pdf
+                case '2F'
+                    Jfactor=(1+bI).^2; %2-fluid factor. From eq(14)
+                case 'RSJ'
+                    Jfactor=(1+(5+3*bI)*bI/2); %RSJ model factor. eq(13)
+                case 'general'
+                    drd=1; %dRd/dR 
+                    Jfactor=(1+(2-drd/2)*bI+bI^2); %general factor. eq(12).
+                otherwise
+                    error('wrong Excess Factor Model');
+            end
+            Vjo=Vjo0*Jfactor;
+            fJohnsonNoiseHandler=@(f)Vjo.*abs(ztes(f)+R0).^2./(R0^2*(2+bI).^2*abs(zcirc(f)).^2);%%%ruido johnson
             obj.fJohnsonNoiseHandler=fJohnsonNoiseHandler;
         end
         function fPhononNoiseHandlerArray=BuildPhononNoiseComponents(obj)
@@ -334,21 +371,21 @@ classdef NoiseThermalModelClass < handle
         %%%%%%%%%%%%%%%%%%%%%
         %%% Plotter Functions
         %%%%%%%%%%%%%%%%%%%%%        
-        function PlotNoiseModel(obj,varargin)
+        function Plot(obj,varargin)
             options=BuildNoiseOptions();
             if nargin>1
                 options=varargin{1};
             end
-            if obj.boolAddMjohnson && isfield(obj.fOperatingPoint.P,'M')
-                Mjo=obj.fOperatingPoint.P.M;
+            if obj.boolAddMjohnson
+                Mjo=obj.fMjohnson;
             else
                 Mjo=0;
             end
             for i=1:length(obj.boolAddMphononArray)
-                if obj.boolAddMphononArray(i) && isfield(obj.fOperatingPoint.P,'Mph')
-                Mph(i)=obj.fOperatingPoint.P.Mph(i);
+                if obj.boolAddMphononArray(i)
+                    Mph(i)=obj.fMphononArray(i);
                 else
-                Mph(i)=0;
+                    Mph(i)=0;
                 end
             end
             
@@ -392,6 +429,7 @@ classdef NoiseThermalModelClass < handle
             integrand=@(f) 1./nep(f,0,[0 0]).^2;
             aux=integral(integrand,0,fmax);
             Res=2.355/sqrt(aux)/2/1.609e-19;
+            obj.fThResolution=Res;
         end
     end
 end

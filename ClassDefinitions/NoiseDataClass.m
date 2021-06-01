@@ -17,6 +17,7 @@ classdef NoiseDataClass < handle
         filter_options=[];%.method='movingMean'; %a definir en la funcion filterNoise().
         %filter_options.wmed=20;
         %filter_options.wmin=5;
+        %filter_options.thr=25;
         
         %handles
         fRawVoltageDataHandle=[];
@@ -26,7 +27,7 @@ classdef NoiseDataClass < handle
         %plotoptions
         plottype='current';%options: 'current', 'nep'
         units='pA';%options: 'pA, fW, A, W' /raizHz.
-        boolcomponents=0;
+        boolPlotModel=0;
         boolShowFilteredData=1;
     end
     
@@ -81,7 +82,7 @@ classdef NoiseDataClass < handle
 %             filtopt.model=method;
 %             filtopt.wmed=wmed;
 %             filtopt.wmin=wmin;
-            rawData2filter=obj.fRawVoltageDataHandle(obj.freqs);%%%
+            rawData2filter=obj.fRawVoltageDataHandle(obj.freqs);%%% Puedo cambiar freqs para subsamplear por ejemplo.
             filtered_data=filterNoise(rawData2filter,filtopt);
             obj.FilteredVoltageData=filtered_data;
         end
@@ -100,6 +101,9 @@ classdef NoiseDataClass < handle
                 hold on
                 %obj.FilterNoise()
                 loglog(obj.freqs,scale*V2I(obj.FilteredVoltageData,obj.fCircuit),'.-k');
+            end
+            if obj.boolPlotModel
+                obj.NoiseModelClass.Plot();
             end
         end
         
@@ -143,14 +147,36 @@ classdef NoiseDataClass < handle
                 Res=sqrt(2*log(2)./auxint)/1.609e-19;
             else
                 ind=find(obj.freqs<fmax);
-                Res=sqrt(2*log(2))/sqrt(trapz(obj.freqs(ind),1./obj.NEP(ind).^2))/1.609e-19;
+                Res=sqrt(2*log(2))/sqrt(trapz(obj.freqs(ind),1./obj.NEP(ind).^2))/1.609e-19;%?! if fNEPHandle is empty, NEP also.
             end
             
         end
         function Res=GetBaselineResolution(obj)
-            %%%%%%%               
+            %%%%%%%Experimental Baseline Resolution. Necesita modelo
+            %%%%%%%previamente para calcular NEP.
             Res=sqrt(2*log(2))/sqrt(trapz(obj.freqs,1./obj.NEP.^2))/1.609e-19;
         end
         
+        %%%%%
+        %%% Fit Noise Data
+        %%%%%
+        function FitNoise(obj)
+            %%%%Ajustar el ruido filtrado al modelo fijado previamente.
+            if isempty(obj.NoiseModelClass)
+                error('Fijar modelo térmico');
+            end
+            FitFunction=obj.NoiseModelClass.fTotalCurrentNoiseModel;
+            xdata=obj.freqs;
+            ydata=V2I(obj.FilteredVoltageData,obj.fCircuit);
+            if length(xdata)~=length(ydata)
+                error('verify frequency array');
+            end
+            fh=@(x)FitFunction(xdata,x(1),x(2:end));
+            m0=ones(1,length(obj.NoiseModelClass.fNumberOfLinks)+1);
+            LB=zeros(1,length(obj.NoiseModelClass.fNumberOfLinks)+1);
+            maux=lsqcurvefit(fh,m0,xdata(:),ydata(:),LB);
+            obj.NoiseModelClass.fMjohnson=maux(1);
+            obj.NoiseModelClass.fMphononArray=maux(2:end);
+        end
     end %%%end methods
 end

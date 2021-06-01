@@ -338,7 +338,7 @@ classdef BasicAnalisisClass < handle
             end
             cd(olddir);
         end
-        function Noise=GetSingleNoiseClass(obj,Temp,rp,varargin)
+        function Noise=GetNoiseClass(obj,Temp,rp,varargin)
             %%%
             olddir=pwd;
             cd(obj.datadir);
@@ -350,11 +350,13 @@ classdef BasicAnalisisClass < handle
             noisefile=GetFilesFromRp(ivaux,Temp,realRps,str);
             Tdir=GetDirfromTbath(Temp);
             fullname=strcat(Tdir,'\',noisefile);
-            OP=obj.GetSingleOperatingPoint(Temp,rp);
-            parameters.OP=OP;
             parameters.TES=obj.fTES;
             parameters.circuit=obj.fCircuit;
-            Noise=NoiseDataClass(fullname{1},parameters);
+            for i=1:length(rp)
+                OP=obj.GetSingleOperatingPoint(Temp,rp(i));
+                parameters.OP=OP;
+                Noise(i)=NoiseDataClass(fullname{i},parameters);
+            end
             cd(olddir);
         end
         function SimNoise=GetNoiseModel(obj,Temp,rps,varargin)
@@ -733,6 +735,7 @@ classdef BasicAnalisisClass < handle
                     noisefilteropt.model='movingMean';%%%'minfilt+medfilt';%%%default, medfilt, minfilt,''movingMean'
                     noisefilteropt.wmed=20;
                     noisefilteropt.wmin=6;
+                    noisefilteropt.thr=25;
                 else
                     noisefilteropt=obj.NoiseFilterOptions;
                 end
