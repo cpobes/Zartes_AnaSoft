@@ -394,7 +394,7 @@ classdef NoiseThermalModelClass < handle
             if strcmpi(options.tipo,'current')
                 func=obj.fTotalCurrentNoiseModel;
                 scale=obj.PlotCurrentScale;
-                legendstring={'Total Current Nosie'};
+                legendstring={'Total Current Noise'};
             elseif strcmpi(options.tipo,'nep')
                 func=obj.GetTotalNEPNoise();
                 scale=obj.PlotNEPScale;
@@ -416,7 +416,7 @@ classdef NoiseThermalModelClass < handle
             
             %%%Formatting.
             legend(legendstring);
-            ylim([1 1e2])
+            %ylim([1 1e2])
             set(gca,'fontsize',12)
         end
         

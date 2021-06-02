@@ -57,6 +57,10 @@ classdef NoiseDataClass < handle
             obj.fTES=PARAMETERS.TES;
             obj.fOperatingPoint=PARAMETERS.OP;
             
+            if length(obj.fOperatingPoint.parray)==3
+                obj.SetNoiseModel('default');
+            end
+            
             obj.filter_options.model='movingMean';
             obj.filter_options.wmed=20;
             obj.filter_options.wmin=5;
@@ -160,16 +164,19 @@ classdef NoiseDataClass < handle
             if isempty(obj.NoiseModelClass)
                 error('Fijar modelo térmico');
             end
+            
             FitFunction=obj.NoiseModelClass.fTotalCurrentNoiseModel;
-            %loglog(obj.freqs,FitFunction(obj.freqs,0,0))
             faux=obj.freqs;          
             findx=find((faux>obj.fMphFitRange(1) & faux<obj.fMphFitRange(2)) | (faux>obj.fMjoFitRange(1) & faux<obj.fMjoFitRange(2)));
             xdata=obj.freqs(findx);
-            ydata=V2I(obj.FilteredVoltageData(findx),obj.fCircuit);  
+            
+            scale=1e12;
+            ydata=scale*V2I(obj.FilteredVoltageData(findx),obj.fCircuit);  
             if length(xdata)~=length(ydata)
                 error('verify frequency array');
             end
-            fh=@(x,f)FitFunction(f,x(1),x(2:end));
+            
+            fh=@(x,f)scale*FitFunction(f,x(1),x(2:end));%%%Ajustamos en pA.
             m0=ones(1,length(obj.NoiseModelClass.fNumberOfLinks)+1);
             LB=zeros(1,length(obj.NoiseModelClass.fNumberOfLinks)+1);
             maux=lsqcurvefit(fh,m0,xdata(:),ydata(:),LB);

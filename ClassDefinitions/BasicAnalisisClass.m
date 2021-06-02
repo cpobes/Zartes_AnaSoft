@@ -767,13 +767,14 @@ classdef BasicAnalisisClass < handle
             obj.auxSingleFitStruct=paux;
             end
         end
-        function Results=FitNoiseClass(obj,Temp,rps)
+        function Results=FitNoiseClass(obj,Temp,rps,varargin)
+            if nargin==3 HW='\HP_noise*';else HW=varargin{1};end
             model=obj.Zfitmodel;
-            Noises=obj.GetNoiseClass(Temp,rps);
+            Noises=obj.GetNoiseClass(Temp,rps,HW);
+            freqs=logspace(1,5,801);
             for i=1:length(rps)
-                Noises(i).fOperatingPoint
+                Noises(i).freqs=freqs;
                 Noises(i).SetNoiseModel(model);
-                Noises(i).fOperatingPoint
                 Noises(i).FilterNoise();
                 Noises(i).FitNoise();
                 %obj.FitResultsClass(i)=Noises(i).fOPClass;
