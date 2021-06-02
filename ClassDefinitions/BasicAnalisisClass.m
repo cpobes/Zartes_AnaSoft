@@ -15,6 +15,7 @@ classdef BasicAnalisisClass < handle
         
         auxFitstruct=[];%%%Guardo los resultados de reanalisis en una nueva estructura para poder trabajar con ella.
         auxSingleFitStruct=[];
+        FitResultsClass;
         
         fGlobalIndex=[];
         mphfitrange=[];
@@ -766,7 +767,20 @@ classdef BasicAnalisisClass < handle
             obj.auxSingleFitStruct=paux;
             end
         end
-        
+        function Results=FitNoiseClass(obj,Temp,rps)
+            model=obj.Zfitmodel;
+            Noises=obj.GetNoiseClass(Temp,rps);
+            for i=1:length(rps)
+                Noises(i).fOperatingPoint
+                Noises(i).SetNoiseModel(model);
+                Noises(i).fOperatingPoint
+                Noises(i).FilterNoise();
+                Noises(i).FitNoise();
+                %obj.FitResultsClass(i)=Noises(i).fOPClass;
+                Results(i)=Noises(i).fOPClass;
+            end
+            obj.FitResultsClass=Results;
+        end
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%Sim functions

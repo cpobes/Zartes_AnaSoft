@@ -10,7 +10,7 @@ classdef NoiseThermalModelClass < handle
         %%%opciones: 'TES-B', 'TES-H', 'TES-I', 'I-B'. Todos los modelos se
         %%%construyen como combinaciones de ellos.
         fNumberOfComponents=3;%%Numero de componentes de ruido sin contar el circuitnoise.
-        fOperatingPoint=[];
+        fOperatingPoint=[]; %%%OPStruct
         fCircuit=[];
         fTES=[];
         fParameters=[];
@@ -30,7 +30,7 @@ classdef NoiseThermalModelClass < handle
         boolUseExperimentalZtes=0;
         boolUseExperimentalCircuitNoise=0;
         boolAddMjohnson=1;
-        boolAddMphononArray=[1 1 1];
+        boolAddMphononArray=ones(1,1);
         
         %%%Plotting Properties
         boolPlotComponents=0;
@@ -60,6 +60,7 @@ classdef NoiseThermalModelClass < handle
             s=numel(PARAMETERS.OP.parray);
             obj.fNumberOfBlocks=(s-1)/2;
             obj.fNumberOfLinks=numel(obj.fLinksList);
+            obj.boolAddMphononArray=ones(1,obj.fNumberOfLinks);
             obj.fNumberOfComponents=obj.fNumberOfLinks+2;           
             obj.BuildZtesfunction();
             obj.BuildsIfunction();
@@ -76,7 +77,7 @@ classdef NoiseThermalModelClass < handle
                 obj.fMjohnson=0;
             end
             for i=1:length(obj.boolAddMphononArray)
-                if isfield(obj.fOperatingPoint.P,'Mph')
+                if isfield(obj.fOperatingPoint.P,'Mph')%%%Debe definirse como array. Es asi?
                     obj.fMphononArray(i)=obj.fOperatingPoint.P.Mph(i);
                 else
                     obj.fMphononArray(i)=0;
@@ -422,11 +423,24 @@ classdef NoiseThermalModelClass < handle
         %%%%%%%%%%%%%%%%
         %%%Calculations
         %%%%%%%%%%%%%%%%
-        function Res = GetModelResolution(obj)
+        function Res = GetModelResolution(obj,varargin)
             %%%Cálculo de la resolución teórica sin incluir Ms.
+            if nargin==1
+                boolMs=0;
+            else
+                boolMs=varargin{1};%%%Para tener o no en cuenta las Ms en el modelo
+            end
+            if boolMs
+                Mjo=obj.fMjohnson;
+                MphArray=obj.fMphArray;
+            else
+                Mjo=0;
+                MphArray=zeros(1,obj.fNumberOfLinks);
+            end
             fmax=obj.maxResolutionFrequency;
             nep=obj.GetTotalNEPNoise();
-            integrand=@(f) 1./nep(f,0,[0 0]).^2;
+            
+            integrand=@(f) 1./nep(f,Mjo,MphArray).^2;
             aux=integral(integrand,0,fmax);
             Res=2.355/sqrt(aux)/2/1.609e-19;
             obj.fThResolution=Res;

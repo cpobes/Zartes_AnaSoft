@@ -7,7 +7,8 @@ classdef NoiseDataClass < handle
         rawVoltage=[];
         CurrentNoise=[];
         NEP=[];%%%El NEP requiere de la sI y por tanto de un modelo.
-        fOperatingPoint;
+        fOperatingPoint; %%%field for the OPStruct
+        fOPClass; %%%Field for the ModelDependentOperatingPointClass
         fTES;
         fCircuit;
         FilteredVoltageData=[];
@@ -15,9 +16,8 @@ classdef NoiseDataClass < handle
         
         %filter options
         filter_options=[];%.method='movingMean'; %a definir en la funcion filterNoise().
-        %filter_options.wmed=20;
-        %filter_options.wmin=5;
-        %filter_options.thr=25;
+        fMjoFitRange=[1e4 1e5];%%%rango de frecuencias para los fits.
+        fMphFitRange=[200 700];
         
         %handles
         fRawVoltageDataHandle=[];
@@ -68,20 +68,10 @@ classdef NoiseDataClass < handle
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function filtered_data=FilterNoise(obj,varargin)
             if nargin==1
-                %%%method=obj.filter_options.method;
-                %%%wmed=obj.filter_options.wmed;
-                %%%wmin=obj.filter_options.wmin;
                 filtopt=obj.filter_options;
             else
-                %optdata=varargin{1};
-                %method=optdata.method;
-                %wmed=optdata.wmed;
-                %wmin=optdata.wmin;
                 filtopt=varargin{1};
             end
-%             filtopt.model=method;
-%             filtopt.wmed=wmed;
-%             filtopt.wmin=wmin;
             rawData2filter=obj.fRawVoltageDataHandle(obj.freqs);%%% Puedo cambiar freqs para subsamplear por ejemplo.
             filtered_data=filterNoise(rawData2filter,filtopt);
             obj.FilteredVoltageData=filtered_data;
@@ -103,6 +93,7 @@ classdef NoiseDataClass < handle
                 loglog(obj.freqs,scale*V2I(obj.FilteredVoltageData,obj.fCircuit),'.-k');
             end
             if obj.boolPlotModel
+                hold on
                 obj.NoiseModelClass.Plot();
             end
         end
@@ -114,7 +105,10 @@ classdef NoiseDataClass < handle
             parameters.OP=obj.fOperatingPoint;
             parameters.TES=obj.fTES;
             parameters.circuit=obj.fCircuit;
+            parray=obj.fOperatingPoint.parray;
             obj.NoiseModelClass=NoiseThermalModelClass(parameters,model);
+            obj.fOPClass=ModelDependentOperatingPointClass(obj.fOperatingPoint,parameters,parray,model);
+            obj.fOPClass.fThResolution=obj.NoiseModelClass.fThResolution;
             if isfield(obj.fCircuit,'circuitnoise')
                 circuitnoise=obj.fCircuit.circuitnoise;
             else
@@ -133,6 +127,7 @@ classdef NoiseDataClass < handle
             end
             obj.fNEPHandle=@(f) sqrt(obj.fCurrentDataHandle(f).^2-cnHandle(f).^2)./abs(obj.NoiseModelClass.fsIHandler(f));
             obj.NEP=obj.fNEPHandle(obj.freqs);
+            obj.fOPClass.fExResolution=obj.GetBaselineResolution();
         end
         %%%%%%%%%%%%%%%
         %%%Calculations
@@ -166,17 +161,22 @@ classdef NoiseDataClass < handle
                 error('Fijar modelo térmico');
             end
             FitFunction=obj.NoiseModelClass.fTotalCurrentNoiseModel;
-            xdata=obj.freqs;
-            ydata=V2I(obj.FilteredVoltageData,obj.fCircuit);
+            %loglog(obj.freqs,FitFunction(obj.freqs,0,0))
+            faux=obj.freqs;          
+            findx=find((faux>obj.fMphFitRange(1) & faux<obj.fMphFitRange(2)) | (faux>obj.fMjoFitRange(1) & faux<obj.fMjoFitRange(2)));
+            xdata=obj.freqs(findx);
+            ydata=V2I(obj.FilteredVoltageData(findx),obj.fCircuit);  
             if length(xdata)~=length(ydata)
                 error('verify frequency array');
             end
-            fh=@(x)FitFunction(xdata,x(1),x(2:end));
+            fh=@(x,f)FitFunction(f,x(1),x(2:end));
             m0=ones(1,length(obj.NoiseModelClass.fNumberOfLinks)+1);
             LB=zeros(1,length(obj.NoiseModelClass.fNumberOfLinks)+1);
             maux=lsqcurvefit(fh,m0,xdata(:),ydata(:),LB);
             obj.NoiseModelClass.fMjohnson=maux(1);
             obj.NoiseModelClass.fMphononArray=maux(2:end);
+            obj.fOPClass.fMjohnson=maux(1);
+            obj.fOPClass.fMphononArray=maux(2:end);
         end
     end %%%end methods
 end

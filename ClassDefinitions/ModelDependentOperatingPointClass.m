@@ -1,4 +1,4 @@
-classdef ModelDependetOperatingPointClass < GeneralDynamicOperatingPointClass
+classdef ModelDependentOperatingPointClass < GeneralDynamicOperatingPointClass
     properties
         fai=0; %%%Alfa
         fCtes=0;
@@ -20,7 +20,7 @@ classdef ModelDependetOperatingPointClass < GeneralDynamicOperatingPointClass
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%Constructor
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        function obj=ModelDependetOperatingPointClass(OPstruct,SETUP,PARRAY,modelname)
+        function obj=ModelDependentOperatingPointClass(OPstruct,SETUP,PARRAY,modelname)
             obj@GeneralDynamicOperatingPointClass(OPstruct,SETUP,PARRAY);
             ParseModelName(obj,modelname);%%%Actualizamos la lista de links. Redundante.
             switch modelname

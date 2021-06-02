@@ -30,8 +30,8 @@ classdef BasicOperatingPointClass < handle
             obj.fTES=SETUP.TES;
             obj.fCircuit=SETUP.circuit;
             obj.fTbath=OPstruct.Tbath;
-            obj.fIbias=OPstruct.Ibias;
-            obj.fVout=OPstruct.Vout;
+            obj.fIbias=OPstruct.ibias;
+            obj.fVout=OPstruct.vout;
             
             obj.fI0=V2I(obj.fVout,obj.fCircuit);
             Vs=(obj.fIbias-obj.fI0)*obj.fCircuit.Rsh;%(ibias*1e-6-ites)*Rsh;if Ib in uA.
