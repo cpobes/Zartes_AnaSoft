@@ -93,7 +93,7 @@ classdef NoiseDataClass < handle
             grid on
             if obj.boolShowFilteredData
                 hold on
-                %obj.FilterNoise()
+                obj.FilterNoise();
                 loglog(obj.freqs,scale*V2I(obj.FilteredVoltageData,obj.fCircuit),'.-k');
             end
             if obj.boolPlotModel
@@ -177,8 +177,8 @@ classdef NoiseDataClass < handle
             end
             
             fh=@(x,f)scale*FitFunction(f,x(1),x(2:end));%%%Ajustamos en pA.
-            m0=ones(1,length(obj.NoiseModelClass.fNumberOfLinks)+1);
-            LB=zeros(1,length(obj.NoiseModelClass.fNumberOfLinks)+1);
+            m0=ones(1,obj.NoiseModelClass.fNumberOfLinks+1);
+            LB=zeros(1,obj.NoiseModelClass.fNumberOfLinks+1);
             maux=lsqcurvefit(fh,m0,xdata(:),ydata(:),LB);
             obj.NoiseModelClass.fMjohnson=maux(1);
             obj.NoiseModelClass.fMphononArray=maux(2:end);

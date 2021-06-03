@@ -390,7 +390,7 @@ classdef NoiseThermalModelClass < handle
                 end
             end
             
-            f=logspace(0,5,1000);
+            f=logspace(1,5,1000);
             if strcmpi(options.tipo,'current')
                 func=obj.fTotalCurrentNoiseModel;
                 scale=obj.PlotCurrentScale;

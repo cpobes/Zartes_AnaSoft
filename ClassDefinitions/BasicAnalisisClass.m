@@ -75,6 +75,9 @@ classdef BasicAnalisisClass < handle
             end
             noiseoptions=obj.NoisePlotOptions;
             plotnoiseTbathRp(auxStr,Temp,actualRps,noiseoptions)
+            if isempty(strfind(obj.NoisePlotOptions.NoiseBaseName,obj.analizeOptions.ZfitOpt.Noisedata))
+                warning('OJO: mostrando ruidos distintos a los analizados')
+            end
         end
         function plotFunctionFromParameters(obj,Temp,paramList,fhandle,varargin)
             %%%Funcion para pintar una funcion arbitraria de los parametros
@@ -357,6 +360,7 @@ classdef BasicAnalisisClass < handle
                 OP=obj.GetSingleOperatingPoint(Temp,rp(i));
                 parameters.OP=OP;
                 Noise(i)=NoiseDataClass(fullname{i},parameters);
+                Noise(i).SetNoiseModel(obj.Zfitmodel);
             end
             cd(olddir);
         end
@@ -769,15 +773,18 @@ classdef BasicAnalisisClass < handle
         end
         function Results=FitNoiseClass(obj,Temp,rps,varargin)
             if nargin==3 HW='\HP_noise*';else HW=varargin{1};end
-            model=obj.Zfitmodel;
+            %model=obj.Zfitmodel;
             Noises=obj.GetNoiseClass(Temp,rps,HW);
-            freqs=logspace(1,5,801);
+            if strcmp(HW,'\PXI_noise*')
+                freqs=logspace(1,5,801);
+            else
+                freqs=Noises(1).freqs;
+            end
             for i=1:length(rps)
                 Noises(i).freqs=freqs;
-                Noises(i).SetNoiseModel(model);
+                %Noises(i).SetNoiseModel(model);
                 Noises(i).FilterNoise();
                 Noises(i).FitNoise();
-                %obj.FitResultsClass(i)=Noises(i).fOPClass;
                 Results(i)=Noises(i).fOPClass;
             end
             obj.FitResultsClass=Results;

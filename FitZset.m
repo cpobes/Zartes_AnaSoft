@@ -460,7 +460,7 @@ for i=1:length(dirs)
             %if sum(isinf(ydata))==0  %%%Algunos OP dan NEP Inf.pq?
                 ydata=filterNoise(NEP(findx)*1e18,noise_filt_model);
                 %if(jj==5) save('parameters','parameters');end%?debug?
-                maux=lsqcurvefit(@(x,xdata) fitjohnson(x,xdata,parameters),[0 0],xdata,ydata);
+                maux=lsqcurvefit(@(x,xdata) fitjohnson(x,xdata,parameters),[0 0],xdata(:),ydata(:));
                 %maux=lsqcurvefit(@(x,xdata) fitnoise(x,xdata,TES,OP,circuit),[0 0],xdata,ydata);
                 P(i).M(jj)=maux(2);
                 P(i).Mph(jj)=maux(1);
