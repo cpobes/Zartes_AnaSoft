@@ -168,6 +168,8 @@ classdef NoiseThermalModelClass < handle
             bI=obj.fOperatingPoint.bi;
             Vjo0=4*Kb*T0*R0;
             switch obj.fJohnsonExcessModel
+                case 'old'
+                    Jfactor=1; %%%Para probar efecto de despreciar bI.
                 case 'default'
                     Jfactor=(1+2*bI);%%%Original Irwin Non-equilibrium factor.
             %%%Other factors from https://arxiv.org/pdf/1907.11343.pdf
@@ -407,15 +409,17 @@ classdef NoiseThermalModelClass < handle
                 for i=1:obj.fNumberOfLinks
                     fh{2+i}=obj.fPhononNoiseHandlerArray{i};
                 end
+                legendstring=([{'R_{sh}' 'Johnson_{TES}'} obj.fLinksList]);
                 for i=1:obj.fNumberOfComponents                    
-                    loglog(f,scale*sqrt(fh{i}(f)),'-'),hold on;
+                    loglog(f,scale*sqrt(fh{i}(f)),'-','DisplayName',legendstring{i}),hold on;
                 end
-                legendstring=([{'R_{sh}' 'Johnson_{TES}'} obj.fLinksList {'Total Current Noise'}]);
+                
             end
-            loglog(f,scale*func(f,Mjo,Mph),'.-'),grid on;
+            loglog(f,scale*func(f,Mjo,Mph),'-','linewidth',2.,'DisplayName','Total Current Noise'),grid on;
             
             %%%Formatting.
-            legend(legendstring);
+            %legend(legendstring);
+            legend('show')
             %ylim([1 1e2])
             set(gca,'fontsize',12)
         end

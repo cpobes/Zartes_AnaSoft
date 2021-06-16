@@ -89,12 +89,20 @@ classdef NoiseDataClass < handle
             if strcmp(obj.units,'pA')
                 scale=1e12;
             end
-            loglog(obj.freqs,scale*obj.fCurrentDataHandle(obj.freqs),'.-')
+            loglog(obj.freqs,scale*obj.fCurrentDataHandle(obj.freqs),'.-','DisplayName','Current Noise')
+%             ch=get(gca,'children');
+%             if length(ch)==1
+%                 ch.DisplayName='Current Noise'; 
+%             end
             grid on
             if obj.boolShowFilteredData
                 hold on
                 obj.FilterNoise();
-                loglog(obj.freqs,scale*V2I(obj.FilteredVoltageData,obj.fCircuit),'.-k');
+                loglog(obj.freqs,scale*V2I(obj.FilteredVoltageData,obj.fCircuit),'.-k','DisplayName','Filtered Noise');
+%                 ch=get(gca,'children');
+%                 if length(ch)==2
+%                     ch(1).DisplayName='Filtered Noise'; 
+%                 end
             end
             if obj.boolPlotModel
                 hold on

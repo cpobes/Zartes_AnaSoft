@@ -784,6 +784,11 @@ classdef BasicAnalisisClass < handle
                 Noises(i).freqs=freqs;
                 %Noises(i).SetNoiseModel(model);
                 Noises(i).FilterNoise();
+                Noises(i).fMphFitRange=[2e3 4e4];
+                Noises(i).fMjoFitRange=[2e3 4e4];
+                %Podemos cambiar el tipo de ruido0 johnson.
+                Noises(i).NoiseModelClass.fJohnsonExcessModel='2F';%%%ojo, esto solo cambia la variable, no el handle.
+                Noises(i).NoiseModelClass.GetTotalCurrentNoise();
                 Noises(i).FitNoise();
                 Results(i)=Noises(i).fOPClass;
             end
