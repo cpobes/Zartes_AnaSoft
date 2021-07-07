@@ -116,7 +116,7 @@ classdef BasicAnalisisClass < handle
             actualRp=obj.GetActualRps(Temp,rp,paux);
             rtes=GetPparam(paux.p,'rp');
             ivaux=obj.GetIV(Temp);
-            Ibias=obj.GetIbias(Temp,rp);
+            Ibias=obj.GetIbias(Temp,actualRp);
             [~,jj]=min(abs(bsxfun(@minus, rtes', actualRp)));
             jj=unique(jj,'stable');
             opt.model=obj.Zfitmodel;
