@@ -13,11 +13,13 @@ classdef BasicOperatingPointClass < handle
         fVout=0;
         %%%Deduced
         fR0=0;
+        fRp=0;
         fI0=0;
         fV0=0;
+        fP0=0;
         fT0=0;
         fG0=0;
-        fP0=0;
+
     end
     
     methods
@@ -38,6 +40,7 @@ classdef BasicOperatingPointClass < handle
             obj.fV0=Vs-obj.fI0*obj.fCircuit.Rpar;
             obj.fP0=obj.fV0.*obj.fI0;
             obj.fR0=obj.fV0./obj.fI0;
+            obj.fRp=obj.fR0./obj.fCircuit.Rn;%%%La Rn está tanto en circuit como en TES. Ojo al cambiar a clases.
             obj.fT0=obj.fTES.Tc;%%%
             %fT0=(fP0./[fTES.K]+fTbath.^([fTES.n])).^(1./[fTES.n]);
             obj.fG0=obj.fTES.G0;

@@ -2,7 +2,7 @@ classdef GeneralDynamicOperatingPointClass < BasicOperatingPointClass
     %%% Clase para encapsular los parámetros dinámicos generales que son
     %%% comunes a cualquier modelo térmico.
     properties
-        fRp=0;%%% %Rn
+        %fRp=0;%%% %Rn movida a BasicOP.
         fZinf=0;%%% p(1)
         fZ0=0;%%% p(2)
         fTaueff=0; %%% p(3)
@@ -20,9 +20,9 @@ classdef GeneralDynamicOperatingPointClass < BasicOperatingPointClass
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function obj=GeneralDynamicOperatingPointClass(OPstruct,SETUP,PARRAY)
             obj@BasicOperatingPointClass(OPstruct,SETUP);
-            obj.fR0
-            obj.fTES
-            obj.fRp=obj.fR0/obj.fTES.Rn;
+            %obj.fR0
+            %obj.fTES
+            %obj.fRp=obj.fR0/obj.fTES.Rn;
             obj.fParray=PARRAY;
             obj.fZinf=PARRAY(1);
             obj.fZ0=PARRAY(2);
