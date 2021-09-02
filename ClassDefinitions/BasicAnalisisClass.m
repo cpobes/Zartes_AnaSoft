@@ -216,7 +216,7 @@ classdef BasicAnalisisClass < handle
                 Ib=BuildIbiasFromRp(IVmeasure,Rpreal)*1e-6;%%%Ojo, BuildIbias devuelve uA.
                 %modelname
                 param=GetModelParameters(pfit,IVmeasure,Ib,TES,Circuit,modelname);
-                OP=setTESOPfromIb(Ib,IVmeasure,param,varargin);
+                OP=setTESOPfromIb(Ib,IVmeasure,param,Circuit);%!pasaba el varargin?!
                 obj.fOperatingPoint=OP;
         end
         function Pstruct=BuildNewPstruct(obj,pold,varargin)
@@ -446,7 +446,7 @@ classdef BasicAnalisisClass < handle
             %p0=[0.0106   -0.0248   -8.9747e-05   -1.0527   1.9215e-04];%1Z10_62A_down.60%
             %p0=[ 0.0057   -0.0048    4.8e-5    1.7139    0.0024];%1Z10_62B.
             %p0=[0.0152   -0.0114    2.5e-3    0.01    2e-5];%1Z1_54B.
-            p0=[0.0152   -0.0114    5e-5    0.07    2e-4];%1Z1_54B.
+            %p0=[0.0152   -0.0114    5e-5    0.07    2e-4];%1Z1_54B.
             for i=1:numel(ZtesData)
                 %ind_z=ind_z(10:end-1*i);%test.falla.habria que llamarla
                 %ind_z2.
