@@ -1,7 +1,7 @@
 classdef dummycircuit < handle
     properties
-        fRsh
-        fRf
+        fRsh;
+        fRf;
     end
     methods
         function obj=dummycircuit(varargin)

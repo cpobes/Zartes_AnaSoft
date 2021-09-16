@@ -16,3 +16,6 @@ IGH-log2
 matlab.mat
 *.mat
 license.txt
+ClassDefinitions/dummyBasic.m
+ClassDefinitions/dummySecond.m
+ClassDefinitions/dummycircuit.m
