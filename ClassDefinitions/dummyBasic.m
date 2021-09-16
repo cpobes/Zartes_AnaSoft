@@ -1,6 +1,7 @@
-classdef dummyBasic < dummycircuit & handle
+classdef dummyBasic <  handle
     properties
         f1
+        %fRsh='prueba';
     end
     methods
         function obj=dummyBasic()
