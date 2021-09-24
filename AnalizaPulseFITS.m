@@ -11,7 +11,7 @@ fptr=fits.openFile(file)
 %fits.movAbsHDU(fptr,3)%%%el fichero de la LNCS está en dos tablas. 
 fits.movAbsHDU(fptr,2);
 Npulsos=fits.getNumRows(fptr);
-boolfit=1;
+boolfit=0;
 SR=1e6;
 fhandle=@(p,t)p(1)*heaviside(t-p(4)).*(exp(-(t-p(4))/p(2))-exp(-(t-p(4))/p(3))+exp(-(t-p(4))/p(5)))/(p(2)+p(5)-p(3));
 %p0=[0.7635    1.0460    0.0085    2.0009    6.4844]*1e-3;
@@ -41,11 +41,11 @@ for i=1:Npulsos
     dc_std(i)=std(pulso(1:L*t0ini/2,2));
     area(i)=sum(medfilt1(pulso(:,2),10)-dc(i));
     amp(i)=max(medfilt1(pulso(:,2),10))-dc(i);
-    energy(i)=sum((pulso(:,2)-dc(i))'.*ofilt);%%%estimacion OF.
-    energy0(i)=sum(pulso(:,2)'.*ofilt);
+    %energy(i)=sum((pulso(:,2)-dc(i))'.*ofilt);%%%estimacion OF.
+    %energy0(i)=sum(pulso(:,2)'.*ofilt);
     %ind=find(pulso(:,2)-dc(i)<AMPthr);%%%seleccionamos un rango que no esté saturado para hacer el ajuste.
     %ind=find(pulso(:,1)<0.12 & pulso(:,1)>0.1);
-    [v,t]=findpeaks(pulso(:,2),pulso(:,1),'minpeakprominence',0.05);
+    [v,t]=findpeaks(-pulso(:,2),pulso(:,1),'minpeakprominence',0.01);
     %v=0;t=0;
     npeaks(i)=numel(v);
     ntimes(i).times=t;
@@ -90,8 +90,8 @@ fits.closeFile(fptr);
     PulseParameters.amp=amp;
     PulseParameters.npeaks=npeaks;
     PulseParameters.ntimes=ntimes;
-    PulseParameters.energy=energy;
-    PulseParameters.e0=energy0;
+    %PulseParameters.energy=energy;
+    %PulseParameters.e0=energy0;
     PulseParameters.timestamp=timestamp;
     PulseParameters.tbath=tbath;
     PulseParameters.rsensor=rsensor;

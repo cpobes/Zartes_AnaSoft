@@ -19,3 +19,6 @@ license.txt
 ClassDefinitions\dummyBasic.m
 ClassDefinitions\dummySecond.m
 ClassDefinitions\dummycircuit.m
+ClassDefinitions/dummyBasic.m
+ClassDefinitions/dummycircuit.m
+ClassDefinitions/dummySecond.m
