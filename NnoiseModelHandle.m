@@ -18,7 +18,7 @@ else
     i_squid=3e-12;
 end
 
-if isfield(circuit.circuitnoiseHandle)
+if isfield(circuit,'circuitnoiseHandle')
     cnHandle=circuit.circuitnoiseHandle;
 %elseif length(i_squid==1)
     %cnHandle=@(f) circuitnoise;

@@ -12,14 +12,15 @@ fptr=fits.openFile(file)
 fits.movAbsHDU(fptr,2);
 Npulsos=fits.getNumRows(fptr);
 boolfit=0;
-SR=1e6;
+SR=str2num(fits.readKey(fptr,'SR'));
+RL=str2num(fits.readKey(fptr,'RL'));
 fhandle=@(p,t)p(1)*heaviside(t-p(4)).*(exp(-(t-p(4))/p(2))-exp(-(t-p(4))/p(3))+exp(-(t-p(4))/p(5)))/(p(2)+p(5)-p(3));
 %p0=[0.7635    1.0460    0.0085    2.0009    6.4844]*1e-3;
 %p0=[0.3979    0.8078    0.0048    2.0032    3.7450]*1e-3;
 %p0=[5.6925e-04 4.7974*1e-3 4.5895*1e-6 2.0026*1e-3 0.9105*1e-3]; %%%Pulso promedio de los 6.4KeV del p40mK_142uA_PI08 de Julio2020.
 p0=[4.2514e-04 4.0084*1e-3 7.0401*1e-6 2e-3 0.8903*1e-3]; %%%Pulso promedio de 6.4KeV a 90mK Julio2020.
 
-time=(1:20000)/SR;
+time=(1:RL)/SR;
 px=fhandle(p0,time);
 ofilt=px/sum(px);
 
@@ -35,12 +36,12 @@ for i=1:Npulsos
     end
     L=length(raw);
     pulso(:,1)=(1:L)/SR;%%%
-    pulso(:,2)=raw;
+    pulso(:,2)=-raw;%%%Pulsos negativos!
         
     dc(i)=mean(pulso(1:L*t0ini/2,2));
     dc_std(i)=std(pulso(1:L*t0ini/2,2));
-    area(i)=sum(medfilt1(pulso(:,2),10)-dc(i));
-    amp(i)=max(medfilt1(pulso(:,2),10))-dc(i);
+    area(i)=sum(medfilt1(pulso(:,2),1)-dc(i));
+    amp(i)=max(medfilt1(pulso(:,2),1))-dc(i);
     %energy(i)=sum((pulso(:,2)-dc(i))'.*ofilt);%%%estimacion OF.
     %energy0(i)=sum(pulso(:,2)'.*ofilt);
     %ind=find(pulso(:,2)-dc(i)<AMPthr);%%%seleccionamos un rango que no esté saturado para hacer el ajuste.
