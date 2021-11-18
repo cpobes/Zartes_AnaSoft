@@ -17,7 +17,7 @@ ibias=IVstruct(i).ibias;
 vout=IVstruct(i).vout;%valor corregido de Vout.
 
 %curva Vout-Ibias
-subplot(2,2,1);plot(ibias*1e6,vout,'.--','DisplayName',num2str(IVstruct(i).Tbath)),grid on,hold on
+subplot(2,2,1);plot(ibias*1e6,vout,'.--b','DisplayName',num2str(IVstruct(i).Tbath)),grid on,hold on
 xlim([min(0,sign(ibias(1))*500) 500]) %%%Podemos controlar apariencia con esto. 300->500
 xlabel('Ibias(\muA)','fontweight','bold');ylabel('Vout(V)','fontweight','bold');
 set(gca,'fontsize',12,'linewidth',2,'fontweight','bold')

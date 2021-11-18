@@ -19,9 +19,11 @@ for i=1:length(RawIVset)
                 vaux=vaux(r);
                 voff=spline(iaux,vaux,ioff);
             else
-                iaux=RawIVset(i).ibias(end-1:end);
-                vaux=RawIVset(i).vout(end-1:end);
-                voff=spline(iaux,vaux,ioff);
+                %iaux=iaux(end-1:end);%RawIVset(i).ibias(end-1:end);
+                %vaux=vaux(end-1:end);%RawIVset(i).vout(end-1:end);
+                %voff=spline(iaux,vaux,ioff);
+                m=(vaux(end-1)-vaux(end))/(iaux(end-1)-iaux(end));
+                voff=vaux(end)+m*(ioff-iaux(end));
             end
     end
 

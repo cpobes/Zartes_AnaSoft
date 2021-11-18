@@ -6,6 +6,7 @@ info=fitsinfo(file);
 Npulsos=info.BinaryTable.Rows
 %Npulsos=10000;
 t0ini=0.1;
+topt=t0ini+0.02;%fraccion para pulsos V1O 0.02.
 
 fptr=fits.openFile(file)
 %fits.movAbsHDU(fptr,3)%%%el fichero de la LNCS está en dos tablas. 
@@ -29,7 +30,7 @@ time=(1:RL)/SR;
 %fnorm=@(p,t) heaviside(t-p(4)).*(exp(-(t-p(4))/p(2))-exp(-(t-p(4))/p(3))+exp(-(t-p(4))/p(5)))/(p(2)+p(5)-p(3));
 %fh3=@(p,t)p(2)*fhandle([1 p0(2) p0(3) p(3) p0(5)],time)+p(1);
 
-trunc_area_range=1000:10000;
+trunc_area_range=(1080:1440)'
 fit_range=1000:10000;
 fhandle=@(p,x)p(1)*(exp(-(x-p(4))/p(2))-exp(-(x-p(4))/p(3))).*heaviside(x-p(4))+p(5);%%%simple
 boolfit=0;

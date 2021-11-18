@@ -28,8 +28,13 @@ for jj=1:length(perc)
          ind=find(IVTESset(i).rtes>0.05&IVTESset(i).rtes<0.9);%%%algunas IVs fallan.
          minIV=min(abs([IVTESset(i).rtes]));
         if isempty(ind)||minIV>perc(jj)||minIV>0.5 continue;end
-        Paux(end+1)=ppval(spline(IVTESset(i).rtes(ind),IVTESset(i).ptes(ind)),perc(jj));
-        Iaux(end+1)=ppval(spline(IVTESset(i).rtes(ind),IVTESset(i).ites(ind)),perc(jj));%%%
+        [rtaux,iii]=unique(IVTESset(i).rtes(ind));
+        ptaux=IVTESset(i).ptes(ind(iii));
+        itaux=IVTESset(i).ites(ind(iii));
+        %Paux(end+1)=ppval(spline(IVTESset(i).rtes(ind),IVTESset(i).ptes(ind)),perc(jj));
+        %Iaux(end+1)=ppval(spline(IVTESset(i).rtes(ind),IVTESset(i).ites(ind)),perc(jj));%%%
+        Paux(end+1)=ppval(spline(rtaux,ptaux),perc(jj));
+        Iaux(end+1)=ppval(spline(rtaux,itaux),perc(jj));
         Tbath(end+1)=IVTESset(i).Tbath;
             end
     end
