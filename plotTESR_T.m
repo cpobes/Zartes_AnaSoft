@@ -6,6 +6,7 @@ function plotTESR_T(Circuit,IVmeasure,TES)
     naranja=[0.8500    0.3250    0.0980];
 
     color=naranja;
+    %color=blue;
 for i=1:length(IVmeasure)
         if isfield(IVmeasure,'good') good=IVmeasure(i).good;else good=1;end
     if good,

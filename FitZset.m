@@ -11,7 +11,7 @@ Rpar=circuit.Rpar;
 L=circuit.L;
 fS=TFS.f;
 Rn=circuit.Rn;
-Rn=TES.Rn;
+%Rn=TES.Rn;
 
 % 
 % nargin
