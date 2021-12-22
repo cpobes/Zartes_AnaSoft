@@ -1,16 +1,28 @@
-function PulseParameters= AnalizaPulseFITS(file)
+function PulseParameters= AnalizaPulseFITS(file,varargin)
 %%%%Funciona analoga a AnaliaaPulseDir pero para fichero fits
 import matlab.io.*
 
 info=fitsinfo(file);
 Npulsos=info.BinaryTable.Rows
 %Npulsos=10000;
-t0ini=0.1;
-topt=t0ini+0.02;%fraccion para pulsos V1O 0.02.
 
+%%%%%%%%OPTIONS%%%%%%%%%%
+t0ini=0.1;
+topt=t0ini+0.128;
+trunc_area_range=(1080:1440)';
+fit_range=1000:10000;
+%topt=t0ini+0.02;%fraccion para pulsos V1O 0.02.
+boolfit=0;
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+if nargin==1
+    DataUnit=2;
+else
+    DataUnit=varargin{1};
+end
 fptr=fits.openFile(file)
 %fits.movAbsHDU(fptr,3)%%%el fichero de la LNCS está en dos tablas. 
-fits.movAbsHDU(fptr,2);
+fits.movAbsHDU(fptr,DataUnit);
 Npulsos=fits.getNumRows(fptr);
 
 SR=str2num(fits.readKey(fptr,'SR'));
@@ -29,11 +41,8 @@ time=(1:RL)/SR;
 %fh2=@(p,t)p(2)*ofilt+p(1);
 %fnorm=@(p,t) heaviside(t-p(4)).*(exp(-(t-p(4))/p(2))-exp(-(t-p(4))/p(3))+exp(-(t-p(4))/p(5)))/(p(2)+p(5)-p(3));
 %fh3=@(p,t)p(2)*fhandle([1 p0(2) p0(3) p(3) p0(5)],time)+p(1);
-
-trunc_area_range=(1080:1440)'
-fit_range=1000:10000;
 fhandle=@(p,x)p(1)*(exp(-(x-p(4))/p(2))-exp(-(x-p(4))/p(3))).*heaviside(x-p(4))+p(5);%%%simple
-boolfit=0;
+
 for i=1:Npulsos
     %raw=fitsread(file,'binarytable',1,'TableColumns',1,'TableRows',1);%%5Lentisimo.
     try
@@ -48,7 +57,8 @@ for i=1:Npulsos
     dc(i)=mean(pulso(1:L*t0ini/2,2));
     dc_std(i)=std(pulso(1:L*t0ini/2,2));
     area(i)=sum(medfilt1(pulso(:,2),1)-dc(i));
-    trunc_area(i)=sum(medfilt1(pulso(trunc_area_range,2),1)-dc(i));
+    %trunc_area(i)=sum(medfilt1(pulso(trunc_area_range,2),1)-dc(i));
+    optArea(i)=sum(medfilt1(pulso(t0ini*L-10:topt*L,2),1)-dc(i));
     amp(i)=max(medfilt1(pulso(:,2),1))-dc(i);
     %energy(i)=sum((pulso(:,2)-dc(i))'.*ofilt);%%%estimacion OF.
     %energy0(i)=sum(pulso(:,2)'.*ofilt);
@@ -80,7 +90,7 @@ for i=1:Npulsos
         %size(pulso(ind_fit,2))
         %ft_p3=lsqcurvefit(fh3,p0,ind_fit,pulso(ind_fit,2)');
         
-        p0=[0.1 1e-3 10e-6 3e-3 dc(i)];%%%tau1-tau2 para pulso positivo.
+        p0=[0.1 1e-3 10e-6 1.2e-3 dc(i)];%%%tau1-tau2 para pulso positivo.
         ft_p=lsqcurvefit(fhandle,p0,pulso(fit_range,1),pulso(fit_range,2));
         
         dcfit(i)=ft_p(5);
@@ -102,7 +112,8 @@ for i=1:Npulsos
 end
 fits.closeFile(fptr);
     PulseParameters.area=area;
-    PulseParameters.trunc_area=trunc_area;
+    %PulseParameters.trunc_area=trunc_area;
+    PulseParameters.optArea=optArea;
     PulseParameters.dc=dc;
     PulseParameters.dc_std=dc_std;
     PulseParameters.amp=amp;
