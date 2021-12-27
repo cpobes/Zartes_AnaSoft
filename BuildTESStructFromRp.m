@@ -1,7 +1,7 @@
 function TES=BuildTESStructFromRp(rp,Gset)
 %%%Genera la estructura TES a partir del Gset y de un porcentaje.
 
-ind=find(round(100*[Gset.rp])==100*rp)
+ind=find(round(100*[Gset.rp])==100*rp);%%%Ojo si rp no está entre el rango de valores de Gset.rp
 
 TES=Gset(ind);
 TES.K=TES.K*1e-12;

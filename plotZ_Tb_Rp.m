@@ -5,14 +5,15 @@ function plotZ_Tb_Rp(anaStruct,Rp,Temp,varargin)
 olddir=pwd;
 
 %%%Cargamos la estructura colores para los plots.
-colordir=GetCloudDataDir();
-cd(colordir);
+%colordir=GetCloudDataDir();
+%cd(colordir);
+cd2CloudDataDir(GetCloudDataDir());
 load('colores.mat')%%%esto carga la estructura colores.
 cd(olddir)
 
 datadir=anaStruct.analizeOptions.datadir;
-%cd(datadir);
-cd2CloudDataDir(datadir);
+cd(datadir);
+%cd2CloudDataDir(datadir);
  
 [mIV,mP]=GetTbathIndex(Temp,anaStruct);%%%Se asume que para todas las temperaturas se toman tanto datos positivos como negativos.
 
@@ -21,6 +22,7 @@ if nargin==4
         polstr=varargin{1};
         f_index=1:length(anaStruct.TFS.f);
     else
+        polstr='p';
         f_index=varargin{1};
     end
     

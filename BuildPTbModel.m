@@ -1,5 +1,5 @@
 function model=BuildPTbModel(varargin)
-
+%%%Modelos: 'default', 'Tcdirect', 'GTcdirect', 'Ic0', 'T2+T4'.
 if nargin==0
     model.nombre='default'
     model.function=@(p,T)(p(1)*T.^p(2)+p(3));

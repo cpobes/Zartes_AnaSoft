@@ -8,6 +8,8 @@ ENG_str='Shared drives'; %%  directorio carpetas compartidas en ingles.
 
 The_string=regexp(dir,'[A-Z]:\\(.*)\\X-IFU','tokens');
 
+if isempty(The_string) cd(dir);return;end
+
 Unidad=regexp(dir,'[A-Z]:\','match');
 Unidad=Unidad{1};
 if isempty(Unidad) Unidad='G:\'; end
