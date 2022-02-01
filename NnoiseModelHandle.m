@@ -34,4 +34,4 @@ v2_sh=4*Kb*Tbath*RL; % ruido voltaje Rsh (mas parasita).
 v2_tes=4*Kb*Ttes*Rtes;%ruido voltaje en el TES en estado normal.
 
 i_jo=@(f) sqrt(v2_sh+v2_tes)./abs(Zcirc(f));
-NoiseHandle=@(f) sqrt(i_jo(f).^2+cnHandle(f)^2);
+NoiseHandle=@(f) sqrt(i_jo(f).^2+cnHandle(f).^2);
