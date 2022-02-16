@@ -1,7 +1,7 @@
 function [SmoothData,varargout]=movingMean(data,w,varargin)
 %%%%Función para aplicar el filtrado de media móvil a unos datos pero
 %%%%sin afectar al inicio y final de los mismos, reduciendo el tamaño de la
-%%%%ventana en los extremos.
+%%%%ventana en los extremos. Usa trimmean para descartar outliers.
 
 D=ceil(w-1/2);
 L=length(data);
