@@ -9,7 +9,7 @@ N=length(x);
 ft=fft(x);ft=ft(1:ceil(N/2));
 psd=abs(ft).^2/SF/N;
 psd(2:end-1)=2*psd(2:end-1);
-freq=0:SF/N:SF/2;
+freq=1:SF/N:SF/2;%%%!!!
 if nargin==2
     opt=varargin{1};
     if isnumeric(opt) && opt
