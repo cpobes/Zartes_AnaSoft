@@ -5,7 +5,7 @@ function TF=TF_HP(Rtes,circuit)
 %nota también un poco, pero sólo a alta frecuencia. 
 %sólo funciona para estado normal y superconductor del TES.
 
-f=logspace(1,5,1e4);
+f=logspace(1,5,1e6);
 
 invMs=circuit.invMin;
 invMf=circuit.invMf;
