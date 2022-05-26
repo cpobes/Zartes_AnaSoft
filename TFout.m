@@ -8,7 +8,7 @@ invMf=circuit.invMf;
 invMin=circuit.invMin;
 L=circuit.L;
 %TES.
-Rn=circuit.Rn;
+%Rn=circuit.Rn;
 Rpar=circuit.Rpar;
 Rth=Rsh+Rpar;
 

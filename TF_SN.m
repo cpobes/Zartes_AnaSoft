@@ -1,7 +1,7 @@
 function [tfs,tfn]=TF_SN(f,L,TFout)
 %funcion para calcular las TF en esatado superconductor y normal teniendo
 %en cuenta la Ibox. Ojo a todas estas funciones, tengo que separar la
-%definicion de los parametros, estan reoetidas.
+%definicion de los parametros, estan repetidas.
 
 Rsh=2e-3;
 %TES.
