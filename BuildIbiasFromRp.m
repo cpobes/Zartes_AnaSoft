@@ -13,6 +13,6 @@ for i=1:length(IVset)
 
     Ibs=spline(raux(1:i3),iaux(1:i3),rp)*1e6;    
     Ibs(rp<raux(i3))=0;%%%Los rps por debajo del mínimo van a dar Ibias absurdos.
-    Ibs=unique(Ibs);%Puede haber varios Ibs en cero y eso ralentiza luego las medidas!
+    Ibs=unique(Ibs,'stable');%Puede haber varios Ibs en cero y eso ralentiza luego las medidas!
 
 end
