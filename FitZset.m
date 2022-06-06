@@ -81,7 +81,7 @@ if nargin==4 || (nargin==5 && isstruct(varargin{1}))
 elseif nargin>4 && isnumeric(varargin{1})
             options.TFdata='HP';
             options.Noisedata='HP';
-            options.ThermalModel='2TB_intermediate';%'default';
+            options.ThermalModel='default';%'2TB_intermediate';%'default';
             options.NoiseFilterModel.model='default';
             options.NoiseFilterModel.wmed=40;
     t=varargin{1};
