@@ -21,5 +21,5 @@ end
 for i=1:length(auxS) %%%si lo aplico al IVset completo hay que hacer bucle.
     IVset(i).ibias=auxS(i).ibias-ioff;
     IVset(i).vout=auxS(i).vout-voff;
+    IVset(i).ioffset=ioff;
 end
-IVset.ioffset=ioff;

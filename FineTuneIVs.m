@@ -16,7 +16,7 @@ ivx=SplitIV(ivzero);
 ivxN=SplitIV(ivzeroN);
 c.mS=mS;
 
-rangoI=[-2:0.01:0]*1e-7;%%%rango en que buscar el ioffset
+rangoI=[-10:0.01:10]*1e-7;%%%rango en que buscar el ioffset
 N=5;
 
 %%%
@@ -30,7 +30,8 @@ for i=1:length(ivx)
         ivtr(i)=ivx(i).transicion; %%%ivx.transicion ya no es vacia. En Split, si da vacia se pasa la curva entera.
         ivtrN(i)=ivxN(i).transicion;
     %end
-    rang2=N:length(ivtr(i).ibias)-N;%%%definimos un rango para comparar IVs
+    %rang2=N:length(ivtr(i).ibias)-N;%%%definimos un rango para comparar IVs
+    rang2=1:length(ivtr(i).ibias);
     for jj=1:length(rangoI)
         c.ioffset=rangoI(jj);
         ivNoff=ApplyOffset(ivtrN(i),c);

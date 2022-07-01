@@ -217,8 +217,8 @@ for i=1:length(dirs)
             Z0=real(ztes(ind_z(1)));
             Y0=real(1./ztes(1));
             %tau0=1e-4;
-            indY=find(imag(ztes)==min(imag(ztes)));
-            tau0=1/(2*pi*fS(indY(1)));%%%tau0 es el valor inicial de taueff. Lo estimamos a partir de la w_min
+            indY=find(imag(ztes(ind_z))==min(imag(ztes(ind_z))));
+            tau0=1/(2*pi*fS(ind_z(indY(1))));%%%tau0 es el valor inicial de taueff. Lo estimamos a partir de la w_min
             tau1=1e-5;
             tau2=1e-5;
             d1=0.8;
