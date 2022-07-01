@@ -1,4 +1,4 @@
 function L=fitLcircuit(tfs,tfn,circuit)
 %%%funcion para ajustar la L del circuito
 
-L=lsqcurvefit(@(x,y)fitLfcn(x,y,circuit),[100e-9 30e-3],tfs.f,imag(tfs.tf./tfn.tf));
+L=lsqcurvefit(@(x,y)fitLfcn(x,y,circuit),[60e-9 50e-3],tfs.f,imag(tfs.tf./tfn.tf));

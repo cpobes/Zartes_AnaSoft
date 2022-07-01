@@ -1,6 +1,6 @@
 function IVset_centered=CentraIVs(IVset,circuit)
 %%%%función para corregir el offset de la fuente de corriente..
-
+%%%% YA hay otra funcion CentrarIVs!!!
 if isfield(circuit,'ioff')
     ioff=circuit.ioff;
 else

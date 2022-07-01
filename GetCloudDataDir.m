@@ -9,8 +9,9 @@ end
 
 ESP_str='Unidades compartidas'; %% directorio carpetas compartidas en castellano
 ENG_str='Shared drives'; %%  directorio carpetas compartidas en ingles.
-ruta='\X-IFU\Datos\Datos Dilución'; %%%Ruta al directorio raiz de los datos.
-
+%%%before Drive discontinuation
+%ruta='\X-IFU\Datos\Datos Dilución'; %%%Ruta al directorio raiz de los datos.
+ruta='\ZARTES\DATOS';
 x_esp=ls(strcat(Unidad,ESP_str));
 x_eng=ls(strcat(Unidad,ENG_str));
 if ~isempty(x_esp)
