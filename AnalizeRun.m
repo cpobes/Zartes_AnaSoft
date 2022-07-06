@@ -69,10 +69,11 @@ faux=figure('visible','off');
 cd(datadir);
 %cd2CloudDataDir(datadir);
 
-[IVset,IVsetN]=LoadIVsets(analizeOptions.circuit);%LoadIVsets(datadir);%%%Cargamos las IVs. Como el 'caller' es AnalizeRun, y no pasamos el circuit a LoadIVsets, dentro se ejecutara
+%[IVset,IVsetN]=LoadIVsets(analizeOptions.circuit);
+[IVset,IVsetN]=LoadIVsets(datadir);%%%Cargamos las IVs. Como el 'caller' es AnalizeRun, y no pasamos el circuit a LoadIVsets, dentro se ejecutara
 %%% el load(circuit) desde dentro del datadir, por lo que se cargara el
 %%% circuit correcto.
-IVset(1)
+%IVset(1)
 ind=[IVset.Tbath]<Tmax;
 Gset=fitPvsTset(IVset(ind),PTrange,PTmodel);
 GsetN=fitPvsTset(IVsetN(ind),PTrange,PTmodel);%%%Ajusto los datos P-Tbath.
