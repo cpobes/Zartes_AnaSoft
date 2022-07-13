@@ -57,14 +57,18 @@ classdef BasicAnalisisClass < handle
         end
         function plotZs(obj,Temp,rps,varargin)
             auxstruct=obj.structure;
-            if nargin==4
-                paux=obj.GetPstruct(Temp,varargin{1});
-                auxstruct.P=paux;
+            polstr='p';
+            for i=1:length(varargin)
+                if isstruct(varargin{i})
+                    paux=obj.GetPstruct(Temp,varargin{1});
+                    auxstruct.P=paux;
+                end
+                if ischar(varargin{i}) polstr=varargin{i};end
             end
             if ~isempty(obj.fGlobalIndex)
-                plotZ_Tb_Rp(auxstruct,rps,Temp,obj.fGlobalIndex);%Para eliminar algunas frecuencias en al pintar.
+                plotZ_Tb_Rp(auxstruct,rps,Temp,obj.fGlobalIndex,polstr);%Para eliminar algunas frecuencias en al pintar.
             else
-                plotZ_Tb_Rp(auxstruct,rps,Temp)
+                plotZ_Tb_Rp(auxstruct,rps,Temp,polstr)
             end
         end
         function plotNoises(obj,Temp,rps,varargin)

@@ -17,19 +17,14 @@ cd(datadir);
  
 [mIV,mP]=GetTbathIndex(Temp,anaStruct);%%%Se asume que para todas las temperaturas se toman tanto datos positivos como negativos.
 
-if nargin==4
-    if ischar(varargin{1}) 
-        polstr=varargin{1};
-        f_index=1:length(anaStruct.TFS.f);
-    else
-        polstr='p';
-        f_index=varargin{1};
-    end
-    
-else
-    polstr='p';
-    f_index=1:length(anaStruct.TFS.f);
+%%%podemos pasar polaridad e indice en cualquier orden.
+polstr='p';
+f_index=1:length(anaStruct.TFS.f);
+for i=1:length(varargin)
+    if ischar(varargin{i}) polstr=varargin{i};end
+    if isnumeric(varargin{i}) f_index=varargin{i};end
 end
+
 Zdata_string=anaStruct.analizeOptions.ZfitOpt.TFdata;
 if strcmp(Zdata_string,'HP')
     TF_str='\TF_*';
