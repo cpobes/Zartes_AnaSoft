@@ -5,9 +5,9 @@ function plotZ_Tb_Rp(anaStruct,Rp,Temp,varargin)
 olddir=pwd;
 
 %%%Cargamos la estructura colores para los plots.
-%colordir=GetCloudDataDir();
-%cd(colordir);
-cd2CloudDataDir(GetCloudDataDir());
+colordir='C:\Users\Carlos\Desktop\ATHENA\medidas';
+cd(colordir);
+%cd2CloudDataDir(GetCloudDataDir());
 load('colores.mat')%%%esto carga la estructura colores.
 cd(olddir)
 

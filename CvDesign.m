@@ -1,16 +1,33 @@
 function Cv=CvDesign(T,varargin)
 %Calculo capacidades termicas para varios materiales.
 %Calcula la suma de la contribución eléctrica y phononica, pero ojo, para
-%el molibdeno no tengo datos para la contribución phononica. Para calcular
-%la Celectrica de una bicapa tengo CthCalc.
+%el molibdeno no tengo datos para la contribución phononica. 
+%Para calcular la Celectrica de una bicapa tengo CthCalc.
 
-%definicion materiales
+%Encuentro una referencia con las Td de los elementos:
+%https://www.knowledgedoor.com/2/elements_handbook/debye_temperature.html
+%Los valores no coinciden exactamente, pero aparece la del Mo.
+%Encuentro tb referencia con las Ef de Mo,W y Ta. Da Ef=0.4978Ryd=6.77eV
+%para el Mo. Coincide con el irwin?
+%Tf(K)=1.16e4*E(eV)
+
+%definicion materiales. Ef(eV).densidad(Kg/m^3).
 %%%ORO
-oro.Ef=5.53;oro.Tf=6.42e4;oro.TD=165;oro.densidad=19.32e6;oro.masa_molar=196.967;oro.att_length6K=1.1755e-6;
+oro.Ef=5.53;oro.Tf=6.42e4;oro.TD=165;
+oro.densidad=19.32e6;oro.masa_molar=196.967;
+oro.att_length6K=1.1755e-6;
 oro.conductivity=5e-9;
 oro.f_obs_free=1.1355;
+%%%Molibdenum
+molibdeno.Ef=6.77;molibdeno.Tf=7.85e4;molibdeno.TD=423;
+molibdeno.densidad=10.22e6;molibdeno.masa_molar=95.96;
+molibdeno.f_obs_free=1;%*
+molibdeno.att_length6K=0;%*
+molibdeno.conductivity=0;%*
 %%%Bismuto
-bismuto.Ef=9.9;bismuto.Tf=11.5e4;bismuto.TD=119;bismuto.densidad=9.7e6;bismuto.masa_molar=208.98;bismuto.att_length6K=2.091e-6;
+bismuto.Ef=9.9;bismuto.Tf=11.5e4;bismuto.TD=119;
+bismuto.densidad=9.7e6;bismuto.masa_molar=208.98;
+bismuto.att_length6K=2.091e-6;
 bismuto.f_obs_free=0.0224;%%%0.008 frente a 0.3566!
 %%%valores tomados de: http://hyperphysics.phy-astr.gsu.edu/hbase/Tables/fermi.html
 %%% Esto da un valor para gamma de 356.6 microJ/molK^2 mientras que el
@@ -20,14 +37,21 @@ bismuto.f_obs_free=0.0224;%%%0.008 frente a 0.3566!
 %%% la contribución electronica domina la phononica.
 
 %%%COBRE
-cobre.Ef=7;cobre.Tf=8.16e4;cobre.TD=315;cobre.densidad=8.96e6;cobre.masa_molar=63.536;cobre.att_length6K=9.85e-6;
+cobre.Ef=7;cobre.Tf=8.16e4;cobre.TD=315;
+cobre.densidad=8.96e6;cobre.masa_molar=63.536;
+cobre.att_length6K=9.85e-6;
 cobre.f_obs_free=1.38;
 %%%SILICIO
-silicio.Ef=Inf;silicio.Tf=Inf;silicio.TD=645;silicio.densidad=2.33e6;silicio.masa_molar=28.09;silicio.att_length6K=30.345e-6;
+silicio.Ef=Inf;silicio.Tf=Inf;silicio.TD=645;
+silicio.densidad=2.33e6;silicio.masa_molar=28.09;
+silicio.att_length6K=30.345e-6;
 silicio.f_obs_free=1;
 %%%NITRURO SILICIO
-Si3N4.Ef=Inf;Si3N4.Tf=Inf;Si3N4.TD=1060;Si3N4.densidad=3.2e6;Si3N4.masa_molar=140.28;Si3N4.att_length6K=30e-6;%%%esto es la membrana, no interesa como absorbente.
-Si3N4.conductivity=0;Si3N4.f_obs_free=1;
+Si3N4.Ef=Inf;Si3N4.Tf=Inf;Si3N4.TD=1060;
+Si3N4.densidad=3.2e6;Si3N4.masa_molar=140.28;
+Si3N4.att_length6K=30e-6;%%%esto es la membrana, no interesa como absorbente.
+Si3N4.conductivity=0;
+Si3N4.f_obs_free=1;
 
 % E_fermi=[5.53,9.9,7,Inf]; %energias de fermi en eV.
 % %Ef=5.53; %eV
@@ -40,7 +64,6 @@ Si3N4.conductivity=0;Si3N4.f_obs_free=1;
 % masa_molar=[196.967,208.98,63.536,28.09]; %en g/mol
 %M=196.967; %masa molar en g/mol
 %cve=8.31*pi^2*(.5*(T/Tf))
-
 
 if nargin==1
     material_str='oro';%'bismuto';%'oro'
@@ -66,6 +89,8 @@ end
 switch material_str
     case 'oro'
         material=oro;
+    case 'molibdeno'
+        material=molibdeno;
     case 'bismuto'
         material=bismuto;
     case 'cobre'
@@ -81,23 +106,19 @@ f_obs_free=material.f_obs_free;
 %rho=material.conductivity;
 
 R=8.31;
-cve=R*pi^2*(.5*(T/Tf))*f_obs_free
-cvp=R*pi^2*((12*pi^2/5)*(T/TD).^3) % J/K*mol
+cve=R*pi^2*(.5*(T/Tf))*f_obs_free;
+cvp=R*pi^2*((12*pi^2/5)*(T/TD).^3); % J/K*mol
 cv=cve+cvp;
 %definimos sensitivity as T/E (incremento de temperatura esperado para un
 %determinado depósito de energía). De Q=cv(g)*m*T=E -> S=1/cv(g)*M
 % m=d*A*h
 
-
-% sizes=[1]*1e-3%%%membrana
-% h=500e-9
-% A=sizes.^2; %area
 Nmol=A*h*d/M;
 Cve=cve*Nmol
 Cvp=cvp*Nmol
 Cv=cv*Nmol;
 
-disp(Cv)
+%disp(Cv)
 return;
 
 

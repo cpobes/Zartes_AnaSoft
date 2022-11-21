@@ -3,7 +3,8 @@ function CN=CthCalc(TES)
 %%%Se calcula sólo la contribución electronica a partir de la expresión 111
 %%%de Irwin y los valores de la tabla. Válido también para absorbentes de
 %%%Oro. Si no, hay que usar CvDesign.
-
+%%%Pasamos estructura TES con campos:
+%%%TES.(Tc,hMo,hAu,hBi,length,width)
 gammas=[2 0.729 0.008]*1e-3; %valores de gama para Mo y Au y Bi. Multiplicado por 1e-3 para J/molK^2
 rhoAs=[0.107 0.0983 0.0468]*1e6;%valores de Rho/A para Mo y Au. Multiplcado por 1e6 para mol/m^3
 
@@ -24,7 +25,7 @@ if isfield(TES,'sides') sides=TES.sides;end
 if sides, area=sides.^2;end 
 if TES_length, area=TES_length.*TES_width;end
 %sides^2*hBi*rhoAs(3)
-hAu,hMo,hBi,area
+%hAu,hMo,hBi,area
 if length(hAu)==1 hAu=hAu*ones(1,length(TES.Tc));end
 for i=1:length(hAu)    
     %(gammas.*rhoAs).*(([hMo ;hAu(i);hBi]*sides.^2)').*TES.Tc %%%show each
