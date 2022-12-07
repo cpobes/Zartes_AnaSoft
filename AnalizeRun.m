@@ -111,6 +111,13 @@ TESN.Rn=TES.Rn;%66.9e-3;%%%<-%%%%%%
 %TFS=importTF('TFS.txt');%%%Necesitamos la TF en estado 'S'!
 
 TESDATA=BuildDataStruct;
+if strcmp(ZfitOpt.TFdata,'HP')
+    TFS=importTF('TFS_HP.txt');
+elseif strcmp(ZfitOpt.TFdata,'PXI')
+    TFS=importTF('TFS_PXI.txt');
+end
+%%%cargamos la TFGS adecuada.Ojo, hay que nombrarla así en el dir.
+TESDATA.TFS=TFS;%%Esta TFS sobreescribe la TFS.txt que se carga por defecto en FitZset_remote
 %P=FitZset(IVset,circuit,TES,TFS);%%%Ajustamos las Z positivas.
 P=FitZset_remote(TESDATA,ZfitOpt);
 
@@ -121,7 +128,7 @@ TESDATAN.IVset=IVsetN;
 TESDATAN.circuit=TESDATA.circuit;
 TESDATAN.TES=TESN;
 %TESDATAN.TFS=TESDATA.TFS;
-TFS=importTF('..\TFS.txt');
+%TFS=importTF('..\TFS.txt');
 TESDATAN.TFS=TFS;
 PN=P;
 if(1)
