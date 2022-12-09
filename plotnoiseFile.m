@@ -144,12 +144,14 @@ if iscell(file)
         %%%intento de pasar la ztes experimental para el modelo de ruido.
         if isempty(strfind(NoiseBaseName,'PXI'))
             zfile=strrep(file{i},NoiseBaseName,'TF')
+            tfs=importTF('TFS_HP.txt');
         else
             zfile=strrep(file{i},NoiseBaseName,'PXI_TF')
+            tfs=importTF('TFS_PXI.txt');
         end
         
         auxTF=importTF(strcat(wdir,'\',zfile));
-        tfs=importTF();
+        %tfs=importTF();
         auxZ=GetZfromTF(auxTF,tfs,circuit);
         OP.ztes.data=auxZ.tf;
         OP.ztes.freqs=auxZ.f;
