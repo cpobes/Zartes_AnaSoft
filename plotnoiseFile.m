@@ -44,7 +44,7 @@ if nargin==4
     p=P(Tind).p;
 end
 if nargin==5
-    if isstruct(varargin{1}) %%%si el primer parametro extra es estrtuctura, se interpreta como la 'option'.
+    if isstruct(varargin{1}) %%%si el primer parametro extra es estructura, se interpreta como la 'option'.
         option=varargin{1};
             [noise,file,path]=loadnoise();
             %%%buscamos la IV y P correspondientes a la Tbath dada
