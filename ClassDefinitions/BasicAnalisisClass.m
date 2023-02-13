@@ -84,7 +84,7 @@ classdef BasicAnalisisClass < handle
                 if ischar(varargin{i}) polstr=varargin{i};end
             end
             if ~isempty(obj.fGlobalIndex)
-                plotZ_Tb_Rp(auxstruct,rps,Temp,obj.fGlobalIndex,polstr);%Para eliminar algunas frecuencias en al pintar.
+                plotZ_Tb_Rp(auxstruct,rps,Temp,obj.fGlobalIndex,polstr);%Para eliminar algunas frecuencias al pintar.
             else
                 plotZ_Tb_Rp(auxstruct,rps,Temp,polstr)
             end

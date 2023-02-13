@@ -22,7 +22,7 @@ classdef NoiseThermalModelClass < handle
         fTotalCurrentNoiseModel=@(x)x;
         fJohnsonExcessModel='default';%also 'RSJ' or '2F'.
         
-        fMjohnson=0;%%%Los defino aquí para poder jugar con ellos, actuaizarlos tras fit, y usarlos en plot.
+        fMjohnson=0;%%%Los defino aquí para poder jugar con ellos, actualizarlos tras fit, y usarlos en plot.
         fMphononArray=0;
         fThResolution=0;
         
@@ -55,8 +55,8 @@ classdef NoiseThermalModelClass < handle
                 obj.ParseModelName(varargin{1});%%%Funcion para actualizar el fLinksList
             end
             obj.fOperatingPoint=PARAMETERS.OP;%%%Si definimos OP como una clase habrá que cambiar esto.
-            obj.fCircuit=PARAMETERS.circuit;
-            obj.fTES=PARAMETERS.TES;
+            obj.fCircuit=PARAMETERS.circuit;%%%Lo mismo para el cirucit.
+            obj.fTES=PARAMETERS.TES;%%%Y para el TES.
             s=numel(PARAMETERS.OP.parray);
             obj.fNumberOfBlocks=(s-1)/2;
             obj.fNumberOfLinks=numel(obj.fLinksList);

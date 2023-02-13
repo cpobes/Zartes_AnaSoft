@@ -44,7 +44,7 @@ if nargin==4
     p=P(Tind).p;
 end
 if nargin==5
-    if isstruct(varargin{1}) %%%si el primer parametro extra es estrtuctura, se interpreta como la 'option'.
+    if isstruct(varargin{1}) %%%si el primer parametro extra es estructura, se interpreta como la 'option'.
         option=varargin{1};
             [noise,file,path]=loadnoise();
             %%%buscamos la IV y P correspondientes a la Tbath dada
@@ -144,12 +144,14 @@ if iscell(file)
         %%%intento de pasar la ztes experimental para el modelo de ruido.
         if isempty(strfind(NoiseBaseName,'PXI'))
             zfile=strrep(file{i},NoiseBaseName,'TF')
+            tfs=importTF('TFS_HP.txt');
         else
             zfile=strrep(file{i},NoiseBaseName,'PXI_TF')
+            tfs=importTF('TFS_PXI.txt');
         end
         
         auxTF=importTF(strcat(wdir,'\',zfile));
-        tfs=importTF();
+        %tfs=importTF();
         auxZ=GetZfromTF(auxTF,tfs,circuit);
         OP.ztes.data=auxZ.tf;
         OP.ztes.freqs=auxZ.f;
