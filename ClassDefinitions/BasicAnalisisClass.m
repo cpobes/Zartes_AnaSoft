@@ -36,6 +36,11 @@ classdef BasicAnalisisClass < handle
             obj.auxFitstruct=TES_data_str.P;%inicializo la auxFitstruct a la estructura original.(para bias positivos).
             obj.fCircuit=obj.structure.circuit;
             obj.fTES=obj.structure.TES;
+            if strcmp(TES_data_str.analizeOptions.ZfitOpt.Noisedata,'HP')
+                obj.NoisePlotOptions.NoiseBaseName='\HP_noise*';
+            elseif strcmp(TES_data_str.analizeOptions.ZfitOpt.Noisedata,'PXI')
+                obj.NoisePlotOptions.NoiseBaseName='\PXI_noise*';
+            end
         end
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -54,6 +59,19 @@ classdef BasicAnalisisClass < handle
                 paux=obj.GetPstruct(Temp,varargin{1});
             end
             plotParamTES(paux,x_str,y_str)
+        end
+        function plotIVs(obj,Temps,pol)
+            %%%plot IVs at Temps and polarity
+            data=obj.structure;
+            for i=1:length(Temps)
+                [mIV(i),mP]=GetTbathIndex(Temps(i),data);
+                %ivaux=data.IVset(mIV);
+            end
+            if strcmp(pol,'p')
+                plotIVs(obj.fCircuit,data.IVset(mIV));
+            elseif strcmp(pol,'n')
+                plotIVs(obj.fCircuit,data.IVsetN(mIV));
+            end
         end
         function plotZs(obj,Temp,rps,varargin)
             auxstruct=obj.structure;

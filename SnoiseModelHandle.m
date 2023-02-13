@@ -5,6 +5,11 @@ function NoiseHandle=SnoiseModelHandle(circuit, Tbath,varargin)
 Kb=1.38e-23;
 RL=circuit.Rsh+circuit.Rpar;
 
+if nargin>2
+    Tshunt=varargin{1};
+else
+    Tshunt=Tbath;
+end
 if isfield(circuit,'squid')
     i_squid=circuit.squid;
 else
@@ -25,7 +30,7 @@ Rtes=0; %TES estado superconductor.
 Ttes=max(Tbath,Tc);%Es irrelevante porque sólo actúa RL.
 
 Zcirc=@(f) RL+Rtes+1i*2*pi*f*circuit.L;% impedancia del circuito.
-v2_sh=4*Kb*Tbath*RL; % ruido voltaje Rsh (mas parasita).
+v2_sh=4*Kb*Tshunt*RL; % ruido voltaje Rsh (mas parasita).
 v2_tes=4*Kb*Ttes*Rtes;%%%Esto es cero.
 
 i_jo=@(f) sqrt(v2_sh+v2_tes)./abs(Zcirc(f));

@@ -70,11 +70,31 @@ cd(datadir);
 %cd2CloudDataDir(datadir);
 
 %[IVset,IVsetN]=LoadIVsets(analizeOptions.circuit);
-[IVset,IVsetN]=LoadIVsets(datadir);%%%Cargamos las IVs. Como el 'caller' es AnalizeRun, y no pasamos el circuit a LoadIVsets, dentro se ejecutara
+evalin('caller','load(''circuit.mat'')'); %%esto va a ir machacando la estructura circuit del workspace, ojo si se usa en un analisis conjunto.
+circuit=evalin('caller','circuit');
+if isfield(analizeOptions,'circuit')
+    circuit=analizeOptions.circuit;
+end
+%%%Para asegurarse de que se usa un circuit determinado o poder
+%%%analizar con distintos circuits, es mejor pasarlo como opcion en anaopt.
+[IVset,IVsetN]=LoadIVsets(datadir,circuit);
+%%%Cargamos las IVs. Como el 'caller' es AnalizeRun, y no pasamos el circuit a LoadIVsets, dentro se ejecutara
 %%% el load(circuit) desde dentro del datadir, por lo que se cargara el
 %%% circuit correcto.
-%IVset(1)
+
 ind=[IVset.Tbath]<Tmax;
+if isfield(analizeOptions,'IVpskip')
+    ivpskip=analizeOptions.IVpskip;
+    for i=1:length(ivpskip)
+        IVset(ivpskip(i)).good=0;
+    end
+end
+if isfield(analizeOptions,'IVnskip')
+    ivnskip=analizeOptions.IVnskip;
+    for i=1:length(ivnskip)
+        IVsetN(ivnskip(i)).good=0;
+    end
+end
 Gset=fitPvsTset(IVset(ind),PTrange,PTmodel);
 GsetN=fitPvsTset(IVsetN(ind),PTrange,PTmodel);%%%Ajusto los datos P-Tbath.
 close(faux);
@@ -83,8 +103,6 @@ close(faux);
 TES=BuildTESStructFromRp(RpTES,Gset);
 TESN=BuildTESStructFromRp(RpTES,GsetN);
 
-evalin('caller','load(''circuit.mat'')'); %%esto va a ir machacando la estructura circuit del workspace, ojo si se usa en un analisis conjunto.
-circuit=evalin('caller','circuit')
 IVset=GetIVTES(circuit,IVset,TES);
 IVsetN=GetIVTES(circuit,IVsetN,TESN);
 

@@ -1,6 +1,8 @@
 function dir=GetCloudDataDir(varargin)
 %%% funcion para devolver la ruta correcta al directorio de la nube
-
+%%%Cloud Dir movido a qmadnas en 2023.
+dir='\\qmadnas\zartes\DOCUZAR\Datos'
+return;
 if nargin==0
     Unidad='G:\'; %%%Unidad donde esté montado el Drive.
 else
