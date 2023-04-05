@@ -38,10 +38,20 @@ end
         cd(datadir);
     end
     
-filesP=ListInTbathOrder('IVs\*_p_*matlab.txt');
-filesN=ListInTbathOrder('IVs\*_n_*matlab.txt');
+    try%%%podemos pasar un dir cualquiera con IVs 
+        filesP=ListInTbathOrder('*_p_*matlab.txt');
+        filesN=ListInTbathOrder('*_n_*matlab.txt');
+        raizdir=0;
+    catch%%%o como siempre, el raiz con subcarpeta IVs.
+        filesP=ListInTbathOrder('IVs\*_p_*matlab.txt');
+        filesN=ListInTbathOrder('IVs\*_n_*matlab.txt');
+        raizdir=1;
+    end
 
-cd 'IVs'
+    if raizdir 
+        cd 'IVs';
+    else
+    end
 %IVset=ImportFullIV(filesP);
 IVset=ImportRawIVs(filesP);
 %IVsetN=ImportFullIV(filesN);

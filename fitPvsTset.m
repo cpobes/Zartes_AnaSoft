@@ -13,7 +13,8 @@ end
 %for i=1:length(IVTESset), Tbath(i)=IVTESset(i).Tbath;end
 
 hold off;
-
+RTESmin=0.15;
+RTESmax=0.85;
 for jj=1:length(perc)
     Paux=[];
     Iaux=[];
@@ -25,7 +26,7 @@ for jj=1:length(perc)
         %exec=strcat(txt,'(i)=','ppval(spline(IVTESset{i}.rtes,IVTESset{i}.ptes),jj)')
         %evalin('caller',exec);
         %ind=find(IVTESset(i).rtes>0.25&IVTESset(i).rtes<0.85);%%%algunas IVs fallan.
-         ind=find(IVTESset(i).rtes>0.05&IVTESset(i).rtes<0.9);%%%algunas IVs fallan.
+         ind=find(IVTESset(i).rtes>RTESmin&IVTESset(i).rtes<RTESmax);%%%algunas IVs fallan.
          minIV=min(abs([IVTESset(i).rtes]));
         if isempty(ind)||minIV>perc(jj)||minIV>0.5 continue;end
         [rtaux,iii]=unique(IVTESset(i).rtes(ind));
@@ -42,7 +43,7 @@ for jj=1:length(perc)
     %Tbath
     %Paux
     %Tbath=0.9932*Tbath+0.006171; %%Curva de calibración del termómetro Kelvinox al calibrado. Ver Tcal.m en medidas/TES.
-    plot(Tbath,Paux*1e12,'bo','markerfacecolor','b'),hold on
+    plot(Tbath,Paux*1e12,'bo','markerfacecolor','b'),hold on,grid on
     
     if isnumeric(model)%%%old model definition
     if model==1
