@@ -8,6 +8,7 @@ TES.K=TES.K*1e-12;
 TES.G=TES.G*1e-12;
 TES.G100=TES.G100*1e-12;
 TES.G0=TES.G;
+TES.CN=100e-12;%default value.
 
 vars=evalin('caller','who');
 

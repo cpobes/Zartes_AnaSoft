@@ -6,7 +6,8 @@ olddir=pwd;
 
 %%%Cargamos la estructura colores para los plots.
 %colordir='C:\Users\Carlos\Desktop\ATHENA\medidas';
-colordir='C:\Users\Athena\Documents\GitHub\zartes\utils';
+%colordir='C:\Users\Athena\Documents\GitHub\zartes\utils';
+colordir='\\qmadnas\zartes\DOCUZAR\Datos';
 cd(colordir);
 %cd2CloudDataDir(GetCloudDataDir());
 load('colores.mat')%%%esto carga la estructura colores.
@@ -115,4 +116,3 @@ for i=1:length(Rp)
 end
 
 cd(olddir)
-
