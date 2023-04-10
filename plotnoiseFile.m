@@ -142,19 +142,24 @@ if iscell(file)
         OP=setTESOPfromIb(Ib,IVstr,p(indx),circuit)
         
         %%%intento de pasar la ztes experimental para el modelo de ruido.
-        if isempty(strfind(NoiseBaseName,'PXI'))
-            zfile=strrep(file{i},NoiseBaseName,'TF')
-            tfs=importTF('TFS_HP.txt');
-        else
-            zfile=strrep(file{i},NoiseBaseName,'PXI_TF')
-            tfs=importTF('TFS_PXI.txt');
+        %%%En realidad no lo estamos usando y no gestiona bien si TF es con
+        %%%HP y ruidos con PXI.
+        boolZexp=0;
+        if boolZexp
+            if isempty(strfind(NoiseBaseName,'PXI'))
+                zfile=strrep(file{i},NoiseBaseName,'TF')
+                tfs=importTF('TFS_HP.txt');
+            else
+                zfile=strrep(file{i},NoiseBaseName,'PXI_TF')
+                tfs=importTF('TFS_PXI.txt');
+            end
+
+            auxTF=importTF(strcat(wdir,'\',zfile));
+            %tfs=importTF();
+            auxZ=GetZfromTF(auxTF,tfs,circuit);
+            OP.ztes.data=auxZ.tf;
+            OP.ztes.freqs=auxZ.f;
         end
-        
-        auxTF=importTF(strcat(wdir,'\',zfile));
-        %tfs=importTF();
-        auxZ=GetZfromTF(auxTF,tfs,circuit);
-        OP.ztes.data=auxZ.tf;
-        OP.ztes.freqs=auxZ.f;
         %%%%
         
         %%OP.Tbath=1.5*OP.Tbath;%%%effect of Tbath error.Despreciable.

@@ -87,7 +87,9 @@ else
     L0=P0*alfa/(G*T0);
     n=TES.n;
     M=0;
-    if isfield(Circuit,'Nsquid') Nsquid=Circuit.Nsquid;else Nsquid=3e-12;end
+    %%%Ojo, usaba Nsquid como campo de ruido del squid y si no 3e-12 por
+    %%%defecto!
+    if isfield(Circuit,'squid') Nsquid=Circuit.squid;else Nsquid=3e-12;end
     if abs(OP.Z0-OP.Zinf)<1.5e-3, 
         %R0=0; L0=0;V0=0;P0=0;
         I0=(Rs/RL)*OP.ibias;

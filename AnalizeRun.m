@@ -15,7 +15,7 @@ end
 if isfield(analizeOptions,'PTrange')
     PTrange=analizeOptions.PTrange;
 else
-    PTrange=[0.05:0.01:0.9];
+    PTrange=[0.2:0.01:0.9];
 end
 
 if isfield(analizeOptions,'PTmodel')
@@ -70,7 +70,10 @@ cd(datadir);
 %cd2CloudDataDir(datadir);
 
 %[IVset,IVsetN]=LoadIVsets(analizeOptions.circuit);
-evalin('caller','load(''circuit.mat'')'); %%esto va a ir machacando la estructura circuit del workspace, ojo si se usa en un analisis conjunto.
+try
+    evalin('caller','load(''circuit.mat'')'); %%esto va a ir machacando la estructura circuit del workspace, ojo si se usa en un analisis conjunto.
+catch
+end
 circuit=evalin('caller','circuit');
 if isfield(analizeOptions,'circuit')
     circuit=analizeOptions.circuit;
