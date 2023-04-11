@@ -14,7 +14,7 @@ end
 
 hold off;
 RTESmin=0.15;
-RTESmax=0.85;
+RTESmax=0.6;
 for jj=1:length(perc)
     Paux=[];
     Iaux=[];

@@ -29,6 +29,12 @@ else
     Tbath=Tbathstring;
 end
 Tdir=GetDirfromTbath(Tbath);
-files=GetFilesFromRp(IVset(GetTbathIndex(Tbath,IVset,P)),Tbath,Rps,option.NoiseBaseName)
+%NoiseBaseName. Para poder usar PXI o HP sólo en NoisePlotOptions
+if isempty(strfind(option.NoiseBaseName,'PXI'))
+    NoiseBaseName='\HP_noise*';
+else
+    NoiseBaseName='\PXI_noise*';
+end
+files=GetFilesFromRp(IVset(GetTbathIndex(Tbath,IVset,P)),Tbath,Rps,NoiseBaseName);
 plotnoiseFile(IVset,P,circuit,TES,Tdir,files,option);
 cd(olddir);

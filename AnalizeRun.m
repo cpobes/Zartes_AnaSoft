@@ -80,7 +80,15 @@ if isfield(analizeOptions,'circuit')
 end
 %%%Para asegurarse de que se usa un circuit determinado o poder
 %%%analizar con distintos circuits, es mejor pasarlo como opcion en anaopt.
+
 [IVset,IVsetN]=LoadIVsets(datadir,circuit);
+if isfield(analizeOptions,'IVset')
+    IVset=analizeOptions.IVset;
+end
+if isfield(analizeOptions,'IVsetN')
+    IVsetN=analizeOptions.IVsetN;
+end
+
 %%%Cargamos las IVs. Como el 'caller' es AnalizeRun, y no pasamos el circuit a LoadIVsets, dentro se ejecutara
 %%% el load(circuit) desde dentro del datadir, por lo que se cargara el
 %%% circuit correcto.

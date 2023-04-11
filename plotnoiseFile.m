@@ -23,14 +23,13 @@ function si0=plotnoiseFile(IVset,P,circuit,ZTES,varargin)
 %     [noise,file]=loadnoise(0,wdir,filesNoise);
 % end
 
-    option.tipo='current';
-    option.boolcomponents=0;
-    option.Mph=0;
-    option.Mjo=0;
-    option.NoiseBaseName='HP_noise';
-
-    NoiseBaseName=option.NoiseBaseName;%%%%Añadimos campo a option para elegir si pintar ruidos del HP o de la PXI.
-    %NoiseBaseName='PXI_noise';
+option.tipo='current';
+option.boolcomponents=0;
+option.Mph=0;
+option.Mjo=0;
+option.NoiseBaseName='HP_noise';
+NoiseBaseName=option.NoiseBaseName;%%%%Añadimos campo a option para elegir si pintar ruidos del HP o de la PXI.
+%NoiseBaseName='PXI_noise';
     
 if nargin==4
     [noise,file,path]=loadnoise();
@@ -110,30 +109,25 @@ if nargin==7 %%%%Se puede pasar también tanto el directorio, como los ficheros, 
     NoiseBaseName=option.NoiseBaseName;
     AllfilesNoise=ListInBiasOrder(strcat(wdir,'\',NoiseBaseName,'*'),'descend');
 end
-
-% [IVstr.Tbath]
-% [P(Tind).Tbath]
-
-%tipo='current';%%% 'NEP' or 'current'
-%tipo='NEP';
+%NoiseBaseName. Para poder usar PXI o HP sólo en NoisePlotOptions
+if isempty(strfind(NoiseBaseName,'PXI'))
+    NoiseBaseName='\HP_noise*';
+else
+    NoiseBaseName='\PXI_noise*';
+end
 tipo=option.tipo;
 boolcomponents=option.boolcomponents;%%%%para pintar o no las componentes
 Mph=option.Mph;
 Mjo=option.Mjo;
-NoiseBaseName=regexp(option.NoiseBaseName,'(PXI|HP)_noise','match');%%%%%!!!!!El patrón en option es: '\(PXI|HP)_noise*', pero para sacar el Ibias se necesita '(PXI|HP)_noise' !!!! 
+NoiseBaseName=regexp(NoiseBaseName,'(PXI|HP)_noise','match');%%%%%!!!!!El patrón en option es: '\(PXI|HP)_noise*', pero para sacar el Ibias se necesita '(PXI|HP)_noise' !!!! 
 NoiseBaseName=NoiseBaseName{1};%%%%convert cell 2 string.
-
-%figure
 
 if ~iscell(file) file={file};end
 if iscell(file)
-    N=length(file)
-    
+    N=length(file);    
     for i=1:N
-        i
-        file{i}
-        
-        strcat(NoiseBaseName,'_%fuA*')
+        i,file{i}
+        %strcat(NoiseBaseName,'_%fuA*')
         Ib=sscanf(file{i},strcat(NoiseBaseName,'_%fuA*'))*1e-6 %%%HP_noise para ZTES18.!!!
         %length(p)
         indx=strcmp(AllfilesNoise,deblank(file{i}));%%%no funciona si el nombre del file tiene espacio en blanco.
@@ -153,7 +147,6 @@ if iscell(file)
                 zfile=strrep(file{i},NoiseBaseName,'PXI_TF')
                 tfs=importTF('TFS_PXI.txt');
             end
-
             auxTF=importTF(strcat(wdir,'\',zfile));
             %tfs=importTF();
             auxZ=GetZfromTF(auxTF,tfs,circuit);
@@ -199,6 +192,13 @@ if iscell(file)
         optfilt.wmin=6;%200;
         optfilt.thr=10;%%%porcentaje para el movingMean.
         optfilt.perc=0.2;
+        if isfield(option,'NoiseSubsampleFreqs')
+            newfreqs=option.NoiseSubsampleFreqs;
+            newnoise=interp1(noise{i}(:,1),noise{i}(:,2),newfreqs);
+            noise{i}=[];
+            noise{i}(:,1)=newfreqs;
+            noise{i}(:,2)=newnoise;
+        end
             if(strcmp(tipo,'current'))
                  %filtered_current_noise=medfilt1(V2I(noise{i}(:,2),circuit)*1e12,medfilt_w);
                  filtered_current_noise=filterNoise(V2I(noise{i}(:,2),circuit)*1e12,optfilt);
@@ -289,7 +289,8 @@ if iscell(file)
                 
                 sIaux=ppval(spline(f,auxnoise.sI),noise{i}(:,1));
                 NEP=sqrt((V2I(noise{i}(:,2),circuit).^2-auxnoise.squid.^2))./abs(sIaux);
-                filtered_power_noise=medfilt1(NEP*1e18,medfilt_w);
+                %filtered_power_noise=medfilt1(NEP*1e18,medfilt_w);
+                filtered_power_noise=filterNoise(NEP*1e18,optfilt);
                 loglog(noise{i}(:,1),(NEP*1e18),'.-r'),hold on,grid on,
                 loglog(noise{i}(:,1),filtered_power_noise,'.-k'),hold on,grid on,
                 %loglog(noise{i}(:,1),sgolayfilt(NEP*1e18,3,41),'.-k'),hold on,grid on,

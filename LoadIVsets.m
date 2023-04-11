@@ -99,6 +99,6 @@ cd ..
         IVsetN=GetIVTES(circuit,IVsetN);
     end
     
-        if ~isempty(datadir)
+if ~isempty(datadir)
         cd(olddir);
-    end
+end

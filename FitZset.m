@@ -24,40 +24,24 @@ Rn=circuit.Rn;
 %%%% se quieren analizar (HP o PXI) y también si se quieren todas las temps
 %%%% por defecto o solo algunas.
 if nargin==4 || (nargin==5 && isstruct(varargin{1}))
-%     f=ls;
-%     [i,j]=size(f);
-%     fc=mat2cell(f,ones(1,i),j)
-%     fc=deblank(fc)
-%     %dirs=regexp(fc,'^\d+mK','match');
-%     dirs=regexp(fc,'^\d+.?\d*mK$','match');
-%     dirs=dirs(~cellfun('isempty',dirs))
-%     for i=1:length(dirs) dirs{i}=char(dirs{i}),end
-%     for i=1:length(dirs),aux(i)=sscanf(dirs{i},'%f');end
-%     aux=sort(aux);
-%     for i=1:length(aux) dirs{i}=strcat(num2str(aux(i)),'mK'),end
     if(nargin==5)
-            options=varargin{1};
+        options=varargin{1};
     elseif nargin==4
-            options.TFdata='HP';
-            options.Noisedata='HP';
-            options.ThermalModel='default';
-            options.NoiseFilterModel.model='default';
-            options.NoiseFilterModel.wmed=40;
-    end
-    
-    options
-    
-    if isfield(options,'Temps') & ~isempty(options.Temps)
-        %%%       
-            t=options.Temps;
-            for iii=1:length(t)
-                str=dir('*mK');
-                for jjj=1:length(str)
-                    if strfind(str(jjj).name,num2str(t(iii))) & str(jjj).isdir, break;end%%%Para pintar automáticamente los ruido a una cierta temperatura.50mK.(tiene que funcionar con 50mK y 50.0mK, pero ojo con 50.2mK p.e.)
-                end
-                dirs{iii}=str(jjj).name;
-            end
-        %%%
+        options.TFdata='HP';
+        options.Noisedata='HP';
+        options.ThermalModel='default';
+        options.NoiseFilterModel.model='default';
+        options.NoiseFilterModel.wmed=40;
+    end    
+    if isfield(options,'Temps') && ~isempty(options.Temps)   
+       t=options.Temps;
+       for iii=1:length(t)
+           str=dir('*mK');
+           for jjj=1:length(str)
+               if strfind(str(jjj).name,num2str(t(iii))) & str(jjj).isdir, break;end%%%Para pintar automáticamente los ruidos a una cierta temperatura.50mK.(tiene que funcionar con 50mK y 50.0mK, pero ojo con 50.2mK p.e.)
+           end
+               dirs{iii}=str(jjj).name;
+       end
     else
         f=dir;
         f=f([f.isdir]);
@@ -72,19 +56,19 @@ if nargin==4 || (nargin==5 && isstruct(varargin{1}))
             if length(ls(char(dirs{i})))>2 newdirs{end+1}=dirs{i};end
         end
         for i=1:length(newdirs),aux(i)=sscanf(newdirs{i},'%f');end
-        [ii,jj]=sort(aux)
+        [ii,jj]=sort(aux);
         %for i=1:length(aux) dirs{i}=strcat(num2str(aux(i)),'mK'),end
         dirs=newdirs(jj)
     end
 
     %return;
-elseif nargin>4 && isnumeric(varargin{1})
-            options.TFdata='HP';
-            options.Noisedata='HP';
-            options.ThermalModel='default';%'2TB_intermediate';%'default';
-            options.NoiseFilterModel.model='default';
-            options.NoiseFilterModel.wmed=40;
-    t=varargin{1};
+    elseif nargin>4 && isnumeric(varargin{1})
+        options.TFdata='HP';
+        options.Noisedata='HP';
+        options.ThermalModel='default';%'2TB_intermediate';%'default';
+        options.NoiseFilterModel.model='default';
+        options.NoiseFilterModel.wmed=40;
+        t=varargin{1};
     for iii=1:length(t)
         str=dir('*mK');
         for jjj=1:length(str)
@@ -105,26 +89,12 @@ pause(1)
 for i=1:length(dirs)
     %%%buscamos los ficheros a analizar en cada directorio.
     d=pwd;
-    %dirs{i},pause(1)
-    files=ls(strcat(d,'\',dirs{i}));
-%     if length(files)==2 %%%%Ya había condicion para evitar dirs vacios
-%     pero no estaba funcionando bien.
-%         P(i)=nan;
-%         continue;
-%     end %%%aunque esté vacío lista . y ..
-    
-%%%devolvemos los ficheros en orden de fecha. Pero ojo si se pierde esa
-%%%info. Creo ListInBiasOrder para que se listen siempre en orden de
-%%%corriente.
-
     if strcmp(options.TFdata,'HP')        
         %D=dir(strcat(d,'\',dirs{i},'\TF*'));
         D=strcat(d,'\',dirs{i},'\TF*')
     elseif strcmp(options.TFdata,'PXI')
         D=strcat(d,'\',dirs{i},'\PXI_TF*')
     end
-%     [~,s2]=sort([D(:).datenum]',1,'descend');
-%     filesZ={D(s2).name}%%%ficheros en orden de %Rn!!!
     filesZ=ListInBiasOrder(D);
     
     if strcmp(options.Noisedata,'HP')   
@@ -134,25 +104,9 @@ for i=1:length(dirs)
         NoiseBaseName='\PXI_noise*';%%%'\PXI*';%%%'\HP*'
     end
     D=strcat(d,'\',dirs{i},NoiseBaseName);
-            
-%     [~,s2]=sort([D(:).datenum]',1,'descend');
-%     filesNoise={D(s2).name}%%%ficheros en orden de %Rn!!!
     filesNoise=dir(D);
     if ~isempty(filesNoise) filesNoise=ListInBiasOrder(D);end
-    
-%     [ii,jj]=size(files);
-%     filesc=mat2cell(files,ones(1,ii),jj);
-%     filesZ=regexp(filesc,'^TF_-?\d+.?\d+uA','match');
-%     filesZ=filesZ(~cellfun('isempty',filesZ))
-%     filesNoise=regexp(filesc,'^HP_noise_-?\d+.?\d+uA','match');
-%     filesNoise=filesNoise(~cellfun('isempty',filesNoise));
-%     %length(filesNoise)
-%     for ii=1:length(filesZ) 
-%         filesZ{ii}=char(filesZ{ii});
-%         if ~isempty(filesNoise)filesNoise{ii}=char(filesNoise{ii});end
-%     end
-%     %filesc
-    
+   
     %%%buscamos la IV correspondiente a la Tmc dada
     Tbath=sscanf(dirs{i},'%dmK');
     pause(1)
@@ -224,8 +178,7 @@ for i=1:length(dirs)
             d1=0.8;
             d2=0.1;
             feff0=1e2;
-            
-            
+                      
          %%%Hacemos el ajuste a Z(w)
             p0=[Zinf Z0 tau0];%%%1TB
             %Lt=1e-9;
@@ -341,7 +294,7 @@ for i=1:length(dirs)
             P(i).residuo(jj).ci=ci;
             
             %%%%%%%%%%%%%%%%%%%%%%Pintamos Gráficas
-                boolShow=0;
+            boolShow=0;
             if boolShow
                 %if param.rp> 0.5 continue;end %%%%ojo!!!
                 ind=1:3:length(ztes);
@@ -374,7 +327,7 @@ for i=1:length(dirs)
          %%%Analizamos el ruido
          %medfilt_w=40;
          if ~isempty(filesNoise)
-             dirs{i}, filesNoise{jj}
+            dirs{i}, filesNoise{jj}
             [noisedata,file]=loadnoise(0,dirs{i},filesNoise{jj});%%%quito '.txt'
             %param
             OP=setTESOPfromIb(Ib,IV,param);
@@ -388,16 +341,16 @@ for i=1:length(dirs)
             f=logspace(0,6,1000);%%%Ojo, la definición de 'f' debe coincidir con la que hay dentro de noisesim!!!
             %noiseIrwin
             try
-            sIaux=ppval(spline(f,noiseIrwin.sI),noisedata{1}(:,1));
-            NEP=sqrt(V2I(noisedata{1}(:,2),circuit).^2-noiseIrwin.squid.^2)./sIaux;
-            %[~,nep_index]=find(~isnan(NEP))
-            %pause(2)
-            NEP=NEP(~isnan(NEP));%%%Los ruidos con la PXI tienen el ultimo bin en NAN.
-            noise_filt_model=options.NoiseFilterModel
-            filtNEP=filterNoise(NEP,noise_filt_model);
-            RES=2.35/sqrt(trapz(noisedata{1}(1:length(NEP),1),1./filtNEP.^2))/2/1.609e-19;
-            P(i).ExRes(jj)=RES;
-            P(i).ThRes(jj)=noiseIrwin.Res;
+                sIaux=ppval(spline(f,noiseIrwin.sI),noisedata{1}(:,1));
+                NEP=sqrt(V2I(noisedata{1}(:,2),circuit).^2-noiseIrwin.squid.^2)./sIaux;
+                %[~,nep_index]=find(~isnan(NEP))
+                %pause(2)
+                NEP=NEP(~isnan(NEP));%%%Los ruidos con la PXI tienen el ultimo bin en NAN.
+                noise_filt_model=options.NoiseFilterModel;
+                filtNEP=filterNoise(NEP,noise_filt_model);
+                RES=2.35/sqrt(trapz(noisedata{1}(1:length(NEP),1),1./filtNEP.^2))/2/1.609e-19;
+                P(i).ExRes(jj)=RES;
+                P(i).ThRes(jj)=noiseIrwin.Res;
             catch %me da error el 1Z10_62B RUN007,50mK,92uA.
                 P(i).ExRes(jj)=0;
                 P(i).ThRes(jj)=0;
@@ -445,9 +398,17 @@ for i=1:length(dirs)
 %             %P(i).M(jj)=lsqcurvefit(@(x,xdata) fitjohnson(x,xdata,parameters),[0 0],xdata,ydata);
 
 
-        if(1)         
-            mphfrange=[2e2,1e3];%%%rango habitual 1e3.
-            mjofrange=[5e3,1e5];
+        if(1)  %%%noisefit
+            if isfield(options,'mphfrange')
+                mphfrange=options.mphfrange;
+            else
+                mphfrange=[2e2,1e3];%%%rango habitual 1e3.
+            end
+            if isfield(options,'mjofrange')
+                mjofrange=options.mjofrange;
+            else
+                mjofrange=[5e3,1e5];
+            end
             faux=noisedata{1}(:,1);
             findx=find((faux>mphfrange(1) & faux<mphfrange(2)) | (faux>mjofrange(1) & faux<mjofrange(2)));
             xdata=noisedata{1}(findx,1);
@@ -468,19 +429,7 @@ for i=1:length(dirs)
                 P(i).M(jj)=0;
                 P(i).Mph(jj)=0;
             end
-end
-
-%             %%%Recalculo ExRes* incluyendo los M en el modelo para ver el impacto del fallo en la primera década del analizador!!
-%             auxnoise=noisesim('irwin',TES,OP,circuit,P(i).M(jj));%P(i).M(jj)
-%             nepaux=sqrt(auxnoise.max.^2+auxnoise.jo.^2+auxnoise.sh.^2)./auxnoise.sI;
-%             findx=find(auxnoise.f>1e2);
-%             P(i).ExRes(jj)=2.35/sqrt(trapz(auxnoise.f(findx),1./nepaux(findx).^2))/2/1.609e-19;
-            
-% %         ns=ppval(spline(f,noiseIrwin.sum),noisedata{1}(:,1));
-% %         excess(:,1)=noisedata{1}(:,1);
-% %         excess(:,2)=V2I(noisedata{1}(:,2),circuit.Rf)-noiseIrwin.squid-ns;
-% %         excess;
-% %         P(i).exnoise{jj}=excess;
+        end  %%%noisefit
          end         
     end
         %%%Pasamos ExRes y ThRes dentro de P.p
@@ -493,7 +442,6 @@ end
         end
         end
         P(i).Tbath=Tbath*1e-3;%%%se lee en mK
-end%%% forr principal
-%if ~isempty(filesNoise) P=rmfield(P,{'ExRes','ThRes','M','Mph'});end
+end%%% for principal
 try P=rmfield(P,{'ExRes','ThRes','M','Mph'});catch end;
     
