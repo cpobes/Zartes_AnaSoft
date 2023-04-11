@@ -1,6 +1,6 @@
 function NEP=fitjohnson(M,f,PARAMETERS)
 %%%%Función para ajustar simultáneamente el ruido NEP experimental
-%%%%expresado en attoW con la Mph y la Mjo al modelo de IRwin!
+%%%%expresado en attoW con la Mph y la Mjo al modelo de Irwin!
 %%%%Ojo porque para sacar el NEP necesitamos la sI, que se saca del modelo,
 %%%%así que para cada modelo hay que pasarle el modelo correcto a
 %%%%noisesim.
@@ -12,30 +12,30 @@ Circuit=PARAMETERS.circuit;
 TES=PARAMETERS.TES;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
-    G=TES.G;
-    T0=TES.Tc;
-    Rn=TES.Rn;
-    n=TES.n;
-    
-    Rs=Circuit.Rsh;
-    Rpar=Circuit.Rpar;
-    L=Circuit.L;
-    
-    alfa=OP.ai;
-    bI=OP.bi;    
-    RL=Rs+Rpar;
-    R0=OP.R0;
-    beta=(R0-Rs)/(R0+Rs);
-    %T0=OP.T0;
-    Ts=OP.Tbath
-    P0=OP.P0;
-    T0=TES.Ttes(P0,Ts);%%%Recalculamos T0 ya que los parámetros se calculan también con esa Ttes.
-    G=TES.Gtes(T0);%%%Recalculamoss G0 ya que los parámetros se calculan también con esa Gtes.
-    I0=OP.I0;
-    V0=OP.V0;
-    %L0=P0*alfa/(G*T0);
-    L0=OP.L0;%%%L0 debe estar también en los parámetros del OP.
-    C=OP.C;
+G=TES.G;
+T0=TES.Tc;
+Rn=TES.Rn;
+n=TES.n;
+
+Rs=Circuit.Rsh;
+Rpar=Circuit.Rpar;
+L=Circuit.L;
+
+alfa=OP.ai;
+bI=OP.bi;
+RL=Rs+Rpar;
+R0=OP.R0;
+beta=(R0-Rs)/(R0+Rs);
+%T0=OP.T0;
+Ts=OP.Tbath;
+P0=OP.P0;
+T0=TES.Ttes(P0,Ts);%%%Recalculamos T0 ya que los parámetros se calculan también con esa Ttes.
+G=TES.Gtes(T0);%%%Recalculamoss G0 ya que los parámetros se calculan también con esa Gtes.
+I0=OP.I0;
+V0=OP.V0;
+%L0=P0*alfa/(G*T0);
+L0=OP.L0;%%%L0 debe estar también en los parámetros del OP.
+C=OP.C;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 tau=C/G;
