@@ -104,9 +104,18 @@ for i=1:length(dirs)
         NoiseBaseName='\PXI_noise*';%%%'\PXI*';%%%'\HP*'
     end
     D=strcat(d,'\',dirs{i},NoiseBaseName);
-    filesNoise=dir(D);
-    if ~isempty(filesNoise) filesNoise=ListInBiasOrder(D);end
-   
+    filesNoise=ListInBiasOrder(D);
+%     sizeNoises=size(filesNoise);
+%     sizeZs=size(filesZ);
+%     if ~isempty(filesNoise)
+%         if sizeNoises(2)==sizeZs(2)
+%             filesNoise=ListInBiasOrder(D);
+%         else
+%             %dirs{i},sizeNoises,sizeZs
+%             error('Los ficheros de Z y ruidos no coinciden.');
+%         end
+%     end
+
     %%%buscamos la IV correspondiente a la Tmc dada
     Tbath=sscanf(dirs{i},'%dmK');
     pause(1)
@@ -121,63 +130,61 @@ for i=1:length(dirs)
         
         %thefile=strcat(d,'\',dirs{i},'\',filesZ{jj}); %%%quito '.txt' respecto a version anterior. 
         thefile=strcat(dirs{i},'\',filesZ{jj})
-        %pause(1)
-        if ~isempty(filesNoise) thenoisefile=strcat(d,'\',dirs{i},'\',filesNoise{jj}); end%%%quito'.txt'
+        Ib=sscanf(char(regexp(thefile,'-?\d+.?\d+uA','match')),'%fuA')*1e-6;
+        if isempty(Ib) Ib=0;end
+        
+        if ~isempty(filesNoise) 
+            %thenoisefile=strcat(d,'\',dirs{i},'\',filesNoise{jj}); 
+            auxstr=strsplit(thefile,'_');
+            thenoisefile=strcat(options.Noisedata,'_noise_',auxstr{end});
+            Ibnoise=sscanf(char(regexp(thenoisefile,'-?\d+.?\d+uA','match')),'%fuA')*1e-6;
+            if Ib~=Ibnoise, error('Z y Noise files no coinciden');end
+        end%%%quito'.txt'
         
         if isfield(circuit,'ioffset')
             offset=circuit.ioffset;
         else
             offset=0;
         end
+        Ib=Ib-offset
         %offset=0.11e-6;%-9e-6;!!!!!
         
-        Ib=sscanf(char(regexp(thefile,'-?\d+.?\d+uA','match')),'%fuA')*1e-6-offset
-        if isempty(Ib) Ib=0;end
-        %pause(1)%%debug
-        
         %%%importamos la TF
-            data=importdata(thefile);%size(data)
-            tf=data(:,2)+1i*data(:,3);
-            Rth=Rsh+Rpar+2*pi*L*data(:,1)*1i;
-            ztes=(TFS.tf./tf-1).*Rth;
-            ztes=ztes(~isinf(ztes));%%%%En datos mar19 RUN013 a 80mK e Ib=30uA hay puntos con tf=0 que da error.
-            if nargin==6
-                ztes=(TFS.tf./tf-1).*Rn./(tfsn-1);
+        data=importdata(thefile);%size(data)
+        tf=data(:,2)+1i*data(:,3);
+        Rth=Rsh+Rpar+2*pi*L*data(:,1)*1i;
+        ztes=(TFS.tf./tf-1).*Rth;
+        ztes=ztes(~isinf(ztes));%%%%En datos mar19 RUN013 a 80mK e Ib=30uA hay puntos con tf=0 que da error.
+        if nargin==6
+            ztes=(TFS.tf./tf-1).*Rn./(tfsn-1);
+        end
+            
+        %%%%condicion en frecuencias
+        %ind_z=find(imag(ztes)<-1.5e-3);
+        %ind_z=find(fS>500 & fS<100e3);%%%%filtro en frecuencias
+        %ind_z=30:length(ztes)-500;%
+        ind_z=1:length(ztes);
+        
+        if isfield(options,'f_ind')
+            ind_z=[];
+            for iii=1:length(options.f_ind(:,1))
+                %find(fS>options.f_ind(i,1) & fS<options.f_ind(i,2))'
+                %ind_z
+                ind_z=[ind_z; find(fS>options.f_ind(iii,1) & fS<options.f_ind(iii,2))];
             end
-            
-%             Cp=100e-12;
-%             Zth=Rsh./(1+2*pi*Cp*data(:,1)*1i*Rsh)+Rpar+2*pi*L*data(:,1)*1i;
-%             ztes=(TFS.tf./tf-1).*Zth;
-            
-            %plot(ztes,'.'),hold on
-            %size(ztes)
-            
-            %%%%condicion en frecuencias
-            %ind_z=find(imag(ztes)<-1.5e-3);
-            %ind_z=find(fS>500 & fS<100e3);%%%%filtro en frecuencias
-            %ind_z=30:length(ztes)-500;%
-            ind_z=1:length(ztes);
-            %fS
-            if isfield(options,'f_ind')
-                ind_z=[];
-                for iii=1:length(options.f_ind(:,1))
-                    %find(fS>options.f_ind(i,1) & fS<options.f_ind(i,2))'
-                    %ind_z
-                    ind_z=[ind_z; find(fS>options.f_ind(iii,1) & fS<options.f_ind(iii,2))];
-                end
-            end
+        end
         %%%valores iniciales del fit
-            Zinf=real(ztes(ind_z(end)));
-            Z0=real(ztes(ind_z(1)));
-            Y0=real(1./ztes(1));
-            %tau0=1e-4;
-            indY=find(imag(ztes(ind_z))==min(imag(ztes(ind_z))));
-            tau0=1/(2*pi*fS(ind_z(indY(1))));%%%tau0 es el valor inicial de taueff. Lo estimamos a partir de la w_min
-            tau1=1e-5;
-            tau2=1e-5;
-            d1=0.8;
-            d2=0.1;
-            feff0=1e2;
+        Zinf=real(ztes(ind_z(end)));
+        Z0=real(ztes(ind_z(1)));
+        Y0=real(1./ztes(1));
+        %tau0=1e-4;
+        indY=find(imag(ztes(ind_z))==min(imag(ztes(ind_z))));
+        tau0=1/(2*pi*fS(ind_z(indY(1))));%%%tau0 es el valor inicial de taueff. Lo estimamos a partir de la w_min
+        tau1=1e-5;
+        tau2=1e-5;
+        d1=0.8;
+        d2=0.1;
+        feff0=1e2;
                       
          %%%Hacemos el ajuste a Z(w)
             p0=[Zinf Z0 tau0];%%%1TB
@@ -187,8 +194,8 @@ for i=1:length(dirs)
             %p0=[Zinf Z0 tau0 p04 1e-6];%%%p0 for 2 block model.
             %p0=[Zinf Z0 tau0 tau1 tau2 d1 d2];%%%p0 for 3 block model.
             %pinv0=[Zinf 1/Y0 tau0];
-            %%%%%%%%%%%%%%%%%%%Thermal model definition.
             
+            %%%%%%%%%%%%%%%%%%%Thermal model definition.           
             model=BuildThermalModel(options.ThermalModel);           
             p0=model.X0;
             rps=[0:0.01:1];
@@ -277,11 +284,9 @@ for i=1:length(dirs)
             else
                 opt.boolC=0;
             end
-              opt.C=TES.CN;                
-              opt.model=model.nombre;
-              %Ib
-              %pause(1)%
-             param=GetModelParameters(p,IV,Ib,TES,circuit,opt);
+            opt.C=TES.CN;                
+            opt.model=model.nombre;
+            param=GetModelParameters(p,IV,Ib,TES,circuit,opt);
             resN=aux1;
             %P(i).p(jj)=param;
             if jj==1 
@@ -293,7 +298,7 @@ for i=1:length(dirs)
             P(i).residuo(jj).resN=resN;
             P(i).residuo(jj).ci=ci;
             
-            %%%%%%%%%%%%%%%%%%%%%%Pintamos Gráficas
+            %%%%%%%%%%%Pintamos Gráficas (o no)
             boolShow=0;
             if boolShow
                 %if param.rp> 0.5 continue;end %%%%ojo!!!
@@ -326,10 +331,11 @@ for i=1:length(dirs)
             
          %%%Analizamos el ruido
          %medfilt_w=40;
-         if ~isempty(filesNoise)
-            dirs{i}, filesNoise{jj}
-            [noisedata,file]=loadnoise(0,dirs{i},filesNoise{jj});%%%quito '.txt'
-            %param
+         if ~isempty(filesNoise) & exist(strcat(dirs{i},'\',thenoisefile))
+            
+            %[noisedata,file]=loadnoise(0,dirs{i},filesNoise{jj});%%%quito '.txt'
+            [noisedata,~]=loadnoise(0,dirs{i},thenoisefile);
+            
             OP=setTESOPfromIb(Ib,IV,param);
             OP.parray=p;%%%añadido para modelos a 2TB.
             %noiseIrwin=noisesim('irwin',TES,OP,circuit);
@@ -430,18 +436,23 @@ for i=1:length(dirs)
                 P(i).Mph(jj)=0;
             end
         end  %%%noisefit
-         end         
+         else %%%tanto si no hay ruidos como si no existe el file de ruido correspondiente.
+            P(i).ExRes(jj)=0;
+            P(i).ThRes(jj)=0;
+            P(i).M(jj)=0;
+            P(i).Mph(jj)=0;
+        end  %%%if not empty filesNoise       
     end
-        %%%Pasamos ExRes y ThRes dentro de P.p
-        if ~isempty(filesNoise)
-        for jj=1:length(P(i).ExRes) %%%(filesZ) 
+    %%%Pasamos ExRes y ThRes dentro de P.p
+    if ~isempty(filesNoise)
+        for jj=1:length(P(i).ExRes) %%%(filesZ)
             P(i).p(jj).ExRes=P(i).ExRes(jj);
             P(i).p(jj).ThRes=P(i).ThRes(jj);
             P(i).p(jj).M=real(P(i).M(jj));
             P(i).p(jj).Mph=real(P(i).Mph(jj));
         end
-        end
-        P(i).Tbath=Tbath*1e-3;%%%se lee en mK
+    end
+    P(i).Tbath=Tbath*1e-3;%%%se lee en mK
 end%%% for principal
 try P=rmfield(P,{'ExRes','ThRes','M','Mph'});catch end;
     

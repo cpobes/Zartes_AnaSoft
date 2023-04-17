@@ -112,7 +112,7 @@ switch model
     i_sh=sqrt(4*Kb*Ts*Rs)*sqrt((1-L0)^2+4*pi^2*tau^2.*f.^2)./((R0+Rs)*(1+beta*L0)*sqrt(1+4*pi^2*taueff^2.*f.^2));%%%
     noise.ph=i_ph;noise.jo=i_jo;noise.sh=i_sh;noise.sum=sqrt(i_ph.^2+i_jo.^2+i_sh.^2);
 
-    case 'irwin'
+    case {'irwin','default'}
     %%% ecuaciones capitulo Irwin
     func=@(p,f)([p(1)-(p(1)-p(2))./(1+((2*pi*f).^2)*(p(3).^2)) ...
                     -abs(-(p(1)-p(2))*(2*pi*f)*p(3)./(1+((2*pi*f).^2)*(p(3).^2)))]);

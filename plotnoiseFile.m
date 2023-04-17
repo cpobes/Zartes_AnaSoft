@@ -192,6 +192,9 @@ if iscell(file)
         optfilt.wmin=6;%200;
         optfilt.thr=10;%%%porcentaje para el movingMean.
         optfilt.perc=0.2;
+        if isfield(option,'FiltOpt')
+            optfilt=option.FiltOpt;
+        end
         if isfield(option,'NoiseSubsampleFreqs')
             newfreqs=option.NoiseSubsampleFreqs;
             newnoise=interp1(noise{i}(:,1),noise{i}(:,2),newfreqs);
@@ -218,6 +221,8 @@ if iscell(file)
                     %%%.max.Pero ojo, porque sólo vale para 1TB.
                     tottes2=auxnoise.sum.^2;
                     totnoise=sqrt(tottes2+auxnoise.squidarray.^2);
+                    Mexph=0;
+                    circuitnoise=auxnoise.squidarray;
                 else
                     %%%%%OJO, PARA modelos 2TB no existe noise.ph ya que
                     %%%%%hay 2 componentes de ph diferentes por tanto
@@ -273,13 +278,13 @@ if iscell(file)
                     end
                     %loglog(f,auxnoise.jo*1e12,f,auxnoise.ph*1e12,f,auxnoise.sh*1e12,f,totnoise*1e12);
                     if kkk_ph==2
-                        loglog(f,i_jo,f,i_ph,f,i_sh,f,totnoise*1e12);
-                        legend('experimental','exp\_filtered','jhonson','phonon','shunt','total');
+                        loglog(f,i_jo,f,i_ph*sqrt(1+Mexph^2),f,i_sh,f,circuitnoise*1e12,f,totnoise*1e12);
+                        legend('experimental','exp\_filtered','johnson','phonon','shunt','electronics','total');
                     elseif kkk_ph==3
                         loglog(f,i_jo,f,i_ph(1,:),f,i_ph(2,:),f,i_sh,f,totnoise*1e12);
-                        legend('experimental','exp\_filtered','jhonson','phonon\_1','phonon\_2','shunt','total');
+                        legend('experimental','exp\_filtered','johnson','phonon\_1','phonon\_2','shunt','total');
                     end
-                    %legend('experimental','jhonson','phonon','shunt','total');
+                    %legend('experimental','johnson','phonon','shunt','total');
                     %legend('experimental','exp\_filtered','jhonson','phonon','shunt','total');
                     h=findobj(gca,'displayname','total');
                 end
@@ -296,6 +301,7 @@ if iscell(file)
                 %loglog(noise{i}(:,1),sgolayfilt(NEP*1e18,3,41),'.-k'),hold on,grid on,
                     if Mph==0
                         totNEP=auxnoise.NEP;
+                        Mexph=0;
                     else
                         %totNEP=sqrt(auxnoise.max.^2+auxnoise.jo.^2+auxnoise.sh.^2)./auxnoise.sI;%%%Ojo, estamos asumiendo Mph tal que F=1, no tiene porqué.
                         Mexph=OP.Mph;
@@ -306,9 +312,9 @@ if iscell(file)
                     h=findobj(gca,'color','b');
                 else
                     %%%Esto sólo vale para 1TB.
-                    loglog(f,auxnoise.jo*1e18./auxnoise.sI,f,auxnoise.ph*1e18./auxnoise.sI,f,auxnoise.sh*1e18./auxnoise.sI,f,(totNEP*1e18));
-                    %legend('experimental','jhonson','phonon','shunt','total');
-                    legend('experimental','exp\_filtered','jhonson','phonon','shunt','total');
+                    loglog(f,auxnoise.jo*1e18./auxnoise.sI,f,sqrt(1+Mexph^2)*auxnoise.ph*1e18./auxnoise.sI,f,auxnoise.sh*1e18./auxnoise.sI,f,(totNEP*1e18));
+                    %legend('experimental','johnson','phonon','shunt','total');
+                    legend('experimental','exp\_filtered','johnson','phonon','shunt','total');
                     h=findobj(gca,'displayname','total');
                 end
                ylabel('aW/Hz^{0.5}','fontsize',12,'fontweight','bold')

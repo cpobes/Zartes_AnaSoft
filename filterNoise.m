@@ -12,18 +12,18 @@ end
 
 switch option.model
     case {'default','medfilt'}
-        filtNoise=medfilt1(noisedata,option.wmed);
+        filtNoise=medfilt1(noisedata(:),option.wmed);
     case 'nofilt'
         filtNoise=noisedata;
     case 'minfilt'
-        filtNoise=colfilt(noisedata,[option.wmin 1],'sliding',@min);
+        filtNoise=colfilt(noisedata(:),[option.wmin 1],'sliding',@min);
     case 'minfilt+medfilt'
-        ydata=colfilt(noisedata,[option.wmin 1],'sliding',@min);
+        ydata=colfilt(noisedata(:),[option.wmin 1],'sliding',@min);
         filtNoise=medfilt1(ydata,option.wmed);
     case 'movingMean'
-        filtNoise=movingMean(noisedata,option.wmed,option.thr);
+        filtNoise=movingMean(noisedata(:),option.wmed,option.thr);
     case 'quantile'
         fh=@(data)quantile(data,option.perc);
-        filtNoise=colfilt(noisedata,[option.wmed 1],'sliding',fh);    
+        filtNoise=colfilt(noisedata(:),[option.wmed 1],'sliding',fh);    
       
 end

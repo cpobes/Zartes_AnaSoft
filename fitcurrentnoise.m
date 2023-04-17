@@ -53,11 +53,11 @@ end
         %R0=0; L0=0;V0=0;P0=0;
         I0=(Rs/RL)*OP.ibias;
     end
-     if isfield(Circuit,'squid')
-         ssquid=Circuit.squid.^2*ones(length(f),1);
-     else
-         ssquid=(3e-12).^2*ones(length(f),1);
-     end
+    if isfield(Circuit,'squid')
+        ssquid=Circuit.squid.^2*ones(1,length(f));
+    else
+        ssquid=(3e-12).^2*ones(1,length(f));
+    end
      %if isfield('Circuit','circuitnoise')
      %    ssquid=Circuit.circuitnoise(:,2);
      %end
@@ -86,7 +86,8 @@ if strcmp(model,'default')
     stfn=4*Kb*T0^2*G*abs(sI).^2*F*(1+M(1)^2);
     stes=4*Kb*T0*I0^2*R0*(1+2*bI)*(1+4*pi^2*f.^2*tau^2).*abs(sI).^2/L0^2*(1+M(2)^2);
     ssh=4*Kb*Ts*I0^2*RL*(L0-1)^2*(1+4*pi^2*f.^2*tau^2/(1-L0)^2).*abs(sI).^2/L0^2; %Load resistor Noise
-    pArHz=1e12*sqrt(stfn+stes+ssh+ssquid);
+    %size(ssquid)
+    pArHz=1e12*sqrt(stfn(:)+stes(:)+ssh(:)+ssquid(:));
     %NEP=1e18*sqrt(stes+stfn+ssh)./abs(sI);
 elseif strcmp(model,'2TB_intermediate')
             %model=BuildThermalModel('2TB_1');

@@ -36,11 +36,12 @@ classdef BasicAnalisisClass < handle
             obj.auxFitstruct=TES_data_str.P;%inicializo la auxFitstruct a la estructura original.(para bias positivos).
             obj.fCircuit=obj.structure.circuit;
             obj.fTES=obj.structure.TES;
-            if strcmp(TES_data_str.analizeOptions.ZfitOpt.Noisedata,'HP')
-                obj.NoisePlotOptions.NoiseBaseName='\HP_noise*';
-            elseif strcmp(TES_data_str.analizeOptions.ZfitOpt.Noisedata,'PXI')
-                obj.NoisePlotOptions.NoiseBaseName='\PXI_noise*';
-            end
+            obj.NoisePlotOptions.NoiseBaseName=TES_data_str.analizeOptions.ZfitOpt.Noisedata;
+%             if strcmp(TES_data_str.analizeOptions.ZfitOpt.Noisedata,'HP')
+%                 obj.NoisePlotOptions.NoiseBaseName='\HP_noise*';
+%             elseif strcmp(TES_data_str.analizeOptions.ZfitOpt.Noisedata,'PXI')
+%                 obj.NoisePlotOptions.NoiseBaseName='\PXI_noise*';
+%             end
         end
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -152,7 +153,17 @@ classdef BasicAnalisisClass < handle
             if nargin==4%isempty(varargin)
                 paux=obj.GetPstruct(Temp);
             else
+                if isstruct(varargin{1})
                 paux=obj.GetPstruct(Temp,varargin{1});%%%Podemos pasar una nueva estructura P o el auxFitstruct.
+                else
+                    if ischar(varargin{1})
+                        if strcmp(varargin{1},'p')
+                            paux=obj.GetPstruct(Temp);
+                        elseif strcmp(varargin{1},'n')
+                            paux=obj.GetPstruct(Temp,'n');
+                        end
+                    end
+                end
             end
             rtes=GetPparam(paux.p,'rp');
             rps=rps(:)';%%%rps tiene que ser vector fila.
@@ -173,8 +184,14 @@ classdef BasicAnalisisClass < handle
                     'pnew'
                     paux=varargin{1};
                 else
-                    'paux'
-                    paux=obj.auxFitstruct;
+                    if strcmp(varargin{1},'paux')
+                        'paux'
+                        paux=obj.auxFitstruct;
+                    elseif strcmp(varargin{1},'p')
+                        paux=obj.structure.P;
+                    elseif strcmp(varargin{1},'n')
+                        paux=obj.structure.PN;
+                    end
                 end
             else
                 'pold'
@@ -257,7 +274,7 @@ classdef BasicAnalisisClass < handle
             
         end
         function fpar=GetFunctionFromParameters(obj,Temp,paramList,fhandle,varargin)
-            %%%paramList es un cellarray con los nomrbes de los parametros
+            %%%paramList es un cellarray con los nombres de los parametros
             %%%fhandle es un handle a la definicion de la funcion que se
             %%%quiere ejecutar sobre los parametros. fhandle(p) con
             %%%p_i=p(i,:). Se asumen los rps de la estructura P.
@@ -354,7 +371,15 @@ classdef BasicAnalisisClass < handle
             Tdir=GetDirfromTbath(Temp);
             ivaux=obj.GetIV(Temp);
             realRps=obj.GetActualRps(Temp,rps);
-            if nargin==3 str='\HP_noise*'; else str=varargin{1};end 
+            if nargin==3 
+                str='\HP_noise*'; 
+            else
+                if strfind(varargin{1},'HP')
+                    str='\HP_noise*';
+                elseif strfind(varargin{1},'PXI')
+                    str='\PXI_noise*';
+                end
+            end
             noisefiles=GetFilesFromRp(ivaux,Temp,realRps,str);
            
             Noises=loadnoise(0,Tdir,noisefiles);
@@ -727,6 +752,7 @@ classdef BasicAnalisisClass < handle
             TES=obj.structure.TES;
             circuit=obj.structure.circuit;
             
+            %%%ojo, solo polaridad positiva.
             for kk=1:length(Temp)
             Noises=obj.GetNoiseData(Temp(kk),rps,HW);
             Ib=obj.GetIbias(Temp(kk),rps);
@@ -752,12 +778,21 @@ classdef BasicAnalisisClass < handle
                 else
                     mjofrange=obj.mjofitrange;
                 end
-                faux=Noises{1}(:,1);
+                if isfield(obj.NoiseFilterOptions,'NoiseSubsampleFreqs')
+                    datax=obj.NoiseFilterOptions.NoiseSubsampleFreqs;
+                    datay=interp1(Noises{1}(:,1),Noises{1}(:,2),datax);
+                else
+                    datax=Noises{1}(:,1);
+                    datay=Noises{1}(:,2);
+                end
+                %faux=Noises{1}(:,1);
+                faux=datax;
                 findx=find((faux>mphfrange(1) & faux<mphfrange(2)) | (faux>mjofrange(1) & faux<mjofrange(2)));
-                xdata=Noises{1}(findx,1);
-                %size(Noises{i}),i
+                %xdata=Noises{1}(findx,1);
+                xdata=datax(findx);
+                %size(datax),i
                 
-                %%%Filtramos ruido
+                %%%Filtramos ruido con NoiseFilterOptions
                 if isempty(obj.NoiseFilterOptions)
                     noisefilteropt.model='movingMean';%%%'minfilt+medfilt';%%%default, medfilt, minfilt,''movingMean'
                     noisefilteropt.wmed=20;
@@ -767,20 +802,33 @@ classdef BasicAnalisisClass < handle
                     noisefilteropt=obj.NoiseFilterOptions;
                 end
                 %rps(i)
-                ydata=filterNoise(1e12*Noises{i}(findx,2),noisefilteropt);%%%
-
+                %size(datay(findx))
+                %ydata=filterNoise(1e12*Noises{i}(findx,2),noisefilteropt);%%%
+                ydata=filterNoise(1e12*datay(findx),noisefilteropt);    
                 aux.model=obj.Zfitmodel;
                 param=GetModelParameters(parray(:,i)',IV,Ib(i),TES,circuit,aux);%acepta varargin
                 OP=setTESOPfromIb(Ib(i),IV,param);
                 OP.parray=parray(:,i)';%%%añadido para modelos a 2TB.
-                OP.ztes.data=zaux(i).tf;
-                OP.ztes.freqs=zaux(i).f;
+                boolusezexp=0;
+                if boolusezexp
+                    OP.ztes.data=zaux(i).tf;
+                    OP.ztes.freqs=zaux(i).f;
+                end
                 parameters.TES=TES;parameters.OP=OP;parameters.circuit=circuit;
-                m0=[0 0];LB=[0 0];
+                noiseaux=noisesim(obj.Zfitmodel,TES,OP,circuit);
+                sI=interp1(noiseaux.f,noiseaux.sI,xdata);
+                nep=sqrt((ydata(:)*1e-12).^2-circuit.squid.^2)./abs(sI(:));
+                m0=[1 1];LB=[0 0];
                 if strcmp(obj.Zfitmodel,'2TB_intermediate') m0=[1 1 1];LB=[0 0 0];end
                 
                 %size(xdata),size(ydata)
-                maux=lsqcurvefit(@(x,xdata) fitcurrentnoise(x,xdata,parameters,obj.Zfitmodel),m0,xdata(:),ydata(:),LB);
+                boolfitcurrent=1;
+                if boolfitcurrent
+                    maux=lsqcurvefit(@(x,xdata) fitcurrentnoise(x,xdata,parameters,obj.Zfitmodel),m0,xdata(:),ydata(:),LB);
+                else
+                    ydata=nep;%%%ojo, fitjohnson sólo está implementado para usar 'irwin' model.
+                    maux=lsqcurvefit(@(x,xdata) fitjohnson(x,xdata,parameters),m0,xdata(:),ydata(:),LB);
+                end
                 maux=real(maux);
                 paux.p(jj(i)).M=maux(end);
                 paux.p(jj(i)).Mph=maux(1);
@@ -791,6 +839,9 @@ classdef BasicAnalisisClass < handle
             %obj.auxFitstruct=paux;
             obj.auxFitstruct(kk)=paux;
             obj.auxSingleFitStruct=paux;
+            if length(Temp)==1 & length(rps)==1
+                obj.plotNoises(Temp,rps,paux)
+            end
             end
         end
         function Results=FitNoiseClass(obj,Temp,rps,varargin)
@@ -854,15 +905,4 @@ classdef BasicAnalisisClass < handle
         end
         
     end %end public methods
-    
-%     methods (Access=private)
-%         function RUNDATA=AnalizeRun(obj,varargin)
-%             if nargin==1
-%                 anaopt=obj.analizeOptions;
-%             elseif nargin==2
-%                 anaopt=varargin{1};
-%             end
-%             RUNDATA=AnalizeRun(anaopt);
-%         end
-%     end
 end
