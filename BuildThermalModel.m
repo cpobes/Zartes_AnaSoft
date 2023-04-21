@@ -3,13 +3,13 @@ function model=BuildThermalModel(varargin)
 
 opt=[];
 for i=1:nargin
-    varargin{i}
-    if ischar(varargin{i}) name=varargin{i}, end
-    if isstruct(varargin{i}) opt=varargin{i}, end
+    %varargin{i}
+    if ischar(varargin{i}) name=varargin{i}; end
+    if isstruct(varargin{i}) opt=varargin{i}; end
 end
 
 if nargin==0
-    model.nombre='default'
+    model.nombre='default';
     model.function=@(p,f)([p(1)-(p(1)-p(2))./(1+((2*pi*f).^2)*(p(3).^2)) ...
       -abs(-(p(1)-p(2))*(2*pi*f)*p(3)./(1+((2*pi*f).^2)*(p(3).^2)))]);
     model.Cfunction=@(p,f)(p(1)+(p(2)-p(1)).*(1-1i*(2*pi*f)*p(3)).^-1);
@@ -23,7 +23,7 @@ if nargin==0
     %imz=-(p(1)-p(2))*w*p(3)./D;%%% modelo de 1 bloque.
     %imz=-abs(imz);
     
-    model.description='p(1)=Zinf p(2)=Z0 p(3)=taueff'
+    model.description='p(1)=Zinf p(2)=Z0 p(3)=taueff';
     model.X0=[-1e-2 1e-2 1e-6];%%%p0=[Zinf Z0 tau0];%%%1TB
     model.LB=[-Inf -Inf 0];%%%lower bounds
     model.UB=[];%%%upper bounds    
@@ -31,12 +31,12 @@ if nargin==0
 else
     switch name
         case 'default'
-                model.nombre='default'
+                model.nombre='default';
                 model.function=@(p,f)([p(1)-(p(1)-p(2))./(1+((2*pi*f).^2)*(p(3).^2)) ...
                     -abs(-(p(1)-p(2))*(2*pi*f)*p(3)./(1+((2*pi*f).^2)*(p(3).^2)))]);
                 
                 model.Cfunction=@(p,f)(p(1)+(p(2)-p(1)).*(1-1i*(2*pi*f)*p(3)).^-1);
-                model.description='p(1)=Zinf p(2)=Z0 p(3)=taueff'
+                model.description='p(1)=Zinf p(2)=Z0 p(3)=taueff';
                 model.X0=[-1e-2 1e-2 1e-6];%%%p0=[Zinf Z0 tau0];%%%1TB
                 model.LB=[-Inf -Inf 0];%%%lower bounds
                 model.UB=[];%%%upper bounds
@@ -47,10 +47,10 @@ else
                 end
             
         case 'ImZ'
-            model.nombre='ImZ'
+            model.nombre='ImZ';
             model.function=@(p,f)([ ... %%%%modelo para ajustar sólo Imag(Z).
                 -abs(-(p(1)-p(2))*(2*pi*f)*p(3)./(1+((2*pi*f).^2)*(p(3).^2)))]);
-            model.description='p(1)=Zinf p(2)=Z0 p(3)=taueff'
+            model.description='p(1)=Zinf p(2)=Z0 p(3)=taueff';
             model.X0=[-1e-2 1e-2 1e-6];%%%p0=[Zinf Z0 tau0];%%%1TB
             model.LB=[-Inf -Inf 0];%%%lower bounds
             model.UB=[];%%%upper bounds
@@ -60,7 +60,7 @@ else
                     model.noise=noisesim('irwin',opt.TES,opt.OP,opt.circuit);
                 end
         case '2TB_hanging'
-            model.nombre='2TB_hanging'
+            model.nombre='2TB_hanging';
             %fz=p(1)+(p(2)-p(1)).*(1+p(4)).*(1-1i*w*p(3)+p(4)./(1+1i*w*p(5))).^-1;
             model.function=@(p,f)[real(p(1)+(p(2)-p(1)).*(1+p(4)).*(1-1i*(2*pi*f)*p(3)+p(4)./(1+1i*(2*pi*f)*p(5))).^-1)...
                  imag(p(1)+(p(2)-p(1)).*(1+p(4)).*(1-1i*(2*pi*f)*p(3)+p(4)./(1+1i*(2*pi*f)*p(5))).^-1)];
@@ -75,7 +75,7 @@ else
                     model.noise=noisesim('2TB_hanging',opt.TES,opt.OP,opt.circuit);
                 end
         case '2TB_hanging_Lh-a'
-            model.nombre='2TB_hanging_Lh-a'
+            model.nombre='2TB_hanging_Lh-a';
             %fz=p(1)+(p(2)-p(1)).*(1+p(4)).*(1-1i*w*p(3)+p(4)./(1+1i*w*p(5))).^-1;
             model.function=@(p,f)[real(p(1)+(p(2)*p(1))./(1-p(2)).*(1-1i*(2*pi*f)*p(3)-(p(4)./(1-p(2)))./(1+1i*(2*pi*f)*p(5))).^-1)...
                  imag(p(1)+(p(2)*p(1))./(1-p(2)).*(1-1i*(2*pi*f)*p(3)-(p(4)./(1-p(2)))./(1+1i*(2*pi*f)*p(5))).^-1)];
@@ -97,7 +97,7 @@ else
                     model.noise=noisesim('2TB_hanging',opt.TES,opt.OP,opt.circuit);
                 end
         case '2TB_intermediate'
-            model.nombre='2TB_intermediate'
+            model.nombre='2TB_intermediate';
             %fz=p(1)+(p(2)-p(1)).*(1+p(4)).*(1-1i*w*p(3)+p(4)./(1+1i*w*p(5))).^-1;
             model.function=@(p,f)[real(p(1)+(p(2)-p(1)).*(1+p(4)).*(1-1i*(2*pi*f)*p(3)+p(4)./(1+1i*(2*pi*f)*p(5))).^-1)...
                  imag(p(1)+(p(2)-p(1)).*(1+p(4)).*(1-1i*(2*pi*f)*p(3)+p(4)./(1+1i*(2*pi*f)*p(5))).^-1)];
@@ -113,7 +113,7 @@ else
                 end
                 
         case '2TB_parallel'
-            model.nombre='2TB_parallel'
+            model.nombre='2TB_parallel';
             %fz=p(1)+(p(2)-p(1)).*(1+p(4)).*(1-1i*w*p(3)+p(4)./(1+1i*w*p(5))).^-1;
             model.function=@(p,f)[real(p(1)+(p(2)-p(1)).*(1+p(4)).*(1-1i*(2*pi*f)*p(3)+p(4)./(1+1i*(2*pi*f)*p(5))).^-1)...
                  imag(p(1)+(p(2)-p(1)).*(1+p(4)).*(1-1i*(2*pi*f)*p(3)+p(4)./(1+1i*(2*pi*f)*p(5))).^-1)];
@@ -129,7 +129,7 @@ else
                 end
                 
         case '3TB_general'
-            model.nombre='3TB'
+            model.nombre='3TB';
             %fz=p(1)+(p(2)-p(1)).*(1+p(4)).*(1-1i*w*p(3)+p(4)./(1+1i*w*p(5))).^-1;
             model.function=@(p,f)[real(p(1)+(p(2)-p(1)).*(1+p(4)+p(6)).*(1-1i*(2*pi*f)*p(3)+p(4)./(1+1i*(2*pi*f)*p(5))+p(6)./(1+1i*(2*pi*f)*p(7))).^-1)...
                  imag(p(1)+(p(2)-p(1)).*(1+p(4)).*(1-1i*(2*pi*f)*p(3)+p(4)./(1+1i*(2*pi*f)*p(5))+p(6)./(1+1i*(2*pi*f)*p(7))).^-1)];
@@ -139,7 +139,7 @@ else
             %model.X0=[1e-2 -1e-2 1/(2*pi*1e4) 0.03 1/(2*pi*1e2) 0.1 1/(2*pi*1e6)];
             K1=a1/(L-1);K2=a2/(L-1);tI0=tau0/(L-1);
             model.X0=[1e-2 -1e-2 tI0 K1 tau1 K2 tau2];
-            if sign(L-1)>0 lb=0;ub=Inf; else lb=-Inf,ub=0;end
+            if sign(L-1)>0 lb=0;ub=Inf; else lb=-Inf;ub=0;end
             model.LB=[0 -Inf lb lb 0 lb 0];
             model.UB=[Inf Inf ub ub 1 ub 1];
                 if isempty(opt)

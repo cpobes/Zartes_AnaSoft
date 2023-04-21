@@ -189,4 +189,6 @@ AnalizedData.analizeOptions.ZfitOpt=ZfitOpt;
 if isfield(analizeOptions,'TES_sides')
     AnalizedData.analizeOptions.TES_sides=TES.sides;
 end
+%devolvemos ya directamente la clase.
+AnalizedData=BasicAnalisisClass(AnalizedData);
 

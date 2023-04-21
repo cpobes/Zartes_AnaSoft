@@ -8,11 +8,11 @@ function plotParamTES(P,xl,yl,varargin)
 
 if nargin>3
     opt=varargin{1};
-    optname=[opt.name,{'markersize'}]
-    optvalue=[opt.value,{15}]
+    optname=[opt.name,{'markersize'}];
+    optvalue=[opt.value,{15}];
 else
-    optname={'markersize','linestyle','linewidth'}
-    optvalue={15,'-',1}
+    optname={'markersize','linestyle','linewidth'};
+    optvalue={15,'-',1};
 end
 
 %%%In case of taueff, Zinf or Z0

@@ -124,7 +124,7 @@ classdef NoiseDataClass < handle
             if isfield(obj.fCircuit,'circuitnoise')
                 circuitnoise=obj.fCircuit.circuitnoise;
             else
-                circuitnoise=3e-12;
+                circuitnoise=obj.fCircuit.squid;%3e-12;
             end
 %             ss=obj.CurrentNoise.^2-circuitnoise.^2;
 %             sI=obj.NoiseModelClass.fsIHandel(obj.freqs);

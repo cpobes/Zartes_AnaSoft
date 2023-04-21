@@ -748,7 +748,14 @@ classdef BasicAnalisisClass < handle
         end
         function NoiseFit(obj,Temp,rps,varargin)
             %%%funcion para jugar con los ajustes de los espectros de ruido
-            if nargin==3 HW='\HP_noise*';else HW=varargin{1};end
+            if nargin==3 
+                %HW='\HP_noise*';
+                HW=obj.NoisePlotOptions.NoiseBaseName;
+            else
+                HW=varargin{1};
+            end
+            if strfind(HW,'HP') HW='\HP_noise*';end
+            if strfind(HW,'PXI') HW='\PXI_noise*';end
             TES=obj.structure.TES;
             circuit=obj.structure.circuit;
             
@@ -841,6 +848,7 @@ classdef BasicAnalisisClass < handle
             obj.auxSingleFitStruct=paux;
             if length(Temp)==1 & length(rps)==1
                 obj.plotNoises(Temp,rps,paux)
+                %loglog(datax,datay*1e12,'.-')
             end
             end
         end

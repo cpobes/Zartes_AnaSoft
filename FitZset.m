@@ -38,7 +38,7 @@ if nargin==4 || (nargin==5 && isstruct(varargin{1}))
        for iii=1:length(t)
            str=dir('*mK');
            for jjj=1:length(str)
-               if strfind(str(jjj).name,num2str(t(iii))) & str(jjj).isdir, break;end%%%Para pintar automáticamente los ruidos a una cierta temperatura.50mK.(tiene que funcionar con 50mK y 50.0mK, pero ojo con 50.2mK p.e.)
+               if strfind(str(jjj).name,num2str(t(iii))) & str(jjj).isdir, break;end
            end
                dirs{iii}=str(jjj).name;
        end
@@ -58,7 +58,7 @@ if nargin==4 || (nargin==5 && isstruct(varargin{1}))
         for i=1:length(newdirs),aux(i)=sscanf(newdirs{i},'%f');end
         [ii,jj]=sort(aux);
         %for i=1:length(aux) dirs{i}=strcat(num2str(aux(i)),'mK'),end
-        dirs=newdirs(jj)
+        dirs=newdirs(jj);
     end
 
     %return;
@@ -72,7 +72,7 @@ if nargin==4 || (nargin==5 && isstruct(varargin{1}))
     for iii=1:length(t)
         str=dir('*mK');
         for jjj=1:length(str)
-            if strfind(str(jjj).name,num2str(t(iii))) & str(jjj).isdir, break;end%%%Para pintar automáticamente los ruido a una cierta temperatura.50mK.(tiene que funcionar con 50mK y 50.0mK, pero ojo con 50.2mK p.e.)
+            if strfind(str(jjj).name,num2str(t(iii))) & str(jjj).isdir, break;end
         end
         dirs{iii}=str(jjj).name;
     end
@@ -82,18 +82,15 @@ if nargin==6
     TFN=varargin{2};
     tfsn=TFS.tf./TFN.tf;
 end
-dirs
-
-pause(1)
 
 for i=1:length(dirs)
     %%%buscamos los ficheros a analizar en cada directorio.
     d=pwd;
     if strcmp(options.TFdata,'HP')        
         %D=dir(strcat(d,'\',dirs{i},'\TF*'));
-        D=strcat(d,'\',dirs{i},'\TF*')
+        D=strcat(d,'\',dirs{i},'\TF*');
     elseif strcmp(options.TFdata,'PXI')
-        D=strcat(d,'\',dirs{i},'\PXI_TF*')
+        D=strcat(d,'\',dirs{i},'\PXI_TF*');
     end
     filesZ=ListInBiasOrder(D);
     
@@ -118,7 +115,7 @@ for i=1:length(dirs)
 
     %%%buscamos la IV correspondiente a la Tmc dada
     Tbath=sscanf(dirs{i},'%dmK');
-    pause(1)
+    %pause(1)
     %Tind=[IVset.Tbath]*1e3==Tbath;
     [~,Tind]=min(abs([IVset.Tbath]*1e3-Tbath));%%%En general Tbath de la IVsest tiene que ser exactamente la misma que la del directorio, pero en algun run he puesto el valor 'real'.(ZTES20)
     IV=IVset(Tind);
@@ -140,7 +137,7 @@ for i=1:length(dirs)
             Ibnoise=sscanf(char(regexp(thenoisefile,'-?\d+.?\d+uA','match')),'%fuA')*1e-6;
             if Ib~=Ibnoise, error('Z y Noise files no coinciden');end
         end%%%quito'.txt'
-        
+        %thenoisefile,continue;
         if isfield(circuit,'ioffset')
             offset=circuit.ioffset;
         else
@@ -253,7 +250,7 @@ for i=1:length(dirs)
             end
             fitfunc=model.function;%%%@fitZ
             if p0(3)==Inf, p0(3)=1e-3;end
-            p0
+            
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             try
             [p,aux1,aux2,aux3,out,aux4,auxJ]=lsqcurvefit(fitfunc,p0,XDATA,YDATA,LB,UB);%%%uncomment for real parameters.
