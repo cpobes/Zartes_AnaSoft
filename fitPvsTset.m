@@ -13,8 +13,8 @@ end
 %for i=1:length(IVTESset), Tbath(i)=IVTESset(i).Tbath;end
 
 hold off;
-RTESmin=0.15;
-RTESmax=0.6;
+RTESmin=0.15;%%%ojo, perc tiene que estar incluido en este rango.
+RTESmax=0.9;
 for jj=1:length(perc)
     Paux=[];
     Iaux=[];
@@ -22,6 +22,9 @@ for jj=1:length(perc)
     for i=1:length(IVTESset) 
         if isfield(IVTESset,'good') good=IVTESset(i).good;else good=1;end
             if good
+                if IVTESset(i).Tbath==0.08
+                    %pause(1)
+                end
         %txt=strcat('P',num2str(100*perc(jj)));
         %exec=strcat(txt,'(i)=','ppval(spline(IVTESset{i}.rtes,IVTESset{i}.ptes),jj)')
         %evalin('caller',exec);
@@ -34,11 +37,13 @@ for jj=1:length(perc)
         itaux=IVTESset(i).ites(ind(iii));
         %Paux(end+1)=ppval(spline(IVTESset(i).rtes(ind),IVTESset(i).ptes(ind)),perc(jj));
         %Iaux(end+1)=ppval(spline(IVTESset(i).rtes(ind),IVTESset(i).ites(ind)),perc(jj));%%%
-        Paux(end+1)=ppval(spline(rtaux,ptaux),perc(jj));
-        Iaux(end+1)=ppval(spline(rtaux,itaux),perc(jj));
+        %Paux(end+1)=ppval(spline(rtaux,ptaux),perc(jj));
+        %Iaux(end+1)=ppval(spline(rtaux,itaux),perc(jj));
+        Paux(end+1)=interp1(rtaux,ptaux,perc(jj));
+        Iaux(end+1)=interp1(rtaux,itaux,perc(jj));
         Tbath(end+1)=IVTESset(i).Tbath;
-            end
-    end
+            end%%%if good
+    end %%%for Tbath
     %fitaux=fit(Tbath',Paux'*1e12,'a*x^b+c','startpoint',[0 3 0]);
     %Tbath
     %Paux
@@ -58,7 +63,8 @@ for jj=1:length(perc)
     elseif model==3
         %%%intento ajuste Gb
         auxtbath=min(Tbath):1e-4:max(Tbath);
-        auxptes=spline(Tbath,Paux,auxtbath);
+        %auxptes=spline(Tbath,Paux,auxtbath);
+        auxptes=interp1(Tbath,Paux,auxtbath);
         gbaux=abs(diff(auxptes)./diff(auxtbath));
         fit2=lsqcurvefit(@(x,tbath)x(1)+x(2)*tbath,[3 2], log(auxtbath(2:end)),log(gbaux));
         Gaux(jj).n=(fit2(2)+1);
