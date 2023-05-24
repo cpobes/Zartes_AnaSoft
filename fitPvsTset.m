@@ -22,9 +22,7 @@ for jj=1:length(perc)
     for i=1:length(IVTESset) 
         if isfield(IVTESset,'good') good=IVTESset(i).good;else good=1;end
             if good
-                if IVTESset(i).Tbath==0.08
-                    %pause(1)
-                end
+%disp(IVTESset(i).Tbath)%
         %txt=strcat('P',num2str(100*perc(jj)));
         %exec=strcat(txt,'(i)=','ppval(spline(IVTESset{i}.rtes,IVTESset{i}.ptes),jj)')
         %evalin('caller',exec);

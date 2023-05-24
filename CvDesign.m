@@ -52,7 +52,10 @@ Si3N4.densidad=3.2e6;Si3N4.masa_molar=140.28;
 Si3N4.att_length6K=30e-6;%%%esto es la membrana, no interesa como absorbente.
 Si3N4.conductivity=0;
 Si3N4.f_obs_free=1;
-
+%%%TiO2
+TiO2.Ef=Inf;TiO2.Tf=Inf;TiO2.TD=232;TiO2.densidad=4.23e6;
+TiO2.masa_molar=79.866;TiO2.f_obs_free=1;TiO2.att_length6K=0e-6;
+TiO2.conductivity=0;
 % E_fermi=[5.53,9.9,7,Inf]; %energias de fermi en eV.
 % %Ef=5.53; %eV
 % T_fermi=[6.42e4,11.5e4,8.16e4,Inf]; %en Kelvin
@@ -99,6 +102,8 @@ switch material_str
         material=silicio;
     case 'Si3N4'
         material=Si3N4;
+    case 'TiO2'
+        material=TiO2;
 end
 %material=oro;%Si3N4;%oro
 Tf=material.Tf;TD=material.TD;d=material.densidad;M=material.masa_molar;L=material.att_length6K;
@@ -113,7 +118,7 @@ cv=cve+cvp;
 %determinado depósito de energía). De Q=cv(g)*m*T=E -> S=1/cv(g)*M
 % m=d*A*h
 
-Nmol=A*h*d/M;
+Nmol=A*h*d/M
 Cve=cve*Nmol
 Cvp=cvp*Nmol
 Cv=cv*Nmol;
