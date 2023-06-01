@@ -175,7 +175,8 @@ classdef BasicAnalisisClass < handle
             param=param(:,jj);%%%Esto devuelve matriz para el p0 y el parray.
         end
         function IV=GetIV(obj,Temp)
-            [mIV,~]=GetTbathIndex(Temp,obj.structure);
+            %[mIV,~]=GetTbathIndex(Temp,obj.structure);
+            mIV=GetTbathIndex_IV(Temp,obj.structure);
             IV=obj.structure.IVset(mIV);
         end
         function P=GetPstruct(obj,Temp,varargin)
@@ -437,8 +438,47 @@ classdef BasicAnalisisClass < handle
                 SimNoise(i)=NoiseThermalModelClass(parameters,ThermalModel);
             end%for
             
+        end   
+        function Taus=GetTaus(obj,Temp,Rp)
+            %%%calcular los taus teoricos del modelo 1TB
+            Ibias=obj.GetIbias(Temp,Rp);
+            ivaux=obj.GetIV(Temp);
+            paux=obj.GetPstruct(Temp);
+            OP=obj.GetSingleOperatingPoint(Temp,Rp);
+            %Taus=GetTaus(Temp,Ibias,ivaux,paux,obj.fCircuit);
+            circuit=obj.fCircuit;
+            RL=circuit.Rsh+circuit.Rpar;
+            Req=RL+OP.R0*(1+OP.bi);
+            beta=(OP.R0-RL)/Req;
+            tau_I=OP.tau0/(1-OP.L0);
+            tau_el=circuit.L/Req;
+            tau_eff=OP.tau0/(1+beta*OP.L0);
+            sqr=sqrt((tau_I^-1+tau_el^-1)^2-4*OP.R0*OP.L0*(2+OP.bi)/circuit.L/OP.tau0);
+            tau_Mas=2*(tau_I^-1+tau_el^-1+sqr)^-1;
+            tau_Menos=2*(tau_I^-1+tau_el^-1-sqr)^-1;
+            Taus.tau_I=tau_I;
+            Taus.tau_el=tau_el;
+            Taus.tau_eff=tau_eff;
+            Taus.tau_Mas=tau_Mas;
+            Taus.tau_Menos=tau_Menos;
         end
-        
+        function SimPulse=GetSimPulse(obj,Temp,Rp)
+            Energy=6e3*1.609e-19;
+            Tend=0.01;
+            Taus=obj.GetTaus(Temp,Rp);
+            normpulsH=@(p,x)(p(1)/(p(3)-p(2)))*(exp(-(x-p(4))/p(2))-exp(-(x-p(4))/p(3))).*heaviside(x-p(4))+p(5);
+            T=[0:1e-6:Tend];
+            tini=Tend/10;
+            trise=Taus.tau_Mas;
+            tfall=Taus.tau_Menos;
+            p0=[1 Taus.tau_Mas Taus.tau_Menos tini 0];
+            pulse=normpulsH(p0,T);
+            pulse(isnan(pulse))=0;
+            OP=obj.GetSingleOperatingPoint(Temp,Rp);
+            Amp=(1-trise)*(1-tfall)*(1/(2+OP.bi))*(Energy/OP.V0);
+            Vpulse=I2V(Amp*pulse,obj.fCircuit);
+            SimPulse=[T(:) Vpulse(:)];
+        end
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%Set functions
