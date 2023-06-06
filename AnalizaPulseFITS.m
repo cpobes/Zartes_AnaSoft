@@ -8,11 +8,13 @@ Npulsos=info.BinaryTable.Rows
 
 %%%%%%%%OPTIONS%%%%%%%%%%
 t0ini=0.1;
-topt=t0ini+0.128;
+optfraction=0.128;
+topt=t0ini+optfraction;
 trunc_area_range=(1080:1440)';
 fit_range=1000:10000;
 %topt=t0ini+0.02;%fraccion para pulsos V1O 0.02.
 boolfit=0;
+wfilt=1;
 %%%%%%%%%%%%%%%%%%%%%%%%%
 
 if nargin==1
@@ -56,10 +58,12 @@ for i=1:Npulsos
         
     dc(i)=mean(pulso(1:L*t0ini/2,2));
     dc_std(i)=std(pulso(1:L*t0ini/2,2));
-    area(i)=sum(medfilt1(pulso(:,2),1)-dc(i));
+    area(i)=sum(medfilt1(pulso(:,2),wfilt)-dc(i));
     %trunc_area(i)=sum(medfilt1(pulso(trunc_area_range,2),1)-dc(i));
-    optArea(i)=sum(medfilt1(pulso(t0ini*L-10:topt*L,2),1)-dc(i));
-    amp(i)=max(medfilt1(pulso(:,2),1))-dc(i);
+    optArea(i)=sum(medfilt1(pulso(t0ini*L-10:topt*L,2),wfilt)-dc(i));
+    [maux,miaux]=max(medfilt1(pulso(:,2),wfilt));
+    amp(i)=maux-dc(i);
+    tmax(i)=time(miaux);
     %energy(i)=sum((pulso(:,2)-dc(i))'.*ofilt);%%%estimacion OF.
     %energy0(i)=sum(pulso(:,2)'.*ofilt);
     %ind=find(pulso(:,2)-dc(i)<AMPthr);%%%seleccionamos un rango que no esté saturado para hacer el ajuste.
@@ -117,6 +121,7 @@ fits.closeFile(fptr);
     PulseParameters.dc=dc;
     PulseParameters.dc_std=dc_std;
     PulseParameters.amp=amp;
+    PulseParameters.tmax=tmax;
     PulseParameters.npeaks=npeaks;
     PulseParameters.ntimes=ntimes;
     %PulseParameters.energy=energy;
