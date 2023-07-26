@@ -23,8 +23,8 @@ Rn=circuit.Rn;
 %%%Ahora podemos pasar como 5º argumento una estructura con los datos que
 %%%% se quieren analizar (HP o PXI) y también si se quieren todas las temps
 %%%% por defecto o solo algunas.
-if nargin==4 || (nargin==5 && isstruct(varargin{1}))
-    if(nargin==5)
+if nargin==4 || (nargin>=5 && isstruct(varargin{1}))
+    if(nargin>=5)
         options=varargin{1};
     elseif nargin==4
         options.TFdata='HP';

@@ -142,11 +142,24 @@ TESN.Rn=TES.Rn;%66.9e-3;%%%<-%%%%%%
 TESDATA=BuildDataStruct;
 if strcmp(ZfitOpt.TFdata,'HP')
     TFS=importTF('TFS_HP.txt');
+    try
+        TFN=importTF('TFN_HP.txt');
+    catch
+        TFN=[];
+    end
 elseif strcmp(ZfitOpt.TFdata,'PXI')
     TFS=importTF('TFS_PXI.txt');
+    try
+        TFN=importTF('TFN_PXI.txt');
+    catch
+        TFN=[];
+    end
 end
 %%%cargamos la TFGS adecuada.Ojo, hay que nombrarla así en el dir.
 TESDATA.TFS=TFS;%%Esta TFS sobreescribe la TFS.txt que se carga por defecto en FitZset_remote
+if ~isempty(TFN)
+    TESDATA.TFN=TFN;
+end
 %P=FitZset(IVset,circuit,TES,TFS);%%%Ajustamos las Z positivas.
 P=FitZset_remote(TESDATA,ZfitOpt);
 
@@ -159,6 +172,9 @@ TESDATAN.TES=TESN;
 %TESDATAN.TFS=TESDATA.TFS;
 %TFS=importTF('..\TFS.txt');
 TESDATAN.TFS=TFS;
+if ~isempty(TFN)
+    TESDATAN.TFN=TFN;
+end
 PN=P;
 if(1)
 PN=FitZset_remote(TESDATAN,ZfitOpt);
@@ -179,6 +195,9 @@ AnalizedData.RpTES=RpTES;
 AnalizedData.TES=TES;
 AnalizedData.TESN=TESN;
 AnalizedData.TFS=TFS;
+if ~isempty(TFN)
+    AnalizedData.TFN=TFN;
+end
 AnalizedData.P=P;
 AnalizedData.PN=PN;
 AnalizedData.analizeOptions.datadir=datadir;

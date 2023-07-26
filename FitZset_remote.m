@@ -23,9 +23,14 @@ if isfield(TESDATA,'datadir')
         'hola, di error'    
     end
     if isfield(TESDATA,'TFS') TFS=TESDATA.TFS;end %%%Podemos sobreescribir la TFS con otra.
+    if isfield(TESDATA,'TFN') TFN=TESDATA.TFN;else TFN=[];end
     if nargin==2
         opt=varargin{1};
-        P=FitZset(IVset,circuit,TES,TFS,opt);
+        if  ~isempty(TFN)
+            P=FitZset(IVset,circuit,TES,TFS,opt,TFN);
+        else
+            P=FitZset(IVset,circuit,TES,TFS,opt);
+        end
     else
         P=FitZset(IVset,circuit,TES,TFS);
     end

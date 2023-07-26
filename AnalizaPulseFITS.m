@@ -16,11 +16,20 @@ fit_range=1000:10000;
 boolfit=0;
 wfilt=1;
 %%%%%%%%%%%%%%%%%%%%%%%%%
-
-if nargin==1
-    DataUnit=2;
-else
-    DataUnit=varargin{1};
+DataUnit=2;
+A=0;B=0;
+for i=1:nargin-1
+    if isnumeric(varargin{i})
+        DataUnit=varargin{i};
+    end
+    if isstruct(varargin{i})
+        OP=varargin{i};%%%Pasamos el OP. Aunque mejor guardarlo en el FITS.
+        RL=OP.circuit.Rsh+OP.circuit.Rpar;
+        I0=OP.I0;
+        Ibias=OP.Ibias;
+        A=(I0-Ibias)*RL;
+        B=RL;
+    end
 end
 fptr=fits.openFile(file)
 %fits.movAbsHDU(fptr,3)%%%el fichero de la LNCS está en dos tablas. 
@@ -30,6 +39,7 @@ Npulsos=fits.getNumRows(fptr);
 SR=str2num(fits.readKey(fptr,'SR'));
 RL=str2num(fits.readKey(fptr,'RL'));
 time=(1:RL)/SR;
+DT=1/SR;
 
 %fhandle=@(p,t)p(1)*heaviside(t-p(4)).*(exp(-(t-p(4))/p(2))-exp(-(t-p(4))/p(3))+exp(-(t-p(4))/p(5)))/(p(2)+p(5)-p(3));
 %p0=[0.7635    1.0460    0.0085    2.0009    6.4844]*1e-3;
@@ -59,6 +69,14 @@ for i=1:Npulsos
     dc(i)=mean(pulso(1:L*t0ini/2,2));
     dc_std(i)=std(pulso(1:L*t0ini/2,2));
     area(i)=sum(medfilt1(pulso(:,2),wfilt)-dc(i));
+    
+    %%%Self Calibrated Energy.E_ETF ec.58 Irwin.
+    ipulse=V2I(pulso(:,2),OP.circuit);
+    idc=V2I(dc(i),OP.circuit);
+    suma_i=sum(medfilt1(ipulse,wfilt)-idc)*DT;
+    suma_i2=sum((medfilt1(ipulse,wfilt)-idc).^2)*DT;
+    Eetf(i)=A*suma_i+B*suma_i2;
+    
     %trunc_area(i)=sum(medfilt1(pulso(trunc_area_range,2),1)-dc(i));
     optArea(i)=sum(medfilt1(pulso(t0ini*L-10:topt*L,2),wfilt)-dc(i));
     [maux,miaux]=max(medfilt1(pulso(:,2),wfilt));
@@ -124,6 +142,7 @@ fits.closeFile(fptr);
     PulseParameters.tmax=tmax;
     PulseParameters.npeaks=npeaks;
     PulseParameters.ntimes=ntimes;
+    PulseParameters.Eetf=Eetf;
     %PulseParameters.energy=energy;
     %PulseParameters.e0=energy0;
     PulseParameters.timestamp=timestamp;

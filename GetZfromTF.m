@@ -1,4 +1,4 @@
-function ztes= GetZfromTF( tf, TFS, circuit )
+function ztes= GetZfromTF( tf, TFS, circuit, varargin )
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -26,5 +26,20 @@ ztesHandle=@(x) (tfsauxHandle(x)./tfauxHandle(x)-1).*RthHandle(x);
 ztes.tf=ztesHandle(f);
 ztes.f=f;
 
+if nargin==4
+    TFN=varargin{1};
+    if isstruct(TFN)
+        tfnaux=TFN.tf;
+        fN=TFN.f;
+    else
+        tfnaux=TFN(:,2)+1i*TFN(:,3);
+        fN=TFN(:,1);
+    end
+    tfnauxHandle=@(x) interp1(fN,tfnaux,x);
+    %ztes=(TFS.tf./tf-1).*Rn./(tfsn-1);
+    RthHandle=@(x)circuit.Rn./(tfsauxHandle(x)./tfnauxHandle(x)-1);
+    ztesHandle=@(x) (tfsauxHandle(x)./tfauxHandle(x)-1).*RthHandle(x);
+    ztes.tf=ztesHandle(f);
+    ztes.f=f;
 end
 

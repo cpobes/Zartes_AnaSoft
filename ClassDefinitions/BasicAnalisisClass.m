@@ -462,23 +462,6 @@ classdef BasicAnalisisClass < handle
             Taus.tau_Mas=tau_Mas;
             Taus.tau_Menos=tau_Menos;
         end
-        function SimPulse=GetSimPulse(obj,Temp,Rp)
-            Energy=6e3*1.609e-19;
-            Tend=0.01;
-            Taus=obj.GetTaus(Temp,Rp);
-            normpulsH=@(p,x)(p(1)/(p(3)-p(2)))*(exp(-(x-p(4))/p(2))-exp(-(x-p(4))/p(3))).*heaviside(x-p(4))+p(5);
-            T=[0:1e-6:Tend];
-            tini=Tend/10;
-            trise=Taus.tau_Mas;
-            tfall=Taus.tau_Menos;
-            p0=[1 Taus.tau_Mas Taus.tau_Menos tini 0];
-            pulse=normpulsH(p0,T);
-            pulse(isnan(pulse))=0;
-            OP=obj.GetSingleOperatingPoint(Temp,Rp);
-            Amp=(1-trise)*(1-tfall)*(1/(2+OP.bi))*(Energy/OP.V0);
-            Vpulse=I2V(Amp*pulse,obj.fCircuit);
-            SimPulse=[T(:) Vpulse(:)];
-        end
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%Set functions
@@ -499,18 +482,18 @@ classdef BasicAnalisisClass < handle
             UB=model.UB;
             for jj=1:length(Temp)
                 actualRps=obj.GetActualRps(Temp(jj),rps);
-            ZtesData=GetZtesData(obj,Temp(jj),actualRps);
-            fS=ZtesData(1).f;
-            ind_all=1:length(fS);%%%De momento cogemos todas las freqs.            
-            %ind_z=find((fS>5e0 & fS<=40e3) |(fS>40e3 & fS<90e3));%%sobreescribimos ind_z            
-            ind_z=ind_all(5:9:end);%para seleccionar sólo 1 de cada 9 puntos.
-            %ind_z=ind_z([13:19 21:end-13]);%Para eliminar frecuencias extra.
-            %ind_z=ind_z(1:end-7);%%%para 62A quitamos tb las ultimas freqs.
-            
-            p0=obj.GetFittedParameterByName(Temp(jj),actualRps(1),'parray');%empiezo con el parray viejo del primer punto.
-            %p0=[p0(1) p0(2) -9.3489e-05 -1.1284 8.2593e-04];%%%data(2)
-            p0x=obj.P0Estimate(Temp(jj),actualRps(1));%Estima las taus y K.
-            p0(3:5)=p0x(3:5);
+                ZtesData=GetZtesData(obj,Temp(jj),actualRps);
+                fS=ZtesData(1).f;
+                ind_all=1:length(fS);%%%De momento cogemos todas las freqs.
+                %ind_z=find((fS>5e0 & fS<=40e3) |(fS>40e3 & fS<90e3));%%sobreescribimos ind_z
+                ind_z=ind_all(5:9:end);%para seleccionar sólo 1 de cada 9 puntos.
+                %ind_z=ind_z([13:19 21:end-13]);%Para eliminar frecuencias extra.
+                %ind_z=ind_z(1:end-7);%%%para 62A quitamos tb las ultimas freqs.
+                
+                p0=obj.GetFittedParameterByName(Temp(jj),actualRps(1),'parray');%empiezo con el parray viejo del primer punto.
+                %p0=[p0(1) p0(2) -9.3489e-05 -1.1284 8.2593e-04];%%%data(2)
+                p0x=obj.P0Estimate(Temp(jj),actualRps(1));%Estima las taus y K.
+                p0(3:5)=p0x(3:5);
 
             if nargin==4% para jugar con el p0 por ejemplo a un %Rn dado.
                 if isnumeric(varargin{1})
@@ -660,7 +643,7 @@ classdef BasicAnalisisClass < handle
             RUNDATA=AnalizeRun(anaopt);
         end
         function Pfit=MCMCZfit(obj,Temp,rps,varargin)
-                        modelname=obj.Zfitmodel;
+            modelname=obj.Zfitmodel;
             model=BuildThermalModel(modelname);
             fitfunc=model.function;
             p0=model.X0;
@@ -950,6 +933,29 @@ classdef BasicAnalisisClass < handle
                 [pulso,t]=impulse(TF);
             end
             %[pulso,t]=step(TF);
+        end
+        function SimPulse=GetSimPulse(obj,Temp,Rp)
+            %similar a SimSmallDelta pero con la i(t) directamente.
+            Energy=6e3*1.609e-19;
+            C=500e-12;%!get
+            Tend=0.01;
+            Taus=obj.GetTaus(Temp,Rp);
+            normpulsH=@(p,x)(p(1)/(p(3)-p(2)))*(exp(-(x-p(4))/p(2))-exp(-(x-p(4))/p(3))).*heaviside(x-p(4))+p(5);
+            T=[0:1e-6:Tend];
+            tini=Tend/10;
+            trise=Taus.tau_Mas;
+            tfall=Taus.tau_Menos;
+            tI=Taus.tau_I;
+            p0=[1 Taus.tau_Mas Taus.tau_Menos tini 0];
+            pulse=normpulsH(p0,T);
+            pulse(isnan(pulse))=0;
+            OP=obj.GetSingleOperatingPoint(Temp,Rp);
+            Amp=(1-trise)*(1-tfall)*(1/(2+OP.bi))*(Energy/OP.V0);
+            Vpulse=I2V(Amp*pulse,obj.fCircuit);
+            SimPulse=[T(:) Vpulse(:)];
+            DT=Energy/C;
+            Tpulse=((1/tI-1/trise)*exp(-T/tfall)+(1/tI-1/tfall)*exp(-T/trise))*DT/(1/trise-1/tfall);
+            SimPulse=[T(:) Tpulse(:)];
         end
         
     end %end public methods
