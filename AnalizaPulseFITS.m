@@ -43,6 +43,7 @@ RL=str2num(fits.readKey(fptr,'RL'));
 Ibias=str2num(fits.readKey(fptr,'Ibias'));
 try
     I0=str2num(fits.readKey(fptr,'I0'));
+    A=(I0-Ibias)*RL;%Asegurarse de que I0 e Ibias están en Amp!
     B=RL;
 catch
 end
