@@ -25,10 +25,12 @@ for i=1:nargin-1
     if isstruct(varargin{i})
         OP=varargin{i};%%%Pasamos el OP. Aunque mejor guardarlo en el FITS.
         RL=OP.circuit.Rsh+OP.circuit.Rpar;
-        I0=OP.I0;
-        Ibias=OP.Ibias;
-        A=(I0-Ibias)*RL;
-        B=RL;
+        if isfield(OP,'I0')
+            I0=OP.I0;
+        end
+        %Ibias=OP.Ibias;
+        %A=(I0-Ibias)*RL;
+        %B=RL;
     end
 end
 fptr=fits.openFile(file)
@@ -38,6 +40,12 @@ Npulsos=fits.getNumRows(fptr);
 
 SR=str2num(fits.readKey(fptr,'SR'));
 RL=str2num(fits.readKey(fptr,'RL'));
+Ibias=str2num(fits.readKey(fptr,'Ibias'));
+try
+    I0=str2num(fits.readKey(fptr,'I0'));
+    B=RL;
+catch
+end
 time=(1:RL)/SR;
 DT=1/SR;
 
