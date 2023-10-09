@@ -63,7 +63,7 @@ DT=1/SR;
 %fnorm=@(p,t) heaviside(t-p(4)).*(exp(-(t-p(4))/p(2))-exp(-(t-p(4))/p(3))+exp(-(t-p(4))/p(5)))/(p(2)+p(5)-p(3));
 %fh3=@(p,t)p(2)*fhandle([1 p0(2) p0(3) p(3) p0(5)],time)+p(1);
 fhandle=@(p,x)p(1)*(exp(-(x-p(4))/p(2))-exp(-(x-p(4))/p(3))).*heaviside(x-p(4))+p(5);%%%simple
-
+minprominence=0.005;
 for i=1:Npulsos
     %raw=fitsread(file,'binarytable',1,'TableColumns',1,'TableRows',1);%%5Lentisimo.
     try
@@ -95,7 +95,8 @@ for i=1:Npulsos
     %energy0(i)=sum(pulso(:,2)'.*ofilt);
     %ind=find(pulso(:,2)-dc(i)<AMPthr);%%%seleccionamos un rango que no esté saturado para hacer el ajuste.
     %ind=find(pulso(:,1)<0.12 & pulso(:,1)>0.1);
-    [v,t]=findpeaks(pulso(:,2),pulso(:,1),'minpeakprominence',0.01);
+    
+    [v,t]=findpeaks(pulso(:,2),pulso(:,1),'minpeakprominence',minprominence);
     %v=0;t=0;
     npeaks(i)=numel(v);
     ntimes(i).times=t;
@@ -157,6 +158,7 @@ fits.closeFile(fptr);
     PulseParameters.timestamp=timestamp;
     PulseParameters.tbath=tbath;
     PulseParameters.rsensor=rsensor;
+    PulseParameters.minprominence=minprominence;
     if(boolfit)
 %     PulseParameters.fit.area_corrected=area_corrected;
 %     PulseParameters.fit.tau_rise=tau_rise;
