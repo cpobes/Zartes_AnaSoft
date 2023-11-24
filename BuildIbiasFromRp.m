@@ -10,7 +10,8 @@ for i=1:length(IVset)
     vaux=IVset.vout(ii);
     raux=IVset.rtes(ii);
     [~,i3]=min(diff(vaux)./diff(iaux));
-
+    
+    i3=i3-1;%
     Ibs=spline(raux(1:i3),iaux(1:i3),rp)*1e6;    
     Ibs(rp<raux(i3))=0;%%%Los rps por debajo del mínimo van a dar Ibias absurdos.
     Ibs=unique(Ibs,'stable');%Puede haber varios Ibs en cero y eso ralentiza luego las medidas!
