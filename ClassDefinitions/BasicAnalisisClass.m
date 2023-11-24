@@ -938,11 +938,12 @@ classdef BasicAnalisisClass < handle
             %similar a SimSmallDelta pero con la i(t) directamente.
             Energy=6e3*1.609e-19;
             C=500e-12;%!get
+            t0ini=0.1;%fraccion de trigger.
             Tend=0.01;
             Taus=obj.GetTaus(Temp,Rp);
             normpulsH=@(p,x)(p(1)/(p(3)-p(2)))*(exp(-(x-p(4))/p(2))-exp(-(x-p(4))/p(3))).*heaviside(x-p(4))+p(5);
             T=[0:1e-6:Tend];
-            tini=Tend/10;
+            tini=t0ini*Tend;
             trise=Taus.tau_Mas;
             tfall=Taus.tau_Menos;
             tI=Taus.tau_I;

@@ -1,5 +1,6 @@
 function [signal,time]=iPSD(psd,freq)
 %%%intento de sacar la f(t) a partir del PSD.
+%%%Se espera freq equiespaciados.
 L=length(freq);
 DF=freq(2)-freq(1);
 totL=2*(L-1);

@@ -1,5 +1,5 @@
 function PulseParameters= AnalizaPulseFITS(file,varargin)
-%%%%Funciona analoga a AnaliaaPulseDir pero para fichero fits
+%%%%Funciona analoga a AnalizaPulseDir pero para fichero fits
 import matlab.io.*
 
 info=fitsinfo(file);
@@ -24,13 +24,13 @@ for i=1:nargin-1
     end
     if isstruct(varargin{i})
         OP=varargin{i};%%%Pasamos el OP. Aunque mejor guardarlo en el FITS.
-        RL=OP.circuit.Rsh+OP.circuit.Rpar;
+        Rsh=OP.circuit.Rsh+OP.circuit.Rpar;%%%!!!Ojo a no nombrarla igual que el record length RL!
         if isfield(OP,'I0')
             I0=OP.I0;
         end
         %Ibias=OP.Ibias;
-        %A=(I0-Ibias)*RL;
-        %B=RL;
+        %A=(I0-Ibias)*Rsh;
+        %B=Rsh;
     end
 end
 fptr=fits.openFile(file)
@@ -43,8 +43,8 @@ RL=str2num(fits.readKey(fptr,'RL'));
 Ibias=str2num(fits.readKey(fptr,'Ibias'));
 try
     I0=str2num(fits.readKey(fptr,'I0'));
-    A=(I0-Ibias)*RL;%Asegurarse de que I0 e Ibias están en Amp!
-    B=RL;
+    A=(I0-Ibias)*Rsh;%Asegurarse de que I0 e Ibias están en Amp!
+    B=Rsh;
 catch
 end
 time=(1:RL)/SR;
