@@ -118,9 +118,11 @@ classdef BasicAnalisisClass < handle
                 end
             end
             %paux
-            rps=[obj.GetPstruct(Temp,paux).p.rp];
+            rps=unique([obj.GetPstruct(Temp,paux).p.rp],'stable');%Ojo. GetFunc no devuelve repetidos
             fpar=obj.GetFunctionFromParameters(Temp,paramList,fhandle,paux);
-            plot(rps,fpar,'.-','markersize',15,'linewidth',1)
+            %size(rps)
+            %size(fpar)
+            plot(rps(:),fpar(:),'.-','markersize',15,'linewidth',1)
             set(gca,'linewidth',2,'fontsize',12,'fontweight','bold')
             grid on
         end
@@ -362,7 +364,7 @@ classdef BasicAnalisisClass < handle
             cd(olddir);
         end
         function Noises=GetNoiseData(obj,Temp,rps,varargin)
-            %%%Función que devuelve los ruidos a unos porcentajes concretos
+            %%%Función que devuelve los ruidos en A/sqrt(Hz) a unos porcentajes concretos
             %%%en un cell array. Se puede pasar '\HP_noise*'(default) o '\PXI_noise*'
             %%%
             olddir=pwd;
@@ -831,6 +833,7 @@ classdef BasicAnalisisClass < handle
                 else
                     noisefilteropt=obj.NoiseFilterOptions;
                 end
+                obj.NoisePlotOptions.FiltOpt=noisefilteropt;
                 %rps(i)
                 %size(datay(findx))
                 %ydata=filterNoise(1e12*Noises{i}(findx,2),noisefilteropt);%%%
