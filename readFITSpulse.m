@@ -20,5 +20,5 @@ RL=str2num(fits.readKey(fptr,'RL'));
 time=(1:RL)/SR;
 ydata=fits.readCol(fptr,1,index,1)';
 
-pulso=[time(:) ydata];
+pulso=double([time(:) ydata]);
 fits.closeFile(fptr);

@@ -63,7 +63,7 @@ DT=1/SR;
 %fnorm=@(p,t) heaviside(t-p(4)).*(exp(-(t-p(4))/p(2))-exp(-(t-p(4))/p(3))+exp(-(t-p(4))/p(5)))/(p(2)+p(5)-p(3));
 %fh3=@(p,t)p(2)*fhandle([1 p0(2) p0(3) p(3) p0(5)],time)+p(1);
 fhandle=@(p,x)p(1)*(exp(-(x-p(4))/p(2))-exp(-(x-p(4))/p(3))).*heaviside(x-p(4))+p(5);%%%simple
-minprominence=0.005;
+minprominence=0.05;%0.005(dic21),0.05(Jan24,Rf=3e3).
 for i=1:Npulsos
     %raw=fitsread(file,'binarytable',1,'TableColumns',1,'TableRows',1);%%5Lentisimo.
     try
@@ -73,7 +73,8 @@ for i=1:Npulsos
     end
     L=length(raw);
     pulso(:,1)=(1:L)/SR;%%%
-    pulso(:,2)=-raw;%%%Pulsos negativos!
+    pol=1;
+    pulso(:,2)=(-1)^(pol+1)*raw;%%%Pulsos negativos! o Positivos!!!
         
     dc(i)=mean(pulso(1:L*t0ini/2,2));
     dc_std(i)=std(pulso(1:L*t0ini/2,2));
