@@ -4,16 +4,17 @@ import matlab.io.*
 
 info=fitsinfo(file);
 Npulsos=info.BinaryTable.Rows
+L=info.BinaryTable.FieldSize(1);
 %Npulsos=10000;
 
 %%%%%%%%OPTIONS%%%%%%%%%%
-t0ini=0.1;
-optfraction=0.128;
+t0ini=0.1;%%%Esto se tiene que leer del fichero tambien.
+optfraction=0.05;%Dic21:0.128; Ene24:0.05.
 topt=t0ini+optfraction;
-trunc_area_range=(1080:1440)';
-fit_range=1000:10000;
+%trunc_area_range=(1080:1440)';
+fit_range=9000:1e5;%Dic21:1000:10000;
 %topt=t0ini+0.02;%fraccion para pulsos V1O 0.02.
-boolfit=0;
+boolfit=1;
 wfilt=1;
 %%%%%%%%%%%%%%%%%%%%%%%%%
 DataUnit=2;
@@ -28,15 +29,17 @@ for i=1:nargin-1
         if isfield(OP,'I0')
             I0=OP.I0;
         end
+        oft=OP.oft(:);%%%%%%estandarizar esto.
         %Ibias=OP.Ibias;
         %A=(I0-Ibias)*Rsh;
         %B=Rsh;
     end
 end
 fptr=fits.openFile(file)
-%fits.movAbsHDU(fptr,3)%%%el fichero de la LNCS está en dos tablas. 
+%fits.movAbsHDU(fptr,3)%%%el fichero de la LNCS está en dos tablas.
+try
 fits.movAbsHDU(fptr,DataUnit);
-Npulsos=fits.getNumRows(fptr);
+%Npulsos=fits.getNumRows(fptr)
 
 SR=str2num(fits.readKey(fptr,'SR'));
 RL=str2num(fits.readKey(fptr,'RL'));
@@ -62,23 +65,30 @@ DT=1/SR;
 %fh2=@(p,t)p(2)*ofilt+p(1);
 %fnorm=@(p,t) heaviside(t-p(4)).*(exp(-(t-p(4))/p(2))-exp(-(t-p(4))/p(3))+exp(-(t-p(4))/p(5)))/(p(2)+p(5)-p(3));
 %fh3=@(p,t)p(2)*fhandle([1 p0(2) p0(3) p(3) p0(5)],time)+p(1);
-fhandle=@(p,x)p(1)*(exp(-(x-p(4))/p(2))-exp(-(x-p(4))/p(3))).*heaviside(x-p(4))+p(5);%%%simple
+%fhandle=@(p,x)p(1)*(exp(-(x-p(4))/p(2))-exp(-(x-p(4))/p(3))).*heaviside(x-p(4))+p(5);%%%simple
+fhandle=BuildPulseHandle(1);%
+
 minprominence=0.05;%0.005(dic21),0.05(Jan24,Rf=3e3).
-for i=1:Npulsos
+polarity=1;% 1: positivos, 0:negativos.
+for i=1:10%Npulsos
     %raw=fitsread(file,'binarytable',1,'TableColumns',1,'TableRows',1);%%5Lentisimo.
     try
         raw=fits.readCol(fptr,1,i,1);
     catch
         continue;
     end
-    L=length(raw);
+    %L=length(raw);Lo podemos calcular fuera.
     pulso(:,1)=(1:L)/SR;%%%
-    pol=1;
-    pulso(:,2)=(-1)^(pol+1)*raw;%%%Pulsos negativos! o Positivos!!!
+    
+    pulso(:,2)=(-1)^(polarity+1)*raw;%%%Pulsos negativos! o Positivos!!!
         
     dc(i)=mean(pulso(1:L*t0ini/2,2));
     dc_std(i)=std(pulso(1:L*t0ini/2,2));
-    area(i)=sum(medfilt1(pulso(:,2),wfilt)-dc(i));
+    area(i)=sum(medfilt1(pulso(L*t0ini-10:end,2),wfilt)-dc(i));
+    optArea(i)=sum(medfilt1(pulso(L*t0ini-10:L*topt,2),wfilt)-dc(i));
+    [maux,miaux]=max(medfilt1(pulso(:,2),wfilt));
+    amp(i)=maux-dc(i);
+    tmax(i)=time(miaux);
     
     %%%Self Calibrated Energy.E_ETF ec.58 Irwin.
     ipulse=V2I(pulso(:,2),OP.circuit);
@@ -87,11 +97,10 @@ for i=1:Npulsos
     suma_i2=sum((medfilt1(ipulse,wfilt)-idc).^2)*DT;
     Eetf(i)=A*suma_i+B*suma_i2;
     
-    %trunc_area(i)=sum(medfilt1(pulso(trunc_area_range,2),1)-dc(i));
-    optArea(i)=sum(medfilt1(pulso(t0ini*L-10:topt*L,2),wfilt)-dc(i));
-    [maux,miaux]=max(medfilt1(pulso(:,2),wfilt));
-    amp(i)=maux-dc(i);
-    tmax(i)=time(miaux);
+    %%%%%FILTRO OPTIMO%%%%%%%%
+    if ~isempty(oft)
+        OFT_Energy(i)=sum(pulso(:,2).*oft(:));
+    end
     %energy(i)=sum((pulso(:,2)-dc(i))'.*ofilt);%%%estimacion OF.
     %energy0(i)=sum(pulso(:,2)'.*ofilt);
     %ind=find(pulso(:,2)-dc(i)<AMPthr);%%%seleccionamos un rango que no esté saturado para hacer el ajuste.
@@ -123,13 +132,15 @@ for i=1:Npulsos
         %size(pulso(ind_fit,2))
         %ft_p3=lsqcurvefit(fh3,p0,ind_fit,pulso(ind_fit,2)');
         
-        p0=[0.1 1e-3 10e-6 1.2e-3 dc(i)];%%%tau1-tau2 para pulso positivo.
+        %p0=[0.1 1e-3 10e-6 1.2e-3 dc(i)];%%%tau1-tau2 para pulso positivo.
+        p0=[-0.1102 4.586e-06 0.0008222 0.005003 dc(i) 0.003218];
         ft_p=lsqcurvefit(fhandle,p0,pulso(fit_range,1),pulso(fit_range,2));
         
         dcfit(i)=ft_p(5);
         Afit(i)=ft_p(1);
         t0fit(i)=ft_p(4);
         area_fit(i)=sum(fhandle(ft_p,pulso(fit_range,1))-dcfit(i));
+        fit_param(i,:)=ft_p;
 %         area_corrected(i)=sum(fhandle(fit_pulso,pulso(ind_fit,1)));
 %         tau_rise(i)=fit_pulso(3);
 %         tau_fall(i)=fit_pulso(2);
@@ -140,6 +151,7 @@ for i=1:Npulsos
             Afit(i)=0;
             t0fit(i)=0;
             area_fit(i)=0;
+            fit_param(i)=0;
     end
     if ~mod(i,10) ['pulso ' num2str(i)],end
 end
@@ -160,6 +172,9 @@ fits.closeFile(fptr);
     PulseParameters.tbath=tbath;
     PulseParameters.rsensor=rsensor;
     PulseParameters.minprominence=minprominence;
+    if ~isempty(oft)
+        PulseParameters.OFT_Energy=OFT_Energy;
+    end
     if(boolfit)
 %     PulseParameters.fit.area_corrected=area_corrected;
 %     PulseParameters.fit.tau_rise=tau_rise;
@@ -170,4 +185,8 @@ fits.closeFile(fptr);
         PulseParameters.fit.Afit=Afit;
         PulseParameters.fit.t0fit=t0fit;
         PulseParameters.fit.area_fit=area_fit;
+        PulseParameters.fit.parameters=fit_param;
     end
+catch
+    fits.closeFile(fptr);
+end
