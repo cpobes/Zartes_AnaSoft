@@ -14,7 +14,7 @@ topt=t0ini+optfraction;
 %trunc_area_range=(1080:1440)';
 fit_range=9000:1e5;%Dic21:1000:10000;
 %topt=t0ini+0.02;%fraccion para pulsos V1O 0.02.
-boolfit=1;
+boolfit=0;
 wfilt=1;
 %%%%%%%%%%%%%%%%%%%%%%%%%
 DataUnit=2;
@@ -66,11 +66,11 @@ DT=1/SR;
 %fnorm=@(p,t) heaviside(t-p(4)).*(exp(-(t-p(4))/p(2))-exp(-(t-p(4))/p(3))+exp(-(t-p(4))/p(5)))/(p(2)+p(5)-p(3));
 %fh3=@(p,t)p(2)*fhandle([1 p0(2) p0(3) p(3) p0(5)],time)+p(1);
 %fhandle=@(p,x)p(1)*(exp(-(x-p(4))/p(2))-exp(-(x-p(4))/p(3))).*heaviside(x-p(4))+p(5);%%%simple
-fhandle=BuildPulseHandle(1);%
+%fhandle=BuildPulseHandle(1);%
 
 minprominence=0.05;%0.005(dic21),0.05(Jan24,Rf=3e3).
 polarity=1;% 1: positivos, 0:negativos.
-for i=1:10%Npulsos
+for i=1:Npulsos
     %raw=fitsread(file,'binarytable',1,'TableColumns',1,'TableRows',1);%%5Lentisimo.
     try
         raw=fits.readCol(fptr,1,i,1);
@@ -84,8 +84,8 @@ for i=1:10%Npulsos
         
     dc(i)=mean(pulso(1:L*t0ini/2,2));
     dc_std(i)=std(pulso(1:L*t0ini/2,2));
-    area(i)=sum(medfilt1(pulso(L*t0ini-10:end,2),wfilt)-dc(i));
-    optArea(i)=sum(medfilt1(pulso(L*t0ini-10:L*topt,2),wfilt)-dc(i));
+    area(i)=sum(medfilt1(pulso(int16(L*t0ini-10):end,2),wfilt)-dc(i));
+    optArea(i)=sum(medfilt1(pulso(int16(L*t0ini-10):L*topt,2),wfilt)-dc(i));
     [maux,miaux]=max(medfilt1(pulso(:,2),wfilt));
     amp(i)=maux-dc(i);
     tmax(i)=time(miaux);
