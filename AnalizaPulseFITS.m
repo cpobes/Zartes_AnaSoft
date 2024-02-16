@@ -7,7 +7,6 @@ Npulsos=info.BinaryTable.Rows
 L=info.BinaryTable.FieldSize(1);
 %Npulsos=10000;
 
-%%%check varargin
 for i=1:nargin-1
     if isnumeric(varargin{i})
         DataUnit=varargin{i};
@@ -93,6 +92,7 @@ DT=1/SR;
 %fnorm=@(p,t) heaviside(t-p(4)).*(exp(-(t-p(4))/p(2))-exp(-(t-p(4))/p(3))+exp(-(t-p(4))/p(5)))/(p(2)+p(5)-p(3));
 %fh3=@(p,t)p(2)*fhandle([1 p0(2) p0(3) p(3) p0(5)],time)+p(1);
 %fhandle=@(p,x)p(1)*(exp(-(x-p(4))/p(2))-exp(-(x-p(4))/p(3))).*heaviside(x-p(4))+p(5);%%%simple
+%fhandle=BuildPulseHandle(1);%
 
 fhandle=BuildPulseHandle('2e');%
 minprominence=0.05;%0.005(dic21),0.05(Jan24,Rf=3e3).
@@ -115,8 +115,8 @@ for i=1:Npulsos%
         
     dc(i)=mean(pulso(1:L*t0ini/2,2));
     dc_std(i)=std(pulso(1:L*t0ini/2,2));
-    area(i)=sum(medfilt1(pulso(L*t0ini-10:end,2),wfilt)-dc(i));
-    optArea(i)=sum(medfilt1(pulso(L*t0ini-10:L*topt,2),wfilt)-dc(i));
+    area(i)=sum(medfilt1(pulso(int16(L*t0ini-10):end,2),wfilt)-dc(i));
+    optArea(i)=sum(medfilt1(pulso(int16(L*t0ini-10):L*topt,2),wfilt)-dc(i));
     [maux,miaux]=max(medfilt1(pulso(:,2),wfilt));
     amp(i)=maux-dc(i);
     tmax(i)=time(miaux);
