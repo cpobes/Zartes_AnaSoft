@@ -16,12 +16,13 @@ if nargin==2
 else
     index=1:N;
 end
+L=length(index);
 aux=zeros(RL,1);
 window=[];
 %window=hamming(RL);
 for i=index
     auxpulse=readFITSpulse(file,i);%%%asumimos baselines en Dataunit=2
 
-    aux=aux(:)+auxpulse(:,2);
+    aux=aux(:)+auxpulse(:,2);%
 end
-pulso=double([auxpulse(:,1) aux(:)/N]);
+pulso=double([auxpulse(:,1) aux(:)/L]);

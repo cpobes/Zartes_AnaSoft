@@ -1,4 +1,4 @@
-function PulseParameters= AnalizaPulseFITS(file,varargin)
+function PulseParameters=AnalizaPulseFITS(file,varargin)
 %%%%Funciona analoga a AnalizaPulseDir pero para fichero fits
 import matlab.io.*
 
@@ -7,18 +7,7 @@ Npulsos=info.BinaryTable.Rows
 L=info.BinaryTable.FieldSize(1);
 %Npulsos=10000;
 
-%%%%%%%%OPTIONS%%%%%%%%%%
-t0ini=0.1;%%%Esto se tiene que leer del fichero tambien.
-optfraction=0.05;%Dic21:0.128; Ene24:0.05.
-topt=t0ini+optfraction;
-%trunc_area_range=(1080:1440)';
-fit_range=9000:1e5;%Dic21:1000:10000;
-%topt=t0ini+0.02;%fraccion para pulsos V1O 0.02.
-boolfit=1;
-wfilt=1;
-%%%%%%%%%%%%%%%%%%%%%%%%%
-DataUnit=2;
-A=0;B=0;
+%%%check varargin
 for i=1:nargin-1
     if isnumeric(varargin{i})
         DataUnit=varargin{i};
@@ -30,12 +19,50 @@ for i=1:nargin-1
             I0=OP.I0;
         end
         oft=OP.oft(:);%%%%%%estandarizar esto.
+        if isfield(OP,'index')
+            index=OP.index;
+            if isempty(index)index=1:Npulsos;end
+        else
+            index=1:Npulsos;
+        end
         %Ibias=OP.Ibias;
         %A=(I0-Ibias)*Rsh;
         %B=Rsh;
+        %%%%%%%%OPTIONS%%%%%%%%%%
+%         t0ini=0.1;%%%Esto se tiene que leer del fichero tambien.
+%         optfraction=0.055;%Dic21:0.128; Ene24:0.055.
+%         topt=t0ini+optfraction;
+        if isfield(OP,'tini')
+            t0ini=OP.tini;
+        else
+            t0ini=0.1;
+        end
+        if isfield(OP,'ToptFraction')
+            optfraction=OP.ToptFraction;
+        else
+            optfraction=0.055;%Dic21:0.128; Ene24:0.055.
+        end
+        if isfield(OP,'boolfit')%ajustamos?
+            boolfit=OP.boolfit;
+        else
+            boolfit=0;
+        end
+        if isfield(OP,'wfilt')%filtrado?
+            wfilt=OP.wfilt;
+        else
+            wfilt=1;
+        end
     end
 end
-fptr=fits.openFile(file)
+%%%
+topt=t0ini+optfraction;
+%trunc_area_range=(1080:1440)';
+fit_range=t0ini*L/2:L/2;%9000:1e5;%Dic21:1000:10000;
+%%%%%%%%%%%%%%%%%%%%%%%%%
+DataUnit=2;
+A=0;B=0;
+
+fptr=fits.openFile(file);
 %fits.movAbsHDU(fptr,3)%%%el fichero de la LNCS está en dos tablas.
 try
 fits.movAbsHDU(fptr,DataUnit);
@@ -66,11 +93,15 @@ DT=1/SR;
 %fnorm=@(p,t) heaviside(t-p(4)).*(exp(-(t-p(4))/p(2))-exp(-(t-p(4))/p(3))+exp(-(t-p(4))/p(5)))/(p(2)+p(5)-p(3));
 %fh3=@(p,t)p(2)*fhandle([1 p0(2) p0(3) p(3) p0(5)],time)+p(1);
 %fhandle=@(p,x)p(1)*(exp(-(x-p(4))/p(2))-exp(-(x-p(4))/p(3))).*heaviside(x-p(4))+p(5);%%%simple
-fhandle=BuildPulseHandle(1);%
 
+fhandle=BuildPulseHandle('2e');%
 minprominence=0.05;%0.005(dic21),0.05(Jan24,Rf=3e3).
 polarity=1;% 1: positivos, 0:negativos.
-for i=1:10%Npulsos
+
+for i=1:Npulsos%
+    if ~ismember(i,index)
+        continue;
+    end
     %raw=fitsread(file,'binarytable',1,'TableColumns',1,'TableRows',1);%%5Lentisimo.
     try
         raw=fits.readCol(fptr,1,i,1);
@@ -99,7 +130,8 @@ for i=1:10%Npulsos
     
     %%%%%FILTRO OPTIMO%%%%%%%%
     if ~isempty(oft)
-        OFT_Energy(i)=sum(pulso(:,2).*oft(:));
+        %OFT_Energy(i)=sum(pulso(:,2).*oft(:));
+        OFT_Energy(i)=OFTEcalcWjit(pulso,[pulso(:,1) oft(:)]);
     end
     %energy(i)=sum((pulso(:,2)-dc(i))'.*ofilt);%%%estimacion OF.
     %energy0(i)=sum(pulso(:,2)'.*ofilt);
@@ -133,7 +165,9 @@ for i=1:10%Npulsos
         %ft_p3=lsqcurvefit(fh3,p0,ind_fit,pulso(ind_fit,2)');
         
         %p0=[0.1 1e-3 10e-6 1.2e-3 dc(i)];%%%tau1-tau2 para pulso positivo.
-        p0=[-0.1102 4.586e-06 0.0008222 0.005003 dc(i) 0.003218];
+        %p0=[-0.1102 4.586e-06 0.0008222 0.005003 dc(i)
+        %0.003218];Jan24.Rf3e3,SR:1e6
+        p0=[-0.3086    1.8e-05    9.2927e-04    0.0040   dc(i)    0.0026];
         ft_p=lsqcurvefit(fhandle,p0,pulso(fit_range,1),pulso(fit_range,2));
         
         dcfit(i)=ft_p(5);

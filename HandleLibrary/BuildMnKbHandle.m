@@ -1,0 +1,16 @@
+function Kbfhandle=BuildMnKbHandle()
+%%%funcion para devolver el handle a las lineas Ka del Mn incluyendo
+%%%resolucion gaussiana.
+HandleDir='C:\Users\Carlos\Documents\GitHub\zartes\HandleLibrary';
+LinesFile=strcat(HandleDir,'\','MnKb-Voigt-Lines.json');
+fhMnKb=BuildVoigtHandle(LinesFile);
+%x=[-10:0.1:10];%%%! ojo, la y que usemos como vector de energia tiene que tener el mismo step de 0.1
+normalizacion='amplitud';%amplitud o area.
+Low=-100;
+High=100;
+switch normalizacion
+    case 'amplitud'
+        Kbfhandle=@(p,y)p(1)*conv(fhMnKb(y),normpdf([Low:(y(2)-y(1)):High],0,p(2)/2.355)./max(conv(fhMnKb(y),normpdf([Low:(y(2)-y(1)):High],0,p(2)/2.355))),'same');
+    case 'area'
+        Kbfhandle=@(p,y)p(1)*conv(fhMnKb(y),normpdf([Low:(y(2)-y(1)):High],0,p(2)/2.355)./sum(conv(fhMnKb(y),normpdf([Low:(y(2)-y(1)):High],0,p(2)/2.355))),'same');
+end

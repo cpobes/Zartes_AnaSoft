@@ -17,7 +17,7 @@ end
 %%% y da error tomar el limite inferior en 1.
 if nargin==2
     opt=varargin{1};
-    if isnumeric(opt) && opt
+    if isnumeric(opt) && opt%%%two-sided. ojo, mejor usar periodogram.
         freq=[freq freq(end)+SF/N:SF/N:2*freq(end)];
         psd=[psd(:); flip(psd(1:end-1))];
     end
