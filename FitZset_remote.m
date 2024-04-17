@@ -20,7 +20,7 @@ if isfield(TESDATA,'datadir')
     try
         TFS=importTF('TFS.txt');%%%%Necesitamos crear TFS en el dir de analisis
     catch
-        'hola, di error al importar la TFS.'    
+        'hola, di error al importar la TFS.' 
     end
     if isfield(TESDATA,'TFS') TFS=TESDATA.TFS;end %%%Podemos sobreescribir la TFS con otra.
     if isfield(TESDATA,'TFN') TFN=TESDATA.TFN;else TFN=[];end

@@ -17,7 +17,7 @@ for i=1:nargin-1
         if isfield(OP,'I0')
             I0=OP.I0;
         end
-        oft=OP.oft(:);%%%%%%estandarizar esto.
+        oft=OP.oft;%%%%%%estandarizar esto.
         if isfield(OP,'index')
             index=OP.index;
             if isempty(index)index=1:Npulsos;end
@@ -131,7 +131,12 @@ for i=1:Npulsos%
     %%%%%FILTRO OPTIMO%%%%%%%%
     if ~isempty(oft)
         %OFT_Energy(i)=sum(pulso(:,2).*oft(:));
-        OFT_Energy(i)=OFTEcalcWjit(pulso,[pulso(:,1) oft(:)]);
+        %OFT_Energy(i)=OFTEcalcWjit(pulso,[pulso(:,1) oft(:)]);
+        %%%temporal baseline filtering.
+        if amp(i)<0.01 && OP.filtopt.boolfit
+            pulso(:,2)=filtfilt(OP.filtopt.filter,pulso(:,2));
+        end
+        OFT_Energy(i)=OFTEcalcWjit(pulso,oft);%metemos time en oft tb.
     end
     %energy(i)=sum((pulso(:,2)-dc(i))'.*ofilt);%%%estimacion OF.
     %energy0(i)=sum(pulso(:,2)'.*ofilt);

@@ -49,6 +49,7 @@ else
     ZfitOpt.NoiseFilterModel.model='medfilt'; %see BuildNoiseOptions
     ZfitOpt.NoiseFilterModel.wmed=40;
 end
+
 % if nargin>2
 %     dir=varargin{1};
 %     cd(dir);

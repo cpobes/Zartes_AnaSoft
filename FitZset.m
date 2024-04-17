@@ -35,10 +35,11 @@ if nargin==4 || (nargin>=5 && isstruct(varargin{1}))
     end    
     if isfield(options,'Temps') && ~isempty(options.Temps)   
        t=options.Temps;
+       if t<1 t=1e3*t;end %%%si t<1 suponemos esta en K y pasamos a mK.
        for iii=1:length(t)
            str=dir('*mK');
            for jjj=1:length(str)
-               if strfind(str(jjj).name,num2str(t(iii))) & str(jjj).isdir, break;end
+               if ~isempty(strfind(str(jjj).name,num2str(t(iii)))) && str(jjj).isdir, break;end
            end
                dirs{iii}=str(jjj).name;
        end
@@ -56,7 +57,7 @@ if nargin==4 || (nargin>=5 && isstruct(varargin{1}))
             if length(ls(char(dirs{i})))>2 newdirs{end+1}=dirs{i};end
         end
         for i=1:length(newdirs),aux(i)=sscanf(newdirs{i},'%f');end
-        [ii,jj]=sort(aux);
+        [~,jj]=sort(aux);
         %for i=1:length(aux) dirs{i}=strcat(num2str(aux(i)),'mK'),end
         dirs=newdirs(jj);
     end
@@ -71,8 +72,9 @@ if nargin==4 || (nargin>=5 && isstruct(varargin{1}))
         t=varargin{1};
     for iii=1:length(t)
         str=dir('*mK');
+        if t(iii)<1 t(iii)=1e3*t(iii);end
         for jjj=1:length(str)
-            if strfind(str(jjj).name,num2str(t(iii))) & str(jjj).isdir, break;end
+            if ~isempty(strfind(str(jjj).name,num2str(t(iii)))) && str(jjj).isdir, break;end
         end
         dirs{iii}=str(jjj).name;
     end
@@ -328,7 +330,7 @@ for i=1:length(dirs)
             
          %%%Analizamos el ruido
          %medfilt_w=40;
-         if ~isempty(filesNoise) & exist(strcat(dirs{i},'\',thenoisefile))
+         if ~isempty(filesNoise) && exist(strcat(dirs{i},'\',thenoisefile))
             
             %[noisedata,file]=loadnoise(0,dirs{i},filesNoise{jj});%%%quito '.txt'
             [noisedata,~]=loadnoise(0,dirs{i},thenoisefile);
@@ -441,6 +443,8 @@ for i=1:length(dirs)
         end  %%%if not empty filesNoise       
     end
     %%%Pasamos ExRes y ThRes dentro de P.p
+    %[numel(P) numel(P(i).ExRes) numel(P(i).p)]
+    %P
     if ~isempty(filesNoise)
         for jj=1:length(P(i).ExRes) %%%(filesZ)
             P(i).p(jj).ExRes=P(i).ExRes(jj);

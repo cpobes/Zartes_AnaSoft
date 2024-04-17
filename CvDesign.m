@@ -1,14 +1,16 @@
 function Cv=CvDesign(T,varargin)
 %Calculo capacidades termicas para varios materiales.
-%Calcula la suma de la contribución eléctrica y phononica, pero ojo, para
-%el molibdeno no tengo datos para la contribución phononica. 
+%Calcula la suma de la contribución eléctrica y phononica, 
+%pero ojo, para el molibdeno no tengo datos para la contribución 
+%phononica. 
 %Para calcular la Celectrica de una bicapa tengo CthCalc.
 
 %Encuentro una referencia con las Td de los elementos:
 %https://www.knowledgedoor.com/2/elements_handbook/debye_temperature.html
 %Los valores no coinciden exactamente, pero aparece la del Mo.
-%Encuentro tb referencia con las Ef de Mo,W y Ta. Da Ef=0.4978Ryd=6.77eV
-%para el Mo. Coincide con el irwin?
+%Encuentro tb referencia con las Ef de Mo,W y Ta.
+%((http://iopscience.iop.org/0953-8984/10/48/005) tabla1.)
+%Da Ef=0.4978Ryd=6.77eV para el Mo. Coincide con el irwin?
 %Tf(K)=1.16e4*E(eV)
 
 %definicion materiales. Ef(eV).densidad(Kg/m^3).
@@ -56,6 +58,12 @@ Si3N4.f_obs_free=1;
 TiO2.Ef=Inf;TiO2.Tf=Inf;TiO2.TD=232;TiO2.densidad=4.23e6;
 TiO2.masa_molar=79.866;TiO2.f_obs_free=1;TiO2.att_length6K=0e-6;
 TiO2.conductivity=0;
+%%%Wolframio
+W.Ef=11.47;W.Tf=13.37e4;W.TD=383;
+W.densidad=19.316e6;W.masa_molar=183.84;
+W.att_length6K=0;%*
+W.conductivity=0;%*
+W.f_obs_free=1;%*
 % E_fermi=[5.53,9.9,7,Inf]; %energias de fermi en eV.
 % %Ef=5.53; %eV
 % T_fermi=[6.42e4,11.5e4,8.16e4,Inf]; %en Kelvin
@@ -104,6 +112,8 @@ switch material_str
         material=Si3N4;
     case 'TiO2'
         material=TiO2;
+    case 'Wolframio'
+        material=W;
 end
 %material=oro;%Si3N4;%oro
 Tf=material.Tf;TD=material.TD;d=material.densidad;M=material.masa_molar;L=material.att_length6K;

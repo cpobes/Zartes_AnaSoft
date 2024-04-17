@@ -22,10 +22,12 @@ end
 
 %par.hAu=300e-9;
 C=CthCalc(par);
+%C=0.72e-15;%for W.
 %C*1e15
 %[Tc' DAU' C'*1e15]
 
 n=par.n;%3.2;
+%n=5;%for W.
 M=0;
 
 Ts=0.7*Tc;
@@ -38,3 +40,9 @@ F2=F./(1-t.^n);
 if isfield(par,'M') M=par.M;end
 
 efwhm=2*sqrt(2*log(2))*sqrt(4*Kb*C.*sqrt(n*(1+M^2).*F2)/alfa).*Tc/e;
+%%%amplitud
+E0=1*e;%1eV.
+I0=50e-6;
+DI=-alfa*E0*I0/(C*Tc);
+Rf=1e4;
+DV=DI*3*Rf
