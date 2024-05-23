@@ -145,7 +145,7 @@ for i=1:length(dirs)
         else
             offset=0;
         end
-        Ib=Ib-offset
+        Ib=Ib-offset;
         %offset=0.11e-6;%-9e-6;!!!!!
         
         %%%importamos la TF
@@ -165,6 +165,7 @@ for i=1:length(dirs)
         ind_z=1:length(ztes);
         
         if isfield(options,'f_ind')
+            %rangos de frecuencias en las que hacer el Z fit.
             ind_z=[];
             for iii=1:length(options.f_ind(:,1))
                 %find(fS>options.f_ind(i,1) & fS<options.f_ind(i,2))'

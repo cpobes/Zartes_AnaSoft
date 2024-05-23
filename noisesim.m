@@ -104,6 +104,18 @@ taueff=tau/(1+beta*L0);
 tauI=tau/(1-L0);
 tau_el=L/(RL+R0*(1+bI));
 
+Fmodel='1';%'ballistic';%'diffusive', '1'.
+%Modelo de 'F' para 1TB y 2TBhanging.
+t=Ts/T0;
+switch Fmodel
+    case 'ballistic'
+        F=(t^(n+1)+1)/2;
+    case 'diffusive'
+        F=n*(t^(2*n+1)-1)/((2*n+1)*(t^n-1));
+    case '1'
+        F=1;
+        warning('Ojo, usando F=1 en el modelo de ruido');
+end
 switch model
     case 'wouter'
     %%%ecuaciones 2.25-2.27 Tesis de Wouter.
@@ -129,9 +141,9 @@ switch model
     %sIHandle=@(f)-(1/(I0*R0))*(L/(tau_el*R0*L0)+(1-RL/R0)-L*tau*(2*pi*f).^2/(L0*R0)+1i*(2*pi*f)*L*tau*(1/tauI+1/tau_el)/(R0*L0)).^-1;%No
     %usado.
     
-    t=Ts/T0;
     %%%calculo factor F. See McCammon p11.
     %n=3.1;
+    %t=Ts/T0;
     %F=t^(n+1)*(t^(n+2)+1)/2;%F de boyle y rogers. n= exponente de la ley de P(T). El primer factor viene de la pag22 del cap de Irwin.
     %%%%UPDATE.23-Oct-2019. Además de eliminar el factor t^(n+1) que era el
     %%%%responsable de que F tendiese a cero en lugar de 1/2 el uso del
@@ -139,8 +151,8 @@ switch model
     %%%%nuestro, sino el exponente de la ley de G, es decir, 'n-1'. Esto
     %%%%cambia las expresiones y cambia la estimación de 'F', sobre todo a Tbath baja.
     %%%%De hecho, la diferencia entre el specular y el diffusive puede llegar también al 10%
-    bb=n-1;
-    F=(t^(bb+2)+1)/2;%%%specular limit
+    %bb=n-1;
+    %F=(t^(bb+2)+1)/2;%%%ballistic limit. Ojo a la definicion de 't'. McCammon:t=Tc/Tbath.
     %F=(bb+1)*(t^(2*bb+3)-1)/((2*bb+3)*(t^(bb+1)-1));%F de Mather.%diffusive limit
     %%%La diferencia entre las dos fÃ³rmulas es menor del 1%.
     %F=(n+1)*(t^(2*n+3)-1)/((2*n+3)*(t^(n+1)-1));%%%diffusive limit.
@@ -152,8 +164,8 @@ switch model
     if ~isreal(sqrt(stes)) stes=zeros(1,length(f));end
     smax=4*Kb*T0^2*G.*abs(sI).^2;
     
-    sfaser=0;%21/(2*pi^2)*((6.626e-34)^2/(1.602e-19)^2)*(10e-9)*P0/R0^2/(2.25e-8)/(1.38e-23*T0);%%%eq22 faser
-    sext=(18.5e-12*abs(sI)).^2;
+    %sfaser=0;%21/(2*pi^2)*((6.626e-34)^2/(1.602e-19)^2)*(10e-9)*P0/R0^2/(2.25e-8)/(1.38e-23*T0);%%%eq22 faser
+    %sext=(18.5e-12*abs(sI)).^2;
     
     NEP_tfn=sqrt(stfn)./abs(sI);
     NEP_ssh=sqrt(ssh)./abs(sI);
@@ -197,9 +209,9 @@ switch model
         zcirc=ztes+RL+1i*2*pi*f*L;
         sI=(ztes-R0*(1+bI))./(zcirc*V0*(2+bI));
         w=2*pi*f;
-        t=Ts/T0;
-        bb=n-1;
-        F=(t^(bb+2)+1)/2;%%%specular limit
+        %t=Ts/T0;
+        %bb=n-1;
+        %F=(t^(bb+2)+1)/2;%%%specular limit
         %F=(bb+1)*(t^(2*bb+3)-1)/((2*bb+3)*(t^(bb+1)-1));%F de Mather.
         g0=G;
         g1=OP.P.g_1;

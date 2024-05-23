@@ -41,10 +41,13 @@ if isfield(analizeOptions,'ZfitOpt')
 else
     ZfitOpt.TFdata='HP';
     ZfitOpt.Noisedata='HP';
-    ZfitOpt.f_ind=[1 1e5];%%%[fmin fmax] De momento no admite un rango arbitrario.
+    ZfitOpt.f_ind=[1 1e5];%rango de frecuencias para fit de Zs.
+    %%%[fmin fmax] De momento no admite un rango arbitrario.
     %%%En realidad puede ser una matriz con f_ind(1,:)=[fmin1 fmax1],
     %%%f_ind(2,:)=[fmin2 fmax2], etc.
     %ZfitOpt.Temps=50;%Temp en mK.
+    %ZfitOpt.mjofrange=[];%frecuencias para el fit de Mjo.
+    %ZfitOpt.mphfrange=[];%frecuencias para el fit de Mph.
     ZfitOpt.ThermalModel='default';
     ZfitOpt.NoiseFilterModel.model='medfilt'; %see BuildNoiseOptions
     ZfitOpt.NoiseFilterModel.wmed=40;
@@ -127,6 +130,7 @@ if isfield(analizeOptions,'TES_sides')
     rhoAs=[0.107 0.0983]; %valores de Rho/A para Mo y Au
     %hMo=45e-9; hAu=270e-9; %hAu=1.5e-6;%%%1Z11.!!!!!!!!!!!!!
     hMo=40e-9;hAu=220e-9;%3Z13.
+    hAu=2.4e-6;
     %CN=(gammas.*rhoAs)*([hMo ;hAu]*sides.^2).*TES.Tc; %%%Calculo directo
     CN=(gammas.*rhoAs).*([hMo hAu]*TES.sides.^2).*TES.Tc; %%%calculo de cada contribucion por separado.
     CN=sum(CN);

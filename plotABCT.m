@@ -18,6 +18,7 @@ elseif nargin==3
     %hMo=55e-9; hAu=340e-9; %hAu=1.5e-6;
     %hMo=45e-9; hAu=270e-9; %hAu=1.5e-6;%%%1Z11.
     hMo=40e-9;hAu=220e-9;%3Z13.
+    hAu=2.4e-6;%%%!!!
     %CN=(gammas.*rhoAs)*([hMo ;hAu]*sides.^2).*TES.Tc; %%%Calculo directo
     CN=(gammas.*rhoAs).*([hMo hAu]*sides.^2).*TES.Tc; %%%calculo de cada contribucion por separado.
     CN=sum(CN);
@@ -81,7 +82,7 @@ hl{i}=linkprop([hc(i) ht(i) ha(i) hb(i)],'brushdata');
 %brush off;
 linkaxes([shc sht sha shb],'x');
 end
-xlim([0.10 0.9])
+xlim([0.05 0.9])
 set(hc,'userdata',hl);
 set(ht,'userdata',hl);
 set(ha,'userdata',hl);
