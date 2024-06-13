@@ -1,4 +1,4 @@
-classdef NoiseThermalModelClass < handle
+classdef ThermalModelClass < handle
     
     properties
         Kb=1.38e-23;
@@ -36,6 +36,7 @@ classdef NoiseThermalModelClass < handle
         boolPlotComponents=0;
         PlotCurrentScale=1e12;%%%Para pintar en picoA/raizHz.
         PlotNEPScale=1e18;%%%Para pintar en aW/raizHz.
+        PlotFreqs=logspace(1,5,1000);
         
         %%%Calculation Properties
         maxResolutionFrequency=Inf;%%%(use 1e5 for experimental comparison, Inf for theoretical Limit.
@@ -45,7 +46,7 @@ classdef NoiseThermalModelClass < handle
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%Constructor
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        function obj=NoiseThermalModelClass(PARAMETERS,varargin)
+        function obj=ThermalModelClass(PARAMETERS,varargin)
             %%%alteramos el orden respecto a BuildThermalModel() function.
             %%%Obligamos a pasar OP, TES y circuit, que son necesarios, y
             %%%opcionalmente el nombre del modelo.
@@ -57,6 +58,8 @@ classdef NoiseThermalModelClass < handle
             obj.fOperatingPoint=PARAMETERS.OP;%%%Si definimos OP como una clase habrá que cambiar esto.
             obj.fCircuit=PARAMETERS.circuit;%%%Lo mismo para el cirucit.
             obj.fTES=PARAMETERS.TES;%%%Y para el TES.
+            obj.fMjohnson=PARAMETERS.OP.P.M;
+            obj.fMphononArray=PARAMETERS.OP.P.Mph;
             s=numel(PARAMETERS.OP.parray);
             obj.fNumberOfBlocks=(s-1)/2;
             obj.fNumberOfLinks=numel(obj.fLinksList);
@@ -392,7 +395,6 @@ classdef NoiseThermalModelClass < handle
                 end
             end
             
-            f=logspace(1,5,1000);
             if strcmpi(options.tipo,'current')
                 func=obj.fTotalCurrentNoiseModel;
                 scale=obj.PlotCurrentScale;
@@ -411,11 +413,11 @@ classdef NoiseThermalModelClass < handle
                 end
                 legendstring=([{'R_{sh}' 'Johnson_{TES}'} obj.fLinksList]);
                 for i=1:obj.fNumberOfComponents                    
-                    loglog(f,scale*sqrt(fh{i}(f)),'-','DisplayName',legendstring{i}),hold on;
+                    loglog(obj.PlotFreqs,scale*sqrt(fh{i}(obj.PlotFreqs)),'-','DisplayName',legendstring{i}),hold on;
                 end
                 
             end
-            loglog(f,scale*func(f,Mjo,Mph),'-','linewidth',2.,'DisplayName','Total Current Noise'),grid on;
+            loglog(obj.PlotFreqs,scale*func(obj.PlotFreqs,Mjo,Mph),'-','linewidth',2.,'DisplayName','Total Current Noise'),grid on;
             
             %%%Formatting.
             %legend(legendstring);
@@ -436,7 +438,7 @@ classdef NoiseThermalModelClass < handle
             end
             if boolMs
                 Mjo=obj.fMjohnson;
-                MphArray=obj.fMphArray;
+                MphArray=obj.fMphononArray;
             else
                 Mjo=0;
                 MphArray=zeros(1,obj.fNumberOfLinks);

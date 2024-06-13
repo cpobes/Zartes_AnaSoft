@@ -17,6 +17,7 @@ Tdir=GetDirfromTbath(Tbath);%%%Esto funciona tanto si pasamos Tbath como string 
 
 files=ls(strcat(Tdir,pattern));
 
+if isempty(files) error('No Noise Files found');end
 [ii,~]=size(files);
 for i=1:ii
 Iaux(i)=sscanf(char(regexp(files(i,:),'-?\d+(\.\d*)?','match')),'%f');

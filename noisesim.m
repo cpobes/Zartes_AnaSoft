@@ -104,7 +104,7 @@ taueff=tau/(1+beta*L0);
 tauI=tau/(1-L0);
 tau_el=L/(RL+R0*(1+bI));
 
-Fmodel='1';%'ballistic';%'diffusive', '1'.
+Fmodel='ballistic';%'ballistic';%'diffusive', '1'.
 %Modelo de 'F' para 1TB y 2TBhanging.
 t=Ts/T0;
 switch Fmodel
@@ -129,12 +129,12 @@ switch model
     func=@(p,f)([p(1)-(p(1)-p(2))./(1+((2*pi*f).^2)*(p(3).^2)) ...
                     -abs(-(p(1)-p(2))*(2*pi*f)*p(3)./(1+((2*pi*f).^2)*(p(3).^2)))]);
                 if nargin>1
-    p0=[OP.Zinf OP.Z0 OP.P.taueff];%%%Ojo a OP, no incluye taueff
-    zdata=func(p0,f);%%%p0=[p1 p2 p3 p4 p5];!!!!!ojo al formato!
-    ztes=zdata(1:end/2)+1i*zdata(end/2+1:end);
-    %ztes=zexp;
-    zcirc=ztes+RL+1i*2*pi*f*L;
-    sI=(ztes-R0*(1+bI))./(zcirc*V0*(2+bI));
+                    p0=[OP.Zinf OP.Z0 OP.P.taueff];%%%Ojo a OP, no incluye taueff
+                    zdata=func(p0,f);%%%p0=[p1 p2 p3 p4 p5];!!!!!ojo al formato!
+                    ztes=zdata(1:end/2)+1i*zdata(end/2+1:end);
+                    %ztes=zexp;
+                    zcirc=ztes+RL+1i*2*pi*f*L;
+                    sI=(ztes-R0*(1+bI))./(zcirc*V0*(2+bI));
                 end
     sI=-(1/(I0*R0))*(L/(tau_el*R0*L0)+(1-RL/R0)-L*tau*(2*pi*f).^2/(L0*R0)+1i*(2*pi*f)*L*tau*(1/tauI+1/tau_el)/(R0*L0)).^-1;%funcion de transferencia.
     

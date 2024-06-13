@@ -30,7 +30,14 @@ option.Mjo=0;
 option.NoiseBaseName='HP_noise';
 NoiseBaseName=option.NoiseBaseName;%%%%Añadimos campo a option para elegir si pintar ruidos del HP o de la PXI.
 %NoiseBaseName='PXI_noise';
-    
+
+%NoiseBaseName. Para poder usar PXI o HP sólo en NoisePlotOptions
+if isempty(strfind(NoiseBaseName,'PXI'))
+    NoiseBaseName='\HP_noise*';
+else
+    NoiseBaseName='\PXI_noise*';
+end
+
 if nargin==4
     [noise,file,path]=loadnoise();
     %%%buscamos la IV y P correspondientes a la Tbath dada
@@ -107,14 +114,14 @@ if nargin==7 %%%%Se puede pasar también tanto el directorio, como los ficheros, 
     [~,Tind]=min(abs([P.Tbath]*1e3-Tbath));
     p=P(Tind).p;
     NoiseBaseName=option.NoiseBaseName;
+    if isempty(strfind(NoiseBaseName,'PXI'))
+        NoiseBaseName='\HP_noise*';
+    else
+        NoiseBaseName='\PXI_noise*';
+    end
     AllfilesNoise=ListInBiasOrder(strcat(wdir,'\',NoiseBaseName,'*'),'descend');
 end
-%NoiseBaseName. Para poder usar PXI o HP sólo en NoisePlotOptions
-if isempty(strfind(NoiseBaseName,'PXI'))
-    NoiseBaseName='\HP_noise*';
-else
-    NoiseBaseName='\PXI_noise*';
-end
+
 tipo=option.tipo;
 boolcomponents=option.boolcomponents;%%%%para pintar o no las componentes
 Mph=option.Mph;

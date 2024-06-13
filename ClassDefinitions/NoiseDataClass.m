@@ -12,7 +12,7 @@ classdef NoiseDataClass < handle
         fTES;
         fCircuit;
         FilteredVoltageData=[];
-        NoiseThermalModelClass=[];
+        fThermalModelClass=[];
         
         %filter options
         filter_options=[];%.method='movingMean'; %a definir en la funcion filterNoise().
@@ -27,7 +27,7 @@ classdef NoiseDataClass < handle
         %plotoptions
         plottype='current';%options: 'current', 'nep'
         units='pA';%options: 'pA, fW, A, W' /raizHz.
-        boolPlotModel=0;
+        boolPlotModel=1;
         boolShowFilteredData=1;
     end
     
@@ -85,6 +85,7 @@ classdef NoiseDataClass < handle
         %%%Plot Noise
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function Plot(obj)
+            %%%Solo pinta modo corriente.
             scale=1;
             if strcmp(obj.units,'pA')
                 scale=1e12;
@@ -106,7 +107,7 @@ classdef NoiseDataClass < handle
             end
             if obj.boolPlotModel
                 hold on
-                obj.NoiseThermalModelClass.Plot();
+                obj.fThermalModelClass.Plot();
             end
         end
         
@@ -118,9 +119,9 @@ classdef NoiseDataClass < handle
             parameters.TES=obj.fTES;
             parameters.circuit=obj.fCircuit;
             parray=obj.fOperatingPoint.parray;
-            obj.NoiseThermalModelClass=NoiseThermalModelClass(parameters,model);
+            obj.fThermalModelClass=ThermalModelClass(parameters,model);
             obj.fOPClass=ModelDependentOperatingPointClass(obj.fOperatingPoint,parameters,parray,model);
-            obj.fOPClass.fThResolution=obj.NoiseThermalModelClass.fThResolution;
+            obj.fOPClass.fThResolution=obj.fThermalModelClass.fThResolution;
             if isfield(obj.fCircuit,'circuitnoise')
                 circuitnoise=obj.fCircuit.circuitnoise;
             else
@@ -137,7 +138,7 @@ classdef NoiseDataClass < handle
             else
                 cnHandle=@(f) interp1(obj.freqs,circuitnoise,f);
             end
-            obj.fNEPHandle=@(f) sqrt(obj.fCurrentDataHandle(f).^2-cnHandle(f).^2)./abs(obj.NoiseThermalModelClass.fsIHandler(f));
+            obj.fNEPHandle=@(f) sqrt(obj.fCurrentDataHandle(f).^2-cnHandle(f).^2)./abs(obj.fThermalModelClass.fsIHandler(f));
             obj.NEP=obj.fNEPHandle(obj.freqs);
             obj.fOPClass.fExResolution=obj.GetBaselineResolution();
         end
@@ -169,11 +170,11 @@ classdef NoiseDataClass < handle
         %%%%%
         function FitNoise(obj)
             %%%%Ajustar el ruido filtrado al modelo fijado previamente.
-            if isempty(obj.NoiseThermalModelClass)
+            if isempty(obj.fThermalModelClass)
                 error('Fijar modelo térmico');
             end
             
-            FitFunction=obj.NoiseThermalModelClass.fTotalCurrentNoiseModel;
+            FitFunction=obj.fThermalModelClass.fTotalCurrentNoiseModel;
             faux=obj.freqs;          
             findx=find((faux>obj.fMphFitRange(1) & faux<obj.fMphFitRange(2)) | (faux>obj.fMjoFitRange(1) & faux<obj.fMjoFitRange(2)));
             xdata=obj.freqs(findx);
@@ -185,11 +186,11 @@ classdef NoiseDataClass < handle
             end
             
             fh=@(x,f)scale*FitFunction(f,x(1),x(2:end));%%%Ajustamos en pA.x(1)=Mjo, x(2:end)=MphArray.
-            m0=ones(1,obj.NoiseThermalModelClass.fNumberOfLinks+1);
-            LB=zeros(1,obj.NoiseThermalModelClass.fNumberOfLinks+1);
+            m0=ones(1,obj.fThermalModelClass.fNumberOfLinks+1);
+            LB=zeros(1,obj.fThermalModelClass.fNumberOfLinks+1);
             maux=lsqcurvefit(fh,m0,xdata(:),ydata(:),LB);
-            obj.NoiseThermalModelClass.fMjohnson=maux(1);
-            obj.NoiseThermalModelClass.fMphononArray=maux(2:end);
+            obj.fThermalModelClass.fMjohnson=maux(1);
+            obj.fThermalModelClass.fMphononArray=maux(2:end);
             obj.fOPClass.fMjohnson=maux(1);
             obj.fOPClass.fMphononArray=maux(2:end);
         end

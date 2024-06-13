@@ -202,6 +202,11 @@ classdef BasicAnalisisClass < handle
             end
             [~,mP]=GetTbathIndex(Temp,obj.structure.IVset,paux);%%%Usamos el formato en que se pasa IVset y Pset
             P=paux(mP);
+            if ~isfield(P.p,'parray')%%%en TES viejos no guardaba parray
+                for i=1:length(P.p)
+                    P.p(i).parray=[P.p(i).Zinf P.p(i).Z0 P.p(i).taueff];%%%asumimos Irwin 1TB
+                end
+            end
         end
         function Ibias=GetIbias(obj,Temp,Rp)
             IV=obj.GetIV(Temp);
@@ -226,6 +231,13 @@ classdef BasicAnalisisClass < handle
             jj=find(IV.ibias>Ibiasmin);
             Rpmin=spline(IV.ibias(jj),IV.rtes(jj),Ibiasmin);
         end
+        function Rlim=Getec51Irwin(obj,Temp,rps)
+            actualrps=obj.GetActualRps(Temp,rps);
+            L0=obj.GetFittedParameterByName(Temp,actualrps,'L0');
+            bi=obj.GetFittedParameterByName(Temp,actualrps,'bi');
+            RL=obj.fCircuit.Rsh+obj.fCircuit.Rpar;
+            Rlim=RL*(L0-1)./(L0+1+bi);
+        end
         function I0=GetI0(obj,Temp,Rp)%Corriente del TES en el punto de operacion
             IV=obj.GetIV(Temp);
             %Ibias=BuildIbiasFromRp(IV,Rp)*1e-6;%%%Ojo, BuildIbias devuelve uA.
@@ -242,7 +254,7 @@ classdef BasicAnalisisClass < handle
             P0=spline(IV.rtes,IV.ptes,Rp);%Ojo, hay que eliminar del spline los Ib<Ibmin.
         end
         function param=GetParameterFromFit(obj,Temp,Rp,pfit,varargin)
-            %%%Si refiteo los datos necesito recalcular la estructura param
+            %%% Si refiteo los datos  de Z(w) necesito recalcular la estructura param
             %%% Función para 1 Rp único. Si no, tendría que pasar también
             %%% pfit como matriz.
                 TES=obj.structure.TES;
@@ -397,10 +409,21 @@ classdef BasicAnalisisClass < handle
             olddir=pwd;
             cd(obj.datadir);
             %%%
-            
+            %NoiseBaseName=obj.NoisePlotOptions.NoiseBaseName;
+            NoiseBaseName=obj.analizeOptions.ZfitOpt.Noisedata;
             ivaux=obj.GetIV(Temp);
             realRps=obj.GetActualRps(Temp,rp);
-            if nargin==3 str='\HP_noise*'; else str=varargin{1};end 
+            
+            %if nargin==3 str='\HP_noise*'; else str=varargin{1};end 
+            if nargin==3 
+                str=strcat('\',NoiseBaseName,'_noise*');%'\HP_noise*'; 
+            else
+                if strfind(varargin{1},'HP')
+                    str='\HP_noise*';
+                elseif strfind(varargin{1},'PXI')
+                    str='\PXI_noise*';
+                end
+            end
             noisefile=GetFilesFromRp(ivaux,Temp,realRps,str);
             Tdir=GetDirfromTbath(Temp);
             fullname=strcat(Tdir,'\',noisefile);
@@ -408,7 +431,11 @@ classdef BasicAnalisisClass < handle
             parameters.circuit=obj.fCircuit;
             for i=1:length(rp)
                 OP=obj.GetSingleOperatingPoint(Temp,rp(i));
-                parameters.OP=OP;
+                Mjo=obj.GetFittedParameterByName(Temp,rp(i),'M');
+                Mph=obj.GetFittedParameterByName(Temp,rp(i),'Mph');%1TB?
+                OP.P.M=Mjo;
+                OP.P.Mph=Mph;
+                parameters.OP=OP;               
                 Noise(i)=NoiseDataClass(fullname{i},parameters);
                 Noise(i).SetNoiseModel(obj.Zfitmodel);
             end
@@ -422,6 +449,8 @@ classdef BasicAnalisisClass < handle
             Ib=obj.GetIbias(Temp,rps);
             IV=obj.GetIV(Temp);
             parray=obj.GetFittedParameterByName(Temp,rps,'parray');%acepta varargin. Devuelve parrays en columnas.
+            Mjo=obj.GetFittedParameterByName(Temp,rps,'M');
+            Mph=obj.GetFittedParameterByName(Temp,rps,'Mph');%1TB?
             if nargin==3
                 ThermalModel=obj.analizeOptions.ZfitOpt.ThermalModel;
             else
@@ -433,16 +462,19 @@ classdef BasicAnalisisClass < handle
                 param=GetModelParameters(parray(:,i)',IV,Ib(i),TES,circuit,opt);%acepta varargin
                 OP=setTESOPfromIb(Ib(i),IV,param);
                 OP.parray=parray(:,i)';%%%añadido para modelos a 2TB.
+                OP.P.M=Mjo(i);
+                OP.P.Mph=Mph(i,:);%Funciona si Mph es array?
                 parameters.TES=TES;parameters.OP=OP;parameters.circuit=circuit;%%%movido de L391.
                 %model=BuildThermalModel(ThermalModel,parameters);%%%lo estamos llamando 2 veces pq en la primera, OP no está definido.
                 %SimNoise{i}=model.noise;%%%%El modelo de ruido se define en BuilThermalModel
                 %prueba a definir el modelo de ruido con una clase.
-                SimNoise(i)=NoiseThermalModelClass(parameters,ThermalModel);
+                SimNoise(i)=ThermalModelClass(parameters,ThermalModel);
             end%for
             
         end   
         function Taus=GetTaus(obj,Temp,Rp)
-            %%%calcular los taus teoricos del modelo 1TB
+            %%%calcular los taus teoricos del modelo 1TB segun las
+            %%%definiciones de Irwin!
             Ibias=obj.GetIbias(Temp,Rp);
             ivaux=obj.GetIV(Temp);
             paux=obj.GetPstruct(Temp);
@@ -451,6 +483,7 @@ classdef BasicAnalisisClass < handle
             circuit=obj.fCircuit;
             RL=circuit.Rsh+circuit.Rpar;
             Req=RL+OP.R0*(1+OP.bi);
+            tau_el0=circuit.L./OP.R0;
             beta=(OP.R0-RL)/Req;
             tau_I=OP.tau0/(1-OP.L0);
             tau_el=circuit.L/Req;
@@ -460,9 +493,26 @@ classdef BasicAnalisisClass < handle
             tau_Menos=2*(tau_I^-1+tau_el^-1-sqr)^-1;
             Taus.tau_I=tau_I;
             Taus.tau_el=tau_el;
+            Taus.tau_el0=tau_el0;
             Taus.tau_eff=tau_eff;
             Taus.tau_Mas=tau_Mas;
             Taus.tau_Menos=tau_Menos;
+        end
+        function [Lcritm,LcritM]=GetLcrit(obj,Temp,rps)
+            TES=obj.fTES;
+            RL=obj.fCircuit.Rsh+obj.fCircuit.Rpar;
+            Rn=TES.Rn;
+            actualrps=obj.GetActualRps(Temp,rps);
+            bi=obj.GetFittedParameterByName(Temp,actualrps,'bi');
+            L0=obj.GetFittedParameterByName(Temp,actualrps,'L0');
+            tau0=obj.GetFittedParameterByName(Temp,actualrps,'tau0');
+            R0=([actualrps]*obj.fCircuit.Rn);
+            p1=(3+bi-RL./R0);
+            p2=(1+bi+RL./R0);
+            sqr=sqrt(L0.*(2+bi).*(L0.*(1-RL./R0)+p2));
+            
+            Lcritm=(L0.*p1+p2-2*sqr).*R0.*tau0./(L0-1).^2;
+            LcritM=(L0.*p1+p2+2*sqr).*R0.*tau0./(L0-1).^2;
         end
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

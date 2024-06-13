@@ -2,9 +2,9 @@ function PulseParameters=AnalizaPulseFITS(file,varargin)
 %%%%Funciona analoga a AnalizaPulseDir pero para fichero fits
 import matlab.io.*
 
-info=fitsinfo(file);
-Npulsos=info.BinaryTable.Rows
-L=info.BinaryTable.FieldSize(1);
+infor=fitsinfo(file);
+Npulsos=infor.BinaryTable.Rows
+L=infor.BinaryTable.FieldSize(1);
 %Npulsos=10000;
 
 for i=1:nargin-1
@@ -17,7 +17,11 @@ for i=1:nargin-1
         if isfield(OP,'I0')
             I0=OP.I0;
         end
-        oft=OP.oft;%%%%%%estandarizar esto.
+        if isfield(OP,'oft')
+            oft=OP.oft;%%%%%%estandarizar esto.
+        else
+            oft=[];
+        end
         if isfield(OP,'index')
             index=OP.index;
             if isempty(index)index=1:Npulsos;end
@@ -56,7 +60,11 @@ end
 %%%
 topt=t0ini+optfraction;
 %trunc_area_range=(1080:1440)';
-fit_range=t0ini*L/2:L/2;%9000:1e5;%Dic21:1000:10000;
+if isfield(OP,'fit_range')
+    fit_range=OP.fit_range;
+else
+    fit_range=t0ini*L/2:L/2;%9000:1e5;%Dic21:1000:10000;
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%
 DataUnit=2;
 A=0;B=0;
@@ -94,7 +102,13 @@ DT=1/SR;
 %fhandle=@(p,x)p(1)*(exp(-(x-p(4))/p(2))-exp(-(x-p(4))/p(3))).*heaviside(x-p(4))+p(5);%%%simple
 %fhandle=BuildPulseHandle(1);%
 
-fhandle=BuildPulseHandle('2e');%
+if isfield(OP,'MeanPulse')
+    Mpulse=OP.MeanPulse;
+    fhandle=@(p,x)p*interp1(Mpulse(:,1),Mpulse(:,2),x)
+    p0=0.284;
+else
+    fhandle=BuildPulseHandle('2e');%
+end
 minprominence=0.05;%0.005(dic21),0.05(Jan24,Rf=3e3).
 polarity=1;% 1: positivos, 0:negativos.
 
@@ -172,12 +186,18 @@ for i=1:Npulsos%
         %p0=[0.1 1e-3 10e-6 1.2e-3 dc(i)];%%%tau1-tau2 para pulso positivo.
         %p0=[-0.1102 4.586e-06 0.0008222 0.005003 dc(i)
         %0.003218];Jan24.Rf3e3,SR:1e6
-        p0=[-0.3086    1.8e-05    9.2927e-04    0.0040   dc(i)    0.0026];
+        %p0=[-0.3086    1.8e-05    9.2927e-04    0.0040   dc(i)    0.0026];
         ft_p=lsqcurvefit(fhandle,p0,pulso(fit_range,1),pulso(fit_range,2));
         
-        dcfit(i)=ft_p(5);
-        Afit(i)=ft_p(1);
-        t0fit(i)=ft_p(4);
+        if length(p0)>1
+            dcfit(i)=ft_p(5);
+            Afit(i)=ft_p(1);
+            t0fit(i)=ft_p(4);
+        else
+            dcfit(i)=mean(fhandle(p0,1:L*t0ini/2));%ft_p(5);
+            Afit(i)=ft_p(1);
+            t0fit(i)=0;%ft_p(4);
+        end
         area_fit(i)=sum(fhandle(ft_p,pulso(fit_range,1))-dcfit(i));
         fit_param(i,:)=ft_p;
 %         area_corrected(i)=sum(fhandle(fit_pulso,pulso(ind_fit,1)));
