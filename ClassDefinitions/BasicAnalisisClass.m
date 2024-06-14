@@ -17,7 +17,7 @@ classdef BasicAnalisisClass < handle
         auxSingleFitStruct=[];
         FitResultsClass;
         
-        fGlobalIndex=[];
+        fGlobalIndex=[];%%%Son los indeces del vector de frecuencias. 1:length()
         mphfitrange=[];
         mjofitrange=[];
         NoiseFilterOptions=[];
@@ -404,7 +404,9 @@ classdef BasicAnalisisClass < handle
             end
             cd(olddir);
         end
-        function Noise=GetNoiseClass(obj,Temp,rp,varargin)
+        function Noises=GetNoiseDataClass(obj,Temp,rps,varargin)
+            %%%Same as GetNoiseData, pero devuelve los datos en una Clase
+            %%%de tipo NoiseDataClass.
             %%%
             olddir=pwd;
             cd(obj.datadir);
@@ -412,7 +414,7 @@ classdef BasicAnalisisClass < handle
             %NoiseBaseName=obj.NoisePlotOptions.NoiseBaseName;
             NoiseBaseName=obj.analizeOptions.ZfitOpt.Noisedata;
             ivaux=obj.GetIV(Temp);
-            realRps=obj.GetActualRps(Temp,rp);
+            realRps=obj.GetActualRps(Temp,rps);
             
             %if nargin==3 str='\HP_noise*'; else str=varargin{1};end 
             if nargin==3 
@@ -429,19 +431,19 @@ classdef BasicAnalisisClass < handle
             fullname=strcat(Tdir,'\',noisefile);
             parameters.TES=obj.fTES;
             parameters.circuit=obj.fCircuit;
-            for i=1:length(rp)
-                OP=obj.GetSingleOperatingPoint(Temp,rp(i));
-                Mjo=obj.GetFittedParameterByName(Temp,rp(i),'M');
-                Mph=obj.GetFittedParameterByName(Temp,rp(i),'Mph');%1TB?
+            for i=1:length(rps)
+                OP=obj.GetSingleOperatingPoint(Temp,rps(i));
+                Mjo=obj.GetFittedParameterByName(Temp,rps(i),'M');
+                Mph=obj.GetFittedParameterByName(Temp,rps(i),'Mph');%1TB?
                 OP.P.M=Mjo;
                 OP.P.Mph=Mph;
                 parameters.OP=OP;               
-                Noise(i)=NoiseDataClass(fullname{i},parameters);
-                Noise(i).SetNoiseModel(obj.Zfitmodel);
+                Noises(i)=NoiseDataClass(fullname{i},parameters);
+                Noises(i).SetNoiseModel(obj.Zfitmodel);
             end
             cd(olddir);
         end
-        function SimNoise=GetNoiseModel(obj,Temp,rps,varargin)
+        function SimModel=GetOPThermalModel(obj,Temp,rps,varargin)
             %%%funcion para devolver el modelo de ruido en unos OPs
             %%%determinados.
             TES=obj.structure.TES;
@@ -468,7 +470,7 @@ classdef BasicAnalisisClass < handle
                 %model=BuildThermalModel(ThermalModel,parameters);%%%lo estamos llamando 2 veces pq en la primera, OP no está definido.
                 %SimNoise{i}=model.noise;%%%%El modelo de ruido se define en BuilThermalModel
                 %prueba a definir el modelo de ruido con una clase.
-                SimNoise(i)=ThermalModelClass(parameters,ThermalModel);
+                SimModel(i)=ThermalModelClass(parameters,ThermalModel);
             end%for
             
         end   
@@ -838,102 +840,102 @@ classdef BasicAnalisisClass < handle
             
             %%%ojo, solo polaridad positiva.
             for kk=1:length(Temp)
-            Noises=obj.GetNoiseData(Temp(kk),rps,HW);
-            Ib=obj.GetIbias(Temp(kk),rps);
-            IV=obj.GetIV(Temp(kk));
-            parray=obj.GetFittedParameterByName(Temp(kk),rps,'parray');%acepta varargin. Devuelve parrays en columnas.
-            paux=obj.GetPstruct(Temp(kk));
-            %%%
-            rtes=GetPparam(paux.p,'rp');
-            rps=rps(:)';%%%rps tiene que ser vector fila.
-            [~,jj]=min(abs(bsxfun(@minus, rtes', rps)));
-            jj=unique(jj,'stable');%Necesario stable, si no los ordena de menor a mayor independientemente de rps!
-            %actualrps=rtes(jj);
-            %%%
-            zaux=obj.GetZtesData(Temp(kk),rps);
-            for i=1:length(rps)    
-                if isempty(obj.mphfitrange)
-                    mphfrange=[2e2,7e2];%%%rango habitual [2e2 1e3].
-                else
-                    mphfrange=obj.mphfitrange;
+                Noises=obj.GetNoiseData(Temp(kk),rps,HW);
+                Ib=obj.GetIbias(Temp(kk),rps);
+                IV=obj.GetIV(Temp(kk));
+                parray=obj.GetFittedParameterByName(Temp(kk),rps,'parray');%acepta varargin. Devuelve parrays en columnas.
+                paux=obj.GetPstruct(Temp(kk));
+                %%%
+                rtes=GetPparam(paux.p,'rp');
+                rps=rps(:)';%%%rps tiene que ser vector fila.
+                [~,jj]=min(abs(bsxfun(@minus, rtes', rps)));
+                jj=unique(jj,'stable');%Necesario stable, si no los ordena de menor a mayor independientemente de rps!
+                %actualrps=rtes(jj);
+                %%%
+                zaux=obj.GetZtesData(Temp(kk),rps);
+                for i=1:length(rps)
+                    if isempty(obj.mphfitrange)
+                        mphfrange=[2e2,7e2];%%%rango habitual [2e2 1e3].
+                    else
+                        mphfrange=obj.mphfitrange;
+                    end
+                    if isempty(obj.mjofitrange)
+                        mjofrange=[1e4,10e4];%%%rango habitual [1e4 1e5].
+                    else
+                        mjofrange=obj.mjofitrange;
+                    end
+                    if isfield(obj.NoiseFilterOptions,'NoiseSubsampleFreqs')
+                        datax=obj.NoiseFilterOptions.NoiseSubsampleFreqs;
+                        datay=interp1(Noises{1}(:,1),Noises{1}(:,2),datax);
+                    else
+                        datax=Noises{1}(:,1);
+                        datay=Noises{1}(:,2);
+                    end
+                    %faux=Noises{1}(:,1);
+                    faux=datax;
+                    findx=find((faux>mphfrange(1) & faux<mphfrange(2)) | (faux>mjofrange(1) & faux<mjofrange(2)));
+                    %xdata=Noises{1}(findx,1);
+                    xdata=datax(findx);
+                    %size(datax),i
+                    
+                    %%%Filtramos ruido con NoiseFilterOptions
+                    if isempty(obj.NoiseFilterOptions)
+                        noisefilteropt.model='movingMean';%%%'minfilt+medfilt';%%%default, medfilt, minfilt,''movingMean'
+                        noisefilteropt.wmed=20;
+                        noisefilteropt.wmin=6;
+                        noisefilteropt.thr=25;
+                    else
+                        noisefilteropt=obj.NoiseFilterOptions;
+                    end
+                    obj.NoisePlotOptions.FiltOpt=noisefilteropt;
+                    %rps(i)
+                    %size(datay(findx))
+                    %ydata=filterNoise(1e12*Noises{i}(findx,2),noisefilteropt);%%%
+                    ydata=filterNoise(1e12*datay(findx),noisefilteropt);
+                    aux.model=obj.Zfitmodel;
+                    param=GetModelParameters(parray(:,i)',IV,Ib(i),TES,circuit,aux);%acepta varargin
+                    OP=setTESOPfromIb(Ib(i),IV,param);
+                    OP.parray=parray(:,i)';%%%añadido para modelos a 2TB.
+                    boolusezexp=0;
+                    if boolusezexp
+                        OP.ztes.data=zaux(i).tf;
+                        OP.ztes.freqs=zaux(i).f;
+                    end
+                    parameters.TES=TES;parameters.OP=OP;parameters.circuit=circuit;
+                    noiseaux=noisesim(obj.Zfitmodel,TES,OP,circuit);
+                    sI=interp1(noiseaux.f,noiseaux.sI,xdata);
+                    nep=sqrt((ydata(:)*1e-12).^2-circuit.squid.^2)./abs(sI(:));
+                    m0=[1 1];LB=[0 0];
+                    if strcmp(obj.Zfitmodel,'2TB_intermediate') m0=[1 1 1];LB=[0 0 0];end
+                    
+                    %size(xdata),size(ydata)
+                    boolfitcurrent=1;
+                    if boolfitcurrent
+                        maux=lsqcurvefit(@(x,xdata) fitcurrentnoise(x,xdata,parameters,obj.Zfitmodel),m0,xdata(:),ydata(:),LB);
+                    else
+                        ydata=nep;%%%ojo, fitjohnson sólo está implementado para usar 'irwin' model.
+                        maux=lsqcurvefit(@(x,xdata) fitjohnson(x,xdata,parameters),m0,xdata(:),ydata(:),LB);
+                    end
+                    maux=real(maux);
+                    paux.p(jj(i)).M=maux(end);
+                    paux.p(jj(i)).Mph=maux(1);
+                    paux.p(jj(i)).Marray=maux;
+                    if strcmp(obj.Zfitmodel,'2TB_intermediate') paux.p(jj(i)).Mph2=maux(2);end
+                end%for_rps
+                %obj.plotNoises(Temp,rps,paux);
+                %obj.auxFitstruct=paux;
+                obj.auxFitstruct(kk)=paux;
+                obj.auxSingleFitStruct=paux;
+                if length(Temp)==1 && length(rps)==1
+                    obj.plotNoises(Temp,rps,paux)
+                    %loglog(datax,datay*1e12,'.-')
                 end
-                if isempty(obj.mjofitrange)
-                    mjofrange=[1e4,10e4];%%%rango habitual [1e4 1e5].
-                else
-                    mjofrange=obj.mjofitrange;
-                end
-                if isfield(obj.NoiseFilterOptions,'NoiseSubsampleFreqs')
-                    datax=obj.NoiseFilterOptions.NoiseSubsampleFreqs;
-                    datay=interp1(Noises{1}(:,1),Noises{1}(:,2),datax);
-                else
-                    datax=Noises{1}(:,1);
-                    datay=Noises{1}(:,2);
-                end
-                %faux=Noises{1}(:,1);
-                faux=datax;
-                findx=find((faux>mphfrange(1) & faux<mphfrange(2)) | (faux>mjofrange(1) & faux<mjofrange(2)));
-                %xdata=Noises{1}(findx,1);
-                xdata=datax(findx);
-                %size(datax),i
-                
-                %%%Filtramos ruido con NoiseFilterOptions
-                if isempty(obj.NoiseFilterOptions)
-                    noisefilteropt.model='movingMean';%%%'minfilt+medfilt';%%%default, medfilt, minfilt,''movingMean'
-                    noisefilteropt.wmed=20;
-                    noisefilteropt.wmin=6;
-                    noisefilteropt.thr=25;
-                else
-                    noisefilteropt=obj.NoiseFilterOptions;
-                end
-                obj.NoisePlotOptions.FiltOpt=noisefilteropt;
-                %rps(i)
-                %size(datay(findx))
-                %ydata=filterNoise(1e12*Noises{i}(findx,2),noisefilteropt);%%%
-                ydata=filterNoise(1e12*datay(findx),noisefilteropt);    
-                aux.model=obj.Zfitmodel;
-                param=GetModelParameters(parray(:,i)',IV,Ib(i),TES,circuit,aux);%acepta varargin
-                OP=setTESOPfromIb(Ib(i),IV,param);
-                OP.parray=parray(:,i)';%%%añadido para modelos a 2TB.
-                boolusezexp=0;
-                if boolusezexp
-                    OP.ztes.data=zaux(i).tf;
-                    OP.ztes.freqs=zaux(i).f;
-                end
-                parameters.TES=TES;parameters.OP=OP;parameters.circuit=circuit;
-                noiseaux=noisesim(obj.Zfitmodel,TES,OP,circuit);
-                sI=interp1(noiseaux.f,noiseaux.sI,xdata);
-                nep=sqrt((ydata(:)*1e-12).^2-circuit.squid.^2)./abs(sI(:));
-                m0=[1 1];LB=[0 0];
-                if strcmp(obj.Zfitmodel,'2TB_intermediate') m0=[1 1 1];LB=[0 0 0];end
-                
-                %size(xdata),size(ydata)
-                boolfitcurrent=1;
-                if boolfitcurrent
-                    maux=lsqcurvefit(@(x,xdata) fitcurrentnoise(x,xdata,parameters,obj.Zfitmodel),m0,xdata(:),ydata(:),LB);
-                else
-                    ydata=nep;%%%ojo, fitjohnson sólo está implementado para usar 'irwin' model.
-                    maux=lsqcurvefit(@(x,xdata) fitjohnson(x,xdata,parameters),m0,xdata(:),ydata(:),LB);
-                end
-                maux=real(maux);
-                paux.p(jj(i)).M=maux(end);
-                paux.p(jj(i)).Mph=maux(1);
-                paux.p(jj(i)).Marray=maux;
-                if strcmp(obj.Zfitmodel,'2TB_intermediate') paux.p(jj(i)).Mph2=maux(2);end
-            end%for_rps
-            %obj.plotNoises(Temp,rps,paux);
-            %obj.auxFitstruct=paux;
-            obj.auxFitstruct(kk)=paux;
-            obj.auxSingleFitStruct=paux;
-            if length(Temp)==1 & length(rps)==1
-                obj.plotNoises(Temp,rps,paux)
-                %loglog(datax,datay*1e12,'.-')
-            end
-            end
+            end %end for_kk
         end
         function Results=FitNoiseClass(obj,Temp,rps,varargin)
             if nargin==3 HW='\HP_noise*';else HW=varargin{1};end
             %model=obj.Zfitmodel;
-            Noises=obj.GetNoiseClass(Temp,rps,HW);
+            Noises=obj.GetNoiseDataClass(Temp,rps,HW);
             if strcmp(HW,'\PXI_noise*')
                 freqs=logspace(1,5,801);
             else
@@ -1016,7 +1018,7 @@ classdef BasicAnalisisClass < handle
                 if isfield(opt,'Energy')
                     Energy=opt.Energy;
                 else
-                    Energy=6e3*1.609e-19;
+                    Energy=5894.4*1.609e-19;
                 end
             end
             Taus=obj.GetTaus(Temp,Rp);
