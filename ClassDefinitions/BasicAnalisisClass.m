@@ -65,7 +65,7 @@ classdef BasicAnalisisClass < handle
             %%%plot IVs at Temps and polarity
             data=obj.structure;
             for i=1:length(Temps)
-                [mIV(i),mP]=GetTbathIndex(Temps(i),data);
+                mIV(i)=GetTbathIndex_IV(Temps(i),data);
                 %ivaux=data.IVset(mIV);
             end
             if strcmp(pol,'p')
@@ -110,10 +110,10 @@ classdef BasicAnalisisClass < handle
                 paux=obj.GetPstruct(Temp);
             else %if nargin==5%%%soreescribimos la P original.
                 if isstruct(varargin{1})
-                    'pnew'
+                    %'pnew'
                     paux=varargin{1};
                 else
-                    'paux'
+                    %'paux'
                     paux=obj.auxFitstruct;
                 end
             end
@@ -172,7 +172,7 @@ classdef BasicAnalisisClass < handle
             [~,jj]=min(abs(bsxfun(@minus, rtes', rps)));
             param=GetPparam(paux.p,name);
             %actualRps=rtes(jj)
-            actualRps=obj.GetActualRps(Temp,rps,paux)
+            actualRps=obj.GetActualRps(Temp,rps,paux);
             jj=unique(jj,'stable');
             param=param(:,jj);%%%Esto devuelve matriz para el p0 y el parray.
         end
@@ -184,11 +184,11 @@ classdef BasicAnalisisClass < handle
         function P=GetPstruct(obj,Temp,varargin)
             if nargin==3%%%soreescribimos la P original.
                 if isstruct(varargin{1})
-                    'pnew'
+                    %'pnew'
                     paux=varargin{1};
                 else
                     if strcmp(varargin{1},'paux')
-                        'paux'
+                        %'paux'
                         paux=obj.auxFitstruct;
                     elseif strcmp(varargin{1},'p')
                         paux=obj.structure.P;
@@ -197,7 +197,7 @@ classdef BasicAnalisisClass < handle
                     end
                 end
             else
-                'pold'
+                %'pold'
                 paux=obj.structure.P;
             end
             [~,mP]=GetTbathIndex(Temp,obj.structure.IVset,paux);%%%Usamos el formato en que se pasa IVset y Pset
@@ -358,7 +358,7 @@ classdef BasicAnalisisClass < handle
             cd(obj.datadir)%ojo, GetFilesFromRp solo funciona desde el directorio de datos.
             realRps=obj.GetActualRps(Temp,rps);
             Zfiles=GetFilesFromRp(ivaux,Temp,realRps,str);
-            realRps
+            %realRps
             cd(olddir)
         end
         function Ztes=GetZtesData(obj,Temp,rps)
@@ -478,25 +478,27 @@ classdef BasicAnalisisClass < handle
             Ibias=obj.GetIbias(Temp,Rp);
             ivaux=obj.GetIV(Temp);
             paux=obj.GetPstruct(Temp);
-            OP=obj.GetSingleOperatingPoint(Temp,Rp);
-            %Taus=GetTaus(Temp,Ibias,ivaux,paux,obj.fCircuit);
             circuit=obj.fCircuit;
             RL=circuit.Rsh+circuit.Rpar;
-            Req=RL+OP.R0*(1+OP.bi);
-            tau_el0=circuit.L./OP.R0;
-            beta=(OP.R0-RL)/Req;
-            tau_I=OP.tau0/(1-OP.L0);
-            tau_el=circuit.L/Req;
-            tau_eff=OP.tau0/(1+beta*OP.L0);
-            sqr=sqrt((tau_I^-1+tau_el^-1)^2-4*OP.R0*OP.L0*(2+OP.bi)/circuit.L/OP.tau0);
-            tau_Mas=2*(tau_I^-1+tau_el^-1+sqr)^-1;
-            tau_Menos=2*(tau_I^-1+tau_el^-1-sqr)^-1;
-            Taus.tau_I=tau_I;
-            Taus.tau_el=tau_el;
-            Taus.tau_el0=tau_el0;
-            Taus.tau_eff=tau_eff;
-            Taus.tau_Mas=tau_Mas;
-            Taus.tau_Menos=tau_Menos;
+            for i=1:length(Rp)
+                OP=obj.GetSingleOperatingPoint(Temp,Rp(i));
+                %Taus=GetTaus(Temp,Ibias,ivaux,paux,obj.fCircuit);
+                Req=RL+OP.R0*(1+OP.bi);
+                tau_el0=circuit.L./OP.R0;
+                beta=(OP.R0-RL)/Req;
+                tau_I=OP.tau0/(1-OP.L0);
+                tau_el=circuit.L/Req;
+                tau_eff=OP.tau0/(1+beta*OP.L0);
+                sqr=sqrt((tau_I^-1+tau_el^-1)^2-4*OP.R0*OP.L0*(2+OP.bi)/circuit.L/OP.tau0);
+                tau_Mas=2*(tau_I^-1+tau_el^-1+sqr)^-1;
+                tau_Menos=2*(tau_I^-1+tau_el^-1-sqr)^-1;
+                Taus.tau_I(i)=tau_I;
+                Taus.tau_el(i)=tau_el;
+                Taus.tau_el0(i)=tau_el0;
+                Taus.tau_eff(i)=tau_eff;
+                Taus.tau_Mas(i)=tau_Mas;
+                Taus.tau_Menos(i)=tau_Menos;
+            end
         end
         function [Lcritm,LcritM]=GetLcrit(obj,Temp,rps)
             TES=obj.fTES;
@@ -958,6 +960,9 @@ classdef BasicAnalisisClass < handle
         function [pulso,t]=SimSmallDelta(obj,Temp,rp,varargin)
             %%%Funcion para simular la respuesta del TES en un OP dado a
             %%%una delta con la aprox pequeña señal.
+            %%%Impulse(TF) devuelve matriz 2x2. La respuesta 'I'-'P' es el
+            %%%elemento (1,2). Luego hay que desplazarlo tini y escalarlo
+            %%%por Amp. GetSimPulse implementa lo mismo de otra forma.
             circuit=obj.structure.circuit;
             Rsh=circuit.Rsh;
             Rpar=circuit.Rpar;
@@ -978,24 +983,45 @@ classdef BasicAnalisisClass < handle
             A(2,1)=I0*R0*(2+bi)/C; %B
             A(2,2)=1/tau_i;
             s=tf('s');
-            TF=1/(s*eye(2)-A)
+            TF=1/(s*eye(2)-A);
             boolplot=0;
             if boolplot
                 impulse(TF);
             else
                 [pulso,t]=impulse(TF);
+                pulso=I2V(pulso(:,1,2),obj.fCircuit);
             end
             %[pulso,t]=step(TF);
         end
-        function SimPulse=GetSimPulse(obj,Temp,Rp)
+        function SimPulse=GetSimPulse(obj,Temp,Rp,varargin)
             %similar a SimSmallDelta pero con la i(t) directamente.
-            Energy=6e3*1.609e-19;
-            C=500e-12;%!get
-            t0ini=0.1;%fraccion de trigger.
-            Tend=0.01;
+            %varargin es opt con t0ini=opt.t0ini, Tend=opt.Tend;
+            
+            %C=500e-12;%!get
+            C=obj.GetFittedParameterByName(Temp,Rp,'C');
+            if nargin==3
+                t0ini=0.1;%fraccion de trigger.
+                Tend=0.04;
+                T=[0:1e-6:Tend];
+                Energy=6e3*1.609e-19;
+            else
+                opt=varargin{1};
+                t0ini=opt.t0ini;
+                Tend=opt.Tend;
+                if isfield(opt,'T')
+                    T=opt.T;
+                else
+                    T=[0:1e-6:Tend];
+                end
+                if isfield(opt,'Energy')
+                    Energy=opt.Energy;
+                else
+                    Energy=6e3*1.609e-19;
+                end
+            end
             Taus=obj.GetTaus(Temp,Rp);
             normpulsH=@(p,x)(p(1)/(p(3)-p(2)))*(exp(-(x-p(4))/p(2))-exp(-(x-p(4))/p(3))).*heaviside(x-p(4))+p(5);
-            T=[0:1e-6:Tend];
+            
             tini=t0ini*Tend;
             trise=Taus.tau_Mas;
             tfall=Taus.tau_Menos;
@@ -1008,8 +1034,8 @@ classdef BasicAnalisisClass < handle
             Vpulse=I2V(Amp*pulse,obj.fCircuit);
             SimPulse=[T(:) Vpulse(:)];
             DT=Energy/C;
-            Tpulse=((1/tI-1/trise)*exp(-T/tfall)+(1/tI-1/tfall)*exp(-T/trise))*DT/(1/trise-1/tfall);
-            SimPulse=[T(:) Tpulse(:)];
+            %Tpulse=((1/tI-1/trise)*exp(-T/tfall)+(1/tI-1/tfall)*exp(-T/trise))*DT/(1/trise-1/tfall);
+            %SimPulse=[T(:) Tpulse(:)];
         end
         
     end %end public methods
