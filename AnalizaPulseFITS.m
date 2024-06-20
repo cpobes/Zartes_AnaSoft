@@ -155,7 +155,12 @@ for i=1:Npulsos%
         if amp(i)<0.01 && filtopt.boolfit
             pulso(:,2)=filtfilt(filtopt.filter,pulso(:,2));
         end
-        OFT_Energy(i)=OFTEcalcWjit(pulso,oft);%metemos time en oft tb.
+        if isfield(OP,'oftrange')
+            oftrange=OP.oftrange;
+        else
+            oftrange=1:L;
+        end
+        OFT_Energy(i)=OFTEcalcWjit(pulso(oftrange,:),oft(oftrange,:));%metemos time en oft tb.
     end
     %energy(i)=sum((pulso(:,2)-dc(i))'.*ofilt);%%%estimacion OF.
     %energy0(i)=sum(pulso(:,2)'.*ofilt);

@@ -1,7 +1,12 @@
 function Kafhandle=BuildMnKaHandle()
 %%%funcion para devolver el handle a las lineas Ka del Mn incluyendo
 %%%resolucion gaussiana.
-HandleDir='C:\Users\Carlos\Documents\GitHub\zartes\HandleLibrary';
+name = getenv('COMPUTERNAME');
+if strcmp(name,'DESKTOP-DNDSVBJ')
+    HandleDir='C:\Users\nico\Documents\GitHub\Zartes_AnaSoft\HandleLibrary';
+else
+    HandleDir='C:\Users\Carlos\Documents\GitHub\zartes\HandleLibrary';
+end
 LinesFile=strcat(HandleDir,'\','MnKa-Voigt-Lines.json');
 fhMnKa=BuildVoigtHandle(LinesFile);
 %x=[-10:0.1:10];%%%! ojo, la y que usemos como vector de energia tiene que tener el mismo step de 0.1
