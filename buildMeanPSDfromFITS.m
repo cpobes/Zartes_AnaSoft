@@ -1,4 +1,4 @@
-function [Mpsd,freqs]=buildMeanPSDfromFITS(file,varargin)
+function MeanPSD=BuildMeanPSDfromFITS(file,varargin)
 %%%%% funcion para construir el PSD promedio de un fichero de 
 %%% baselines para crear el filtro optimo.
 %%% 2-sided.
@@ -28,3 +28,5 @@ for i=index
     aux=aux(:)+psd(:);
 end
 Mpsd=aux/N;
+MeanPSD(:,1)=freqs;
+MeanPSD(:,2)=Mpsd;%devolver directamente sqrt(Mpsd)?

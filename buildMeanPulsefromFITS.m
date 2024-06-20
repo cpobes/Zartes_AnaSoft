@@ -1,4 +1,4 @@
-function pulso=buildMeanPulsefromFITS(file,varargin)
+function pulso=BuildMeanPulsefromFITS(file,varargin)
 %%%%% funcion para construir el Pulso promedio a partir de un FITS.
 %%% V0 no se resta el DC.
 

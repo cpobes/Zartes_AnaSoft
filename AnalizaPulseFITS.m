@@ -24,7 +24,7 @@ for i=1:nargin-1
         end
         if isfield(OP,'index')
             index=OP.index;
-            if isempty(index)index=1:Npulsos;end
+            if isempty(index) index=1:Npulsos;end
         else
             index=1:Npulsos;
         end
@@ -105,7 +105,7 @@ DT=1/SR;
 if isfield(OP,'MeanPulse')
     Mpulse=OP.MeanPulse;
     fhandle=@(p,x)p*interp1(Mpulse(:,1),Mpulse(:,2),x)
-    p0=0.284;
+    p0=0.200;
 else
     fhandle=BuildPulseHandle('2e');%
 end
@@ -147,8 +147,13 @@ for i=1:Npulsos%
         %OFT_Energy(i)=sum(pulso(:,2).*oft(:));
         %OFT_Energy(i)=OFTEcalcWjit(pulso,[pulso(:,1) oft(:)]);
         %%%temporal baseline filtering.
-        if amp(i)<0.01 && OP.filtopt.boolfit
-            pulso(:,2)=filtfilt(OP.filtopt.filter,pulso(:,2));
+        if isfield(OP,'filtopt')
+            filtopt=OP.filtopt;
+        else
+            filtopt.boolfit=0;
+        end
+        if amp(i)<0.01 && filtopt.boolfit
+            pulso(:,2)=filtfilt(filtopt.filter,pulso(:,2));
         end
         OFT_Energy(i)=OFTEcalcWjit(pulso,oft);%metemos time en oft tb.
     end

@@ -1,4 +1,4 @@
-function OF=buildOptimalFilter(MeanPulse,MeanNoise)
+function OF=BuildOptimalFilter(MeanPulse,MeanNoise)
 %%%Construiccion del filtro optimo a partir del pulso y ruidos promedio.
 %%%Suponemos MeanPulse=[time(:) V(:)]; y MeanNoise=[freqs(:) sqrt(PSD(:))];
 oft=ifft(fft(MeanPulse(:,2))./abs(MeanNoise(:,2)).^2);
