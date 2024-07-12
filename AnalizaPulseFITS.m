@@ -134,6 +134,7 @@ for i=1:Npulsos%
     [maux,miaux]=max(medfilt1(pulso(:,2),wfilt));
     amp(i)=maux-dc(i);
     tmax(i)=time(miaux);
+    Amax(i)=maux;%
     
     %%%Self Calibrated Energy.E_ETF ec.58 Irwin.
     ipulse=V2I(pulso(:,2),OP.circuit);
@@ -232,6 +233,7 @@ fits.closeFile(fptr);
     PulseParameters.dc_std=dc_std;
     PulseParameters.amp=amp;
     PulseParameters.tmax=tmax;
+    PulseParameters.Amax=Amax;
     PulseParameters.npeaks=npeaks;
     PulseParameters.ntimes=ntimes;
     PulseParameters.Eetf=Eetf;
