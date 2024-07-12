@@ -1,4 +1,4 @@
-function MeanPSD=BuildMeanPSDfromFITS(file,varargin)
+function MeanNoise=BuildMeanPSDfromFITS(file,varargin)
 %%%%% funcion para construir el PSD promedio de un fichero de 
 %%% baselines para crear el filtro optimo.
 %%% 2-sided.
@@ -28,5 +28,5 @@ for i=index
     aux=aux(:)+psd(:);
 end
 Mpsd=aux/N;
-MeanPSD(:,1)=freqs;
-MeanPSD(:,2)=Mpsd;%devolver directamente sqrt(Mpsd)?
+MeanNoise(:,1)=freqs;
+MeanNoise(:,2)=sqrt(abs(Mpsd));%devolver directamente sqrt(Mpsd)?
