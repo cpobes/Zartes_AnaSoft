@@ -1,12 +1,16 @@
 function IVset=corregir1rama(data)
 %%%corregir datos de una rama de bajada positiva.
 %%%ojo a si hay 2 o 4 columnas.
-[i,j]=size(data);
+[~,j]=size(data);
 
 if j==4
     IVset.ibias=data(:,2)*1e-6;
     ii=find(data(:,2)==0);
-    IVset.vout=data(:,4)-data(ii(1),4);
+    if ~isempty(ii)
+        IVset.vout=data(:,4)-data(ii(1),4);
+    else
+        IVset.vout=data(:,4);
+    end
 %     if data(1,2)==0
 %         IVset.vout=data(:,4)-data(1,4);
 %     elseif data(1,2)>0%%%
