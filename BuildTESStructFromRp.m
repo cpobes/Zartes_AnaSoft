@@ -4,7 +4,7 @@ function TES=BuildTESStructFromRp(rp,Gset)
 ind=find(round(100*[Gset.rp])==100*rp);%%%Ojo si rp no está entre el rango de valores de Gset.rp
 
 TES=Gset(ind);
-TES.K=TES.K*1e-12;
+TES.K=TES.K*1e-12;%En algunos modelos no esta definida.
 TES.G=TES.G*1e-12;
 TES.G100=TES.G100*1e-12;
 TES.G0=TES.G;

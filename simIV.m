@@ -93,7 +93,7 @@ Mq=invMf/invMin;%cociente de inductancias mutuas 66/22.
 Vout=Ites*Rf*Mq;%
 
 if(0)
-showIVsims(Ttes,Ites,Tb,Ib,TESparam,Circuitparam);
+    showIVsims(Ttes,Ites,Tb,Ib,TESparam,Circuitparam);
 end
 IV.ites=Ites;IV.ttes=Ttes;
 IV.Tbath=Tb;

@@ -11,7 +11,7 @@ p=0.74;%%%p=0.82(TES?),(p=0.75 1Z2_35A)
 %%%distancia_p. Esto en realidad supone tomar ya una forma para Ic(Ttes). 
 %%%Si queremos probar otras expresiones, hay que modificar las definiciones de alfa y beta.
 
-if ites<0 | ttes<0, ftes=0;return;end %%%%Prueba para bypasar wrong fits.
+if ites<0 || ttes<0, ftes=0;return;end %%%%Prueba para bypasar wrong fits.
 
 %r=exp(log(exp(p*log(ttes))+exp(p*log(ites)))/p);
 %plot(ttes,ites,'o'),hold on

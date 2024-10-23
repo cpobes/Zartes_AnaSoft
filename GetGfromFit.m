@@ -62,13 +62,35 @@ elseif nargin==2
             param.G=param.n*param.K*param.Tc^(param.n-1);
             param.G0=param.G;
             param.G100=param.n*param.K*0.1^(param.n-1);
-        case 'T2T4'
+        case 'T2+T4'
             param.A=fit(1);
             param.B=fit(2);
             param.Tc=fit(3);
             param.G=2*param.Tc.*(param.A+2*param.B*param.Tc.^2);
             param.G0=param.G;
-            param.G_100=2*0.1.*(param.A+2*param.B*0.1.^2);
+            param.G100=2*0.1.*(param.A+2*param.B*0.1.^2);
+        case 'dobleN'
+            param.A=fit(1);
+            param.B=fit(2);
+            param.Tc=fit(3);
+            ns=model.Ns;%%%
+            param.G=(ns(1)*param.A.*param.Tc.^(ns(1)-1)+ns(2)*param.B.*param.Tc.^(ns(2)-1));
+            param.G0=param.G;
+            param.G100=(ns(1)*param.A.*(0.1)^(ns(1)-1)+ns(2)*param.B.*(0.1).^(ns(2)-1));
+        case 'radiative'
+            param.n=4;
+            param.K=fit(1);
+            param.Tc=fit(2);
+            %param.G=fit(1);
+            param.G=4*fit(1)*fit(2).^3;
+            param.G0=param.G;
+            param.G100=4*param.K*0.1^3;
+            if isfield(model,'ci')
+                %param.Errn=model.ci(2,2)-model.ci(2,1);
+                param.ErrK=model.ci(1,2)-model.ci(1,1);
+                param.ErrTc=model.ci(2,2)-model.ci(2,1);
+                param.ErrG=param.G*(param.ErrK/param.K+3*param.ErrTc/param.Tc);
+            end
     end
 end
 
