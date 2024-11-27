@@ -488,10 +488,10 @@ classdef BasicAnalisisClass < handle
                 Req=RL+OP.R0*(1+OP.bi);
                 tau_el0=circuit.L./OP.R0;
                 beta=(OP.R0-RL)/Req;
-                tau_I=OP.tau0/(1-OP.L0);
+                tau_I=OP.tau0/(1-OP.L0);%%%irwin. es igual a nuestro -tau_eff
                 tau_el=circuit.L/Req;
-                tau_eff=OP.tau0/(1+beta*OP.L0);
-                sqr=sqrt((tau_I^-1+tau_el^-1)^2-4*OP.R0*OP.L0*(2+OP.bi)/circuit.L/OP.tau0);
+                tau_eff=OP.tau0/(1+beta*OP.L0);%%%irwin, no nuestro tau_eff.
+                sqr=sqrt((tau_I^-1-tau_el^-1)^2-4*OP.R0*OP.L0*(2+OP.bi)/circuit.L/OP.tau0);
                 tau_Mas=2*(tau_I^-1+tau_el^-1+sqr)^-1;
                 tau_Menos=2*(tau_I^-1+tau_el^-1-sqr)^-1;
                 Taus.tau_I(i)=tau_I;
@@ -500,6 +500,24 @@ classdef BasicAnalisisClass < handle
                 Taus.tau_eff(i)=tau_eff;
                 Taus.tau_Mas(i)=tau_Mas;
                 Taus.tau_Menos(i)=tau_Menos;
+            end
+        end
+        function A=Get1TBMatrix(obj,Temp,Rp)
+            Ibias=obj.GetIbias(Temp,Rp);
+            ivaux=obj.GetIV(Temp);
+            paux=obj.GetPstruct(Temp);
+            circuit=obj.fCircuit;
+            RL=circuit.Rsh+circuit.Rpar;
+            Taus=obj.GetTaus(Temp,Rp);
+            %G=obj.structure.TES.G0;
+            for i=1:length(Rp)
+                OP=obj.GetSingleOperatingPoint(Temp,Rp(i));
+                G=OP.G0;
+                C=obj.GetFittedParameterByName(Temp,Rp(i),'C');
+                A(i,1,1)=1/Taus.tau_el(i);
+                A(i,1,2)=OP.L0*G/(OP.I0*circuit.L);
+                A(i,2,1)=-(2+OP.bi)*OP.V0/C;
+                A(i,2,2)=1/Taus.tau_I(i);
             end
         end
         function [Lcritm,LcritM]=GetLcrit(obj,Temp,rps)
@@ -976,7 +994,9 @@ classdef BasicAnalisisClass < handle
             tau_el=L/(Rsh+Rpar+R0*(1+bi));
             L0=obj.GetFittedParameterByName(Temp,rp,'L0');
             tau_i=obj.GetFittedParameterByName(Temp,rp,'taueff');
-            G=obj.structure.TES.G;
+            %G=obj.structure.TES.G;%G cte no reproduce bien las Taus!!!
+            OP=obj.GetSingleOperatingPoint(Temp,rp);
+            G=OP.G0;
             %C=obj.structure.TES.CN;
             C=obj.GetFittedParameterByName(Temp,rp,'C');
             %C=50e-15;
@@ -990,7 +1010,7 @@ classdef BasicAnalisisClass < handle
             if boolplot
                 impulse(TF);
             else
-                [pulso,t]=impulse(TF);
+                [pulso,t]=impulse(TF);%Simula bien pulso temporal, pero no tiene en cuenta la amplitud. Usar GetSimPulse!
                 pulso=I2V(pulso(:,1,2),obj.fCircuit);
             end
             %[pulso,t]=step(TF);
@@ -1032,12 +1052,50 @@ classdef BasicAnalisisClass < handle
             pulse=normpulsH(p0,T);
             pulse(isnan(pulse))=0;
             OP=obj.GetSingleOperatingPoint(Temp,Rp);
-            Amp=(1-trise)*(1-tfall)*(1/(2+OP.bi))*(Energy/OP.V0);
+            Amp=(1-trise/tI)*(1-tfall/tI)*(1/(2+OP.bi))*(Energy/OP.V0);
             Vpulse=I2V(Amp*pulse,obj.fCircuit);
-            SimPulse=[T(:) Vpulse(:)];
+            %SimPulse=[T(:) Vpulse(:)];
             DT=Energy/C;
-            %Tpulse=((1/tI-1/trise)*exp(-T/tfall)+(1/tI-1/tfall)*exp(-T/trise))*DT/(1/trise-1/tfall);
+            Tpulse=-((1/tI-1/trise)*exp(-(T-tini)/tfall)+(1/tI-1/tfall)*exp(-(T-tini)/trise))*DT/(1/trise-1/tfall).*heaviside(T-tini);
             %SimPulse=[T(:) Tpulse(:)];
+            SimPulse.T=T(:);
+            SimPulse.Ipulse=Amp*pulse(:);%%%current(I) pulse
+            SimPulse.Vpulse=Vpulse(:);%%% Voltage(V) pulse
+            SimPulse.Tpulse=Tpulse(:);%%% Temperature (T) pulse.
+        end
+        function Eres=SimEnergyResolution(obj,Temp,varargin)
+            %%%funcion para intentar simular la resolucion a partir de
+            %%%pulsos simulados y ruidos simulados. Hay que tomar los rps
+            %%%de las medidas.
+            paux=obj.GetPstruct(Temp);
+            if nargin==2
+                rps=[paux.p.rp];
+            else
+                rps=obj.GetActualRps(Temp,varargin{1});
+            end
+            for i=1:length(rps)
+                SimPulse=obj.GetSimPulse(Temp,rps(i));
+                SimNoise=obj.GetOPThermalModel(Temp,rps(i));
+                RL=length(SimPulse.T);
+                DT=(SimPulse.T(2)-SimPulse.T(1));
+                SR=1/DT;
+                [~,freqs]=periodogram(SimPulse.Ipulse(:),[],RL,SR,'two-sided');
+                fI=SimNoise.GetTotalCurrentNoise();
+                MeanNoise=[freqs(:) fI(freqs,0,0)];
+                MeanPulse=[SimPulse.T(:) -SimPulse.Ipulse(:)];
+                OF=BuildOptimalFilter(MeanPulse,MeanNoise);
+                Nsims=100;
+                for j=1:Nsims
+                    auxnoise=iPSD((MeanNoise(1:ceil(end/2),2)).^2,MeanNoise(1:ceil(end/2),1));
+                    %size(MeanPulse(:,2)),size(auxnoise)
+                    auxpulse=MeanPulse(1:length(auxnoise),2)+auxnoise(:);
+                    Eest(j)=sum(OF(1:length(auxnoise),2).*auxpulse)*DT;
+                end
+                [h,x]=hist(Eest,20);
+                ft=fit(x(:),h(:),'gauss1');
+                Eres(i)=5894.4*2.355*ft.c1/sqrt(2)/ft.b1;
+                %Eres=Eest;%%%
+            end
         end
         
     end %end public methods

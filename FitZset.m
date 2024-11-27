@@ -223,7 +223,9 @@ for i=1:length(dirs)
                     end
                 case '2TB_intermediate'
                     %p0=[Zinf Z0 tau0 1 1/(2*pi*2e3)];
-                    p0=[Zinf Z0 sign(Zinf)*tau0 sign(Zinf)*1 1/(2*pi*2e3)];
+                    %p0=[Zinf Z0 sign(Zinf)*tau0 sign(Zinf)*1 1/(2*pi*2e3)];
+                    tau_nat=16e-6;
+                    p0=[Zinf Z0 sign(Zinf)*tau0 sign(Zinf)*tau0/tau_nat 1/(2*pi*1e2)];
                     if rps(iii)>1%0.7%0.8
                         %p0=[0.0706   -0.3593    -5.8333e-04   -2.1667     2.6923e-04];
                         p0=[Zinf   Z0   sign(Zinf)*1/(2*pi*1e3)    sign(Zinf)*10     1/(2*pi*2e3)];
@@ -256,7 +258,7 @@ for i=1:length(dirs)
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             try
-            [p,aux1,aux2,aux3,out,aux4,auxJ]=lsqcurvefit(fitfunc,p0,XDATA,YDATA,LB,UB);%%%uncomment for real parameters.
+            [p,aux1,aux2,~,~,~,auxJ]=lsqcurvefit(fitfunc,p0,XDATA,YDATA,[],[]);%%%uncomment for real parameters.
             ci = nlparci(p,aux2,'jacobian',auxJ);
             catch
                 error('error in lsqcurvefit');

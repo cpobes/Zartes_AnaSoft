@@ -402,7 +402,7 @@ classdef ThermalModelClass < handle
             elseif strcmpi(options.tipo,'nep')
                 func=obj.GetTotalNEPNoise();
                 scale=obj.PlotNEPScale;
-                obj.boolPlotComponents=0;%%%De moomento no pintamos componentes para NEP.
+                obj.boolPlotComponents=0;%%%De momento no pintamos componentes para NEP.
                 legendstring={'Total NEP'};
             end
             if obj.boolPlotComponents
