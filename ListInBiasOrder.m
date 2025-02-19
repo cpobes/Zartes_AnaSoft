@@ -1,4 +1,4 @@
-function files=ListInBiasOrder(D,varargin)
+function [files,varargout]=ListInBiasOrder(D,varargin)
 %%%Listar ficheros en orden de corriente de bias.
 %%%D es un string tipo 'HP*' 'TF*' ec.
 
@@ -22,3 +22,6 @@ end
 [~,jj]=sort(Ibs,order);
 f=f(jj);
 files={f(:).name};
+if nargout==2
+    varargout{1}=Ibs;
+end

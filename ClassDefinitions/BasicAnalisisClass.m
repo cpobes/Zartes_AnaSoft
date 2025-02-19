@@ -136,12 +136,17 @@ classdef BasicAnalisisClass < handle
         function Rn=GetRn(obj)
            Rn=obj.structure.TES.Rn; 
         end
-        function OP=GetSingleOperatingPoint(obj,Temp,rp)
-            paux=obj.GetPstruct(Temp);
+        function OP=GetSingleOperatingPoint(obj,Temp,rp,varargin)
+            if nargin==3
+                polarity='p';
+            elseif nargin==4
+                polarity=varargin{1};
+            end
+            paux=obj.GetPstruct(Temp,polarity);
             actualRp=obj.GetActualRps(Temp,rp,paux);
             rtes=GetPparam(paux.p,'rp');
-            ivaux=obj.GetIV(Temp);
-            Ibias=obj.GetIbias(Temp,actualRp);
+            ivaux=obj.GetIV(Temp,polarity);
+            Ibias=obj.GetIbias(Temp,actualRp,polarity);
             [~,jj]=min(abs(bsxfun(@minus, rtes', actualRp)));
             jj=unique(jj,'stable');
             opt.model=obj.Zfitmodel;
@@ -176,10 +181,20 @@ classdef BasicAnalisisClass < handle
             jj=unique(jj,'stable');
             param=param(:,jj);%%%Esto devuelve matriz para el p0 y el parray.
         end
-        function IV=GetIV(obj,Temp)
+        function IV=GetIV(obj,Temp,varargin)
+            if nargin==2
+                polarity='p';
+            elseif nargin==3
+                polarity=varargin{1};
+            end
             %[mIV,~]=GetTbathIndex(Temp,obj.structure);
             mIV=GetTbathIndex_IV(Temp,obj.structure);
-            IV=obj.structure.IVset(mIV);
+            switch polarity
+                case 'p'
+                    IV=obj.structure.IVset(mIV);
+                case 'n'
+                    IV=obj.structure.IVsetN(mIV);
+            end
         end
         function P=GetPstruct(obj,Temp,varargin)
             if nargin==3%%%soreescribimos la P original.
@@ -208,48 +223,84 @@ classdef BasicAnalisisClass < handle
                 end
             end
         end
-        function Ibias=GetIbias(obj,Temp,Rp)
-            IV=obj.GetIV(Temp);
+        function Ibias=GetIbias(obj,Temp,Rp,varargin)
+            if nargin==3
+                polarity='p';
+            elseif nargin==4
+                polarity=varargin{1};
+            end
+            IV=obj.GetIV(Temp,polarity);
             Ibias=BuildIbiasFromRp(IV,Rp)*1e-6;%%%Ojo, BuildIbias devuelve uA.
         end
-        function Ibiasmin=GetIbiasmin(obj,Temp)
+        function Ibiasmin=GetIbiasmin(obj,Temp,varargin)
             %función para devolver el Ibias minimo antes de saltar a
             %superC en las IVs. Normalmente en las Zs el mínimo OP bueno es
             %mayor que eso.
-            IV=obj.GetIV(Temp);
+            if nargin==2
+                polarity='p';
+            elseif nargin==3
+                polarity=varargin{1};
+            end
+            IV=obj.GetIV(Temp,polarity);
             [iaux,ii]=unique(IV.ibias,'stable');
             vaux=IV.vout(ii);
             [~,i3]=min(diff(vaux)./diff(iaux));
             Ibiasmin=iaux(i3);
         end
-        function Rpmin=GetRpmin(obj,Temp)
+        function Rpmin=GetRpmin(obj,Temp,varargin)
             %función para devolver el %Rn minimo antes de saltar a
             %superC en las IVs. Normalmente en las Zs el mínimo OP bueno es
             %mayor que eso.
-            Ibiasmin=obj.GetIbiasmin(Temp);
-            IV=obj.GetIV(Temp);
-            jj=find(IV.ibias>Ibiasmin);
+            if nargin==2
+                polarity='p';
+            elseif nargin==3
+                polarity=varargin{1};
+            end
+            Ibiasmin=obj.GetIbiasmin(Temp,polarity);
+            IV=obj.GetIV(Temp,polarity);
+            jj=find(abs(IV.ibias)>abs(Ibiasmin));
             Rpmin=spline(IV.ibias(jj),IV.rtes(jj),Ibiasmin);
         end
-        function Rlim=Getec51Irwin(obj,Temp,rps)
-            actualrps=obj.GetActualRps(Temp,rps);
-            L0=obj.GetFittedParameterByName(Temp,actualrps,'L0');
-            bi=obj.GetFittedParameterByName(Temp,actualrps,'bi');
+        function Rlim=Getec51Irwin(obj,Temp,rps,varargin)
+            %condicion de estabilidad overdumped.
+            if nargin==3
+                polarity='p';
+            elseif nargin==4
+                polarity=varargin{1};
+            end
+            actualrps=obj.GetActualRps(Temp,rps,polarity);
+            L0=obj.GetFittedParameterByName(Temp,actualrps,'L0',polarity);
+            bi=obj.GetFittedParameterByName(Temp,actualrps,'bi',polarity);
             RL=obj.fCircuit.Rsh+obj.fCircuit.Rpar;
             Rlim=RL*(L0-1)./(L0+1+bi);
         end
-        function I0=GetI0(obj,Temp,Rp)%Corriente del TES en el punto de operacion
-            IV=obj.GetIV(Temp);
+        function I0=GetI0(obj,Temp,Rp,varargin)%Corriente del TES en el punto de operacion
+            if nargin==3
+                polarity='p';
+            elseif nargin==4
+                polarity=varargin{1};
+            end
+            IV=obj.GetIV(Temp,polarity);
             %Ibias=BuildIbiasFromRp(IV,Rp)*1e-6;%%%Ojo, BuildIbias devuelve uA.
             I0=spline(IV.rtes,IV.ites,Rp);%Ojo, hay que eliminar del spline los Ib<Ibmin.
         end
-        function V0=GetV0(obj,Temp,Rp)%Voltaje del TES en el punto de operacion
-            IV=obj.GetIV(Temp);
+        function V0=GetV0(obj,Temp,Rp,varargin)%Voltaje del TES en el punto de operacion
+            if nargin==3
+                polarity='p';
+            elseif nargin==4
+                polarity=varargin{1};
+            end
+            IV=obj.GetIV(Temp,polarity);
             %Ibias=BuildIbiasFromRp(IV,Rp)*1e-6;%%%Ojo, BuildIbias devuelve uA.
             V0=spline(IV.rtes,IV.vtes,Rp);%Ojo, hay que eliminar del spline los Ib<Ibmin.
                 end
-        function P0=GetP0(obj,Temp,Rp)%Potencia del TES en el punto de operacion
-            IV=obj.GetIV(Temp);
+        function P0=GetP0(obj,Temp,Rp,varargin)%Potencia del TES en el punto de operacion
+            if nargin==3
+                polarity='p';
+            elseif nargin==4
+                polarity=varargin{1};
+            end
+            IV=obj.GetIV(Temp,polarity);
             %Ibias=BuildIbiasFromRp(IV,Rp)*1e-6;%%%Ojo, BuildIbias devuelve uA.
             P0=spline(IV.rtes,IV.ptes,Rp);%Ojo, hay que eliminar del spline los Ib<Ibmin.
         end
@@ -350,25 +401,56 @@ classdef BasicAnalisisClass < handle
         end
         function Zfiles=GetZfilenames(obj,Temp,rps,varargin)
             %[mIV,~]=GetTbathIndex(Temp,obj.structure);
-            ivaux=obj.GetIV(Temp);
+            if nargin<=4
+                polarity='p';
+            else
+                polarity=varargin{2};%%%!!!
+            end
+            ivaux=obj.GetIV(Temp,polarity);
             olddir=pwd;
-            %podemos pasar 'PXI_TF_*' para cargar las TF de la PXI. Si se
+            %podemos pasar '\PXI_TF_*' para cargar las TF de la PXI. Si se
             %llama obj.GetZfilenames(temp,rps) el nargin sigue siendo 3.
-            if nargin==3 str='\TF_*'; else str=varargin{1};end 
+            %%%Ojo, es importante la barra de directorio.
+            if nargin==3 
+                str='\TF_*'; 
+            else
+                str=varargin{1};
+            end
             cd(obj.datadir)%ojo, GetFilesFromRp solo funciona desde el directorio de datos.
-            realRps=obj.GetActualRps(Temp,rps);
-            Zfiles=GetFilesFromRp(ivaux,Temp,realRps,str);
+            realRps=obj.GetActualRps(Temp,rps,polarity);
+            switch polarity
+                case 'p'
+                    Zfiles=GetFilesFromRp(ivaux,Temp,realRps,str);
+                case 'n'
+                    cd('Negative Bias')
+                    Zfiles=GetFilesFromRp(ivaux,Temp,realRps,str);
+                    cd('..')
+            end
             %realRps
             cd(olddir)
         end
-        function Ztes=GetZtesData(obj,Temp,rps)
+        function Ztes=GetZtesData(obj,Temp,rps,varargin)
+            if nargin==3
+                polarity='p';
+                str='\TF_*';
+            elseif nargin==4
+                str='\TF_*';
+                polarity=varargin{1};
+            end
             olddir=pwd;
             cd(obj.datadir);
             %%%
             Tdir=GetDirfromTbath(Temp);
-            zfiles=obj.GetZfilenames(Temp,rps);
+            zfiles=obj.GetZfilenames(Temp,rps,str,polarity);
             zfullpath=strcat(Tdir,'\',zfiles);
-            tfdata=importTF(zfullpath);
+            switch polarity
+                case 'p'
+                    tfdata=importTF(zfullpath);
+                case 'n'
+                    cd('Negative Bias')
+                    tfdata=importTF(zfullpath);
+                    cd('..')
+            end
             %%%hay que hacer buble porque GetZfromTF sólo admite una tf en
             %%%distintos formatos.
             for i=1:numel(tfdata) Ztes(i)=GetZfromTF(tfdata{i},obj.structure.TFS,obj.structure.circuit); end
@@ -474,16 +556,21 @@ classdef BasicAnalisisClass < handle
             end%for
             
         end   
-        function Taus=GetTaus(obj,Temp,Rp)
+        function Taus=GetTaus(obj,Temp,Rp,varargin)
             %%%calcular los taus teoricos del modelo 1TB segun las
             %%%definiciones de Irwin!
-            Ibias=obj.GetIbias(Temp,Rp);
-            ivaux=obj.GetIV(Temp);
-            paux=obj.GetPstruct(Temp);
+            %Ibias=obj.GetIbias(Temp,Rp);
+            %ivaux=obj.GetIV(Temp);
+            %paux=obj.GetPstruct(Temp);
             circuit=obj.fCircuit;
             RL=circuit.Rsh+circuit.Rpar;
+            if nargin==3
+                polarity='p';
+            elseif nargin==4
+                polarity='n';
+            end
             for i=1:length(Rp)
-                OP=obj.GetSingleOperatingPoint(Temp,Rp(i));
+                OP=obj.GetSingleOperatingPoint(Temp,Rp(i),polarity);
                 %Taus=GetTaus(Temp,Ibias,ivaux,paux,obj.fCircuit);
                 Req=RL+OP.R0*(1+OP.bi);
                 tau_el0=circuit.L./OP.R0;
@@ -502,32 +589,42 @@ classdef BasicAnalisisClass < handle
                 Taus.tau_Menos(i)=tau_Menos;
             end
         end
-        function A=Get1TBMatrix(obj,Temp,Rp)
-            Ibias=obj.GetIbias(Temp,Rp);
-            ivaux=obj.GetIV(Temp);
-            paux=obj.GetPstruct(Temp);
+        function A=Get1TBMatrix(obj,Temp,Rp,varargin)
+            if nargin==3
+                polarity='p';
+            elseif nargin==4
+                polarity='n';
+            end
+            Ibias=obj.GetIbias(Temp,Rp,polarity);
+            ivaux=obj.GetIV(Temp,polarity);
+            paux=obj.GetPstruct(Temp,polarity);
             circuit=obj.fCircuit;
             RL=circuit.Rsh+circuit.Rpar;
-            Taus=obj.GetTaus(Temp,Rp);
+            Taus=obj.GetTaus(Temp,Rp,polarity);
             %G=obj.structure.TES.G0;
             for i=1:length(Rp)
-                OP=obj.GetSingleOperatingPoint(Temp,Rp(i));
+                OP=obj.GetSingleOperatingPoint(Temp,Rp(i),polarity);
                 G=OP.G0;
-                C=obj.GetFittedParameterByName(Temp,Rp(i),'C');
+                %
+                C=obj.GetFittedParameterByName(Temp,Rp(i),'C',polarity);%
                 A(i,1,1)=1/Taus.tau_el(i);
                 A(i,1,2)=OP.L0*G/(OP.I0*circuit.L);
                 A(i,2,1)=-(2+OP.bi)*OP.V0/C;
                 A(i,2,2)=1/Taus.tau_I(i);
             end
         end
-        function [Lcritm,LcritM]=GetLcrit(obj,Temp,rps)
+        function Lcriticas=GetLcrit(obj,Temp,rps,varargin)
+            if nargin==3
+                polarity='p';
+            elseif nargin==4
+                polarity='n';
+            end
             TES=obj.fTES;
-            RL=obj.fCircuit.Rsh+obj.fCircuit.Rpar;
-            Rn=TES.Rn;
-            actualrps=obj.GetActualRps(Temp,rps);
-            bi=obj.GetFittedParameterByName(Temp,actualrps,'bi');
-            L0=obj.GetFittedParameterByName(Temp,actualrps,'L0');
-            tau0=obj.GetFittedParameterByName(Temp,actualrps,'tau0');
+            RL=obj.fCircuit.Rsh+obj.fCircuit.Rpar;            
+            actualrps=obj.GetActualRps(Temp,rps,polarity);
+            bi=obj.GetFittedParameterByName(Temp,actualrps,'bi',polarity);
+            L0=obj.GetFittedParameterByName(Temp,actualrps,'L0',polarity);
+            tau0=obj.GetFittedParameterByName(Temp,actualrps,'tau0',polarity);
             R0=([actualrps]*obj.fCircuit.Rn);
             p1=(3+bi-RL./R0);
             p2=(1+bi+RL./R0);
@@ -535,6 +632,48 @@ classdef BasicAnalisisClass < handle
             
             Lcritm=(L0.*p1+p2-2*sqr).*R0.*tau0./(L0-1).^2;
             LcritM=(L0.*p1+p2+2*sqr).*R0.*tau0./(L0-1).^2;
+            Lcriticas.min=Lcritm;
+            Lcriticas.max=LcritM;
+            %
+            circuit=obj.fCircuit;
+            RL=circuit.Rsh+circuit.Rpar;
+            Rn=circuit.Rn;
+            Req=RL+Rn*actualrps.*(1+bi); %Req=RL+OP.R0*(1+OP.bi);
+            taueff=obj.GetFittedParameterByName(Temp,actualrps,'taueff',polarity);
+            Lcriticas.underD=taueff.*Req;
+        end
+        function ec99=Getec99(obj,Temp,rps,varargin)
+            %19F25 updated for polarity, but fails.Check.
+            if nargin==3
+                polarity='p';
+            elseif nargin==4
+                polarity='n';
+            end
+            kb=1.38e-23;
+            TES=obj.fTES;
+            RL=obj.fCircuit.Rsh+obj.fCircuit.Rpar;
+            actualrps=obj.GetActualRps(Temp,rps,polarity);
+            for i=1:length(actualrps)
+                OP=obj.GetSingleOperatingPoint(Temp,actualrps(i),polarity);              
+                bi=obj.GetFittedParameterByName(Temp,actualrps(i),'bi',polarity);
+                L0=obj.GetFittedParameterByName(Temp,actualrps(i),'L0',polarity);
+                tau0=obj.GetFittedParameterByName(Temp,actualrps(i),'tau0',polarity);
+                R0=([actualrps(i)]*obj.fCircuit.Rn);
+                I0=obj.GetI0(Temp,rps(i),polarity);
+                P0=OP.P0;
+                T0=obj.structure.TES.Ttes(P0,Temp);%ojo, estamos usando positiva
+                SVTES=4*kb*T0*R0*(1+2*bi);
+                TL=0.15;%%%ojo, esto puede cambiar.
+                SVL=4*kb*TL*RL;
+                G0=obj.structure.TES.Gtes(T0);%ojo, estamos usando positiva.
+                t=Temp/T0;%Temp=Tbath
+                F=(1+t^(TES.n+1))/2;
+                %G0=TES.G0;
+                SPTFN=4*kb*T0^2*G0*F;               
+                ec99(i)=2.355*sqrt(tau0.*I0./L0).*((SPTFN+I0.^2.*SVTES./L0.^2+I0.^2.*(L0-1).^2*SVL./L0.^2).*(SVTES+SVL)).^0.25;
+                %ec99(i)=2.355*sqrt(tau0.*I0./L0).*(SPTFN.*SVTES).^0.25;
+            end
+            ec99=ec99/1.609e-19;
         end
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1053,6 +1192,35 @@ classdef BasicAnalisisClass < handle
             pulse(isnan(pulse))=0;
             OP=obj.GetSingleOperatingPoint(Temp,Rp);
             Amp=(1-trise/tI)*(1-tfall/tI)*(1/(2+OP.bi))*(Energy/OP.V0);
+            %%%Amp fluctuation attempt DAmp/Amp=(ai/I0)*(dV0/dR0)*(dT0/T0)           
+            %Tc=obj.GetTc;
+            %DT0=dTperc*Tc;
+            ai=OP.ai;
+            I0=obj.GetI0(Temp,Rp);
+            ivaux=obj.GetIV(Temp);
+            dV=diff(ivaux.vtes)./diff(ivaux.Rtes);
+            %ind=find(abs(ivaux.rtes-Rp)<0.01);
+            %DV0=dV(ind);
+            ind=~isnan(dV);
+            DV0=interp1(ivaux.rtes(ind),dV(ind),Rp);
+            %dTperc=1e-4;%0.5e-6;%0.0001;%dTperc=dT0/T0.
+            Tbath=Temp;%ojo, tiene que estar en K.
+            if Temp>1 Tbath=1e-3*Temp;end%si pasamos en mK pasamos a K.
+            dTbath=1e-6;
+            P0=obj.GetP0(Temp,Rp);
+            T0=obj.structure.TES.Ttes(P0,Tbath);
+            t=Tbath/T0;
+            n=obj.fTES.n;
+            dTperc=(dTbath/Tbath)*t^n;
+            dAperc=(ai/I0)*(DV0)*dTperc;
+            AmpR=normrnd(Amp,Amp*dAperc);
+            %%%
+            boolAmpFluct=0;
+            if boolAmpFluct
+                Amp=AmpR;
+            end
+            %disp(Rp)
+            %disp(Amp)
             Vpulse=I2V(Amp*pulse,obj.fCircuit);
             %SimPulse=[T(:) Vpulse(:)];
             DT=Energy/C;
@@ -1063,7 +1231,7 @@ classdef BasicAnalisisClass < handle
             SimPulse.Vpulse=Vpulse(:);%%% Voltage(V) pulse
             SimPulse.Tpulse=Tpulse(:);%%% Temperature (T) pulse.
         end
-        function Eres=SimEnergyResolution(obj,Temp,varargin)
+        function EresData=SimEnergyResolution(obj,Temp,varargin)
             %%%funcion para intentar simular la resolucion a partir de
             %%%pulsos simulados y ruidos simulados. Hay que tomar los rps
             %%%de las medidas.
@@ -1084,7 +1252,7 @@ classdef BasicAnalisisClass < handle
                 MeanNoise=[freqs(:) fI(freqs,0,0)];
                 MeanPulse=[SimPulse.T(:) -SimPulse.Ipulse(:)];
                 OF=BuildOptimalFilter(MeanPulse,MeanNoise);
-                Nsims=100;
+                Nsims=1000;
                 for j=1:Nsims
                     auxnoise=iPSD((MeanNoise(1:ceil(end/2),2)).^2,MeanNoise(1:ceil(end/2),1));
                     %size(MeanPulse(:,2)),size(auxnoise)
@@ -1093,7 +1261,12 @@ classdef BasicAnalisisClass < handle
                 end
                 [h,x]=hist(Eest,20);
                 ft=fit(x(:),h(:),'gauss1');
-                Eres(i)=5894.4*2.355*ft.c1/sqrt(2)/ft.b1;
+                %Eres(i)=5894.4*2.355*ft.c1/sqrt(2)/ft.b1;
+                EresData(i).Eres=5894.4*2.355*ft.c1/sqrt(2)/ft.b1;
+                EresData(i).MeanPulse=MeanPulse;
+                EresData(i).MeanNoise=MeanNoise;
+                EresData(i).oft=OF;
+                EresData(i).Edata=Eest;
                 %Eres=Eest;%%%
             end
         end

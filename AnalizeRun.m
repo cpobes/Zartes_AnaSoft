@@ -100,7 +100,7 @@ end
 %%% el load(circuit) desde dentro del datadir, por lo que se cargara el
 %%% circuit correcto.
 
-ind=[IVset.Tbath]<Tmax;
+ind=[IVset.Tbath]<=Tmax;
 if isfield(analizeOptions,'IVpskip')
     ivpskip=analizeOptions.IVpskip;
     for i=1:length(ivpskip)
@@ -113,17 +113,28 @@ if isfield(analizeOptions,'IVnskip')
         IVsetN(ivnskip(i)).good=0;
     end
 end
+NegativesFlag=1;
+if isfield(analizeOptions,'NegativesFlag')
+    NegativesFlag=analizeOptions.NegativesFlag;
+end
 Gset=fitPvsTset(IVset(ind),PTrange,PTmodel);
-GsetN=fitPvsTset(IVsetN(ind),PTrange,PTmodel);%%%Ajusto los datos P-Tbath.
+GsetN=[];
+if NegativesFlag
+    GsetN=fitPvsTset(IVsetN(ind),PTrange,PTmodel);%%%Ajusto los datos P-Tbath.
+end
 close(faux);
 
 %RpTES=0.75;%%%Defino el %Rn al que fijar los datos del TES.
 TES=BuildTESStructFromRp(RpTES,Gset);
-TESN=BuildTESStructFromRp(RpTES,GsetN);
+TESN=[];
+if NegativesFlag
+    TESN=BuildTESStructFromRp(RpTES,GsetN);
+end
 
 IVset=GetIVTES(circuit,IVset,TES);
-IVsetN=GetIVTES(circuit,IVsetN,TESN);
-
+if NegativesFlag
+    IVsetN=GetIVTES(circuit,IVsetN,TESN);
+end
 if isfield(analizeOptions,'TES_sides')
     TES.sides=analizeOptions.TES_sides;
     gammas=[2 0.729]*1e3; %valores de gama para Mo y Au
@@ -172,7 +183,7 @@ end
 %P=FitZset(IVset,circuit,TES,TFS);%%%Ajustamos las Z positivas.
 P=FitZset_remote(TESDATA,ZfitOpt);
 
-%%%Solicion temporal para analizar tb negativas.
+%%%Solucion temporal para analizar tb negativas.
 
 cd(strcat(datadir,'\Negative Bias'))
 TESDATAN.IVset=IVsetN;
@@ -185,8 +196,8 @@ if ~isempty(TFN)
     TESDATAN.TFN=TFN;
 end
 PN=P;
-if(1)
-PN=FitZset_remote(TESDATAN,ZfitOpt);
+if(NegativesFlag)
+    PN=FitZset_remote(TESDATAN,ZfitOpt);
 end
 %PN=FitZset(IVsetN,circuit,TESN,TFS); 
 cd ..

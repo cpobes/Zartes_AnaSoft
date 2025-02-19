@@ -1,9 +1,16 @@
 function PulseParameters=AnalizaPulseFITS(file,varargin)
 %%%%Funciona analoga a AnalizaPulseDir pero para fichero fits
 import matlab.io.*
-%%%%%%%%%%%%%%%%%%%%%%%%%
+
+infor=fitsinfo(file);
+%%Npulsos=infor.BinaryTable.Rows
+L=infor.BinaryTable(1).FieldSize(1);
 DataUnit=2;
 A=0;B=0;
+%Npulsos=10000;
+t0ini=0.1;
+optfraction=0.055;
+OP=[];
 
 for i=1:nargin-1
     if isnumeric(varargin{i})
@@ -60,6 +67,14 @@ L=infor.BinaryTable(DataUnit-1).FieldSize(1);
 %%%
 topt=t0ini+optfraction;
 %trunc_area_range=(1080:1440)';
+Npulsos=infor.BinaryTable(DataUnit-1).Rows
+L=infor.BinaryTable(DataUnit-1).FieldSize(1);
+if isfield(OP,'index')
+    index=OP.index;
+    if isempty(index) index=1:Npulsos;end
+else
+    index=1:Npulsos;
+end
 if isfield(OP,'fit_range')
     fit_range=OP.fit_range;
 else
@@ -111,7 +126,13 @@ if isfield(OP,'MeanPulse')
     fhandle=@(p,x)p*interp1(Mpulse(:,1),Mpulse(:,2),x)
     p0=0.200;
 else
-    %fhandle=BuildPulseHandle('2e');%
+
+    try
+        fhandle=BuildPulseHandle('2e');%
+    catch
+        error('BuildPulseHandle not found')
+    end
+
 end
 minprominence=0.05;%0.005(dic21),0.05(Jan24,Rf=3e3).
 polarity=1;% 1: positivos, 0:negativos.
@@ -155,9 +176,9 @@ for i=1:Npulsos%
         if isfield(OP,'filtopt')
             filtopt=OP.filtopt;
         else
-            filtopt.boolfit=0;
+            filtopt.boolfilt=0;
         end
-        if amp(i)<0.01 && filtopt.boolfit
+        if amp(i)<0.01 && filtopt.boolfilt
             pulso(:,2)=filtfilt(filtopt.filter,pulso(:,2));
         end
         if isfield(OP,'oftrange')

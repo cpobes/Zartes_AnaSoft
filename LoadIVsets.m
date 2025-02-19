@@ -16,10 +16,10 @@ function [IVset,IVsetN]=LoadIVsets(varargin)
 olddir=pwd;
 
 try %%%en realidad no necesitamos aqui 'colores' para nada y en LowTPC da error.
-cd(colordir)%%%Cargamos automaticamente la estructura colores para trabajar con ella
-%evalin('caller','load(''colores.mat'')');
-load('colores.mat');
-cd(olddir)
+    cd(colordir)%%%Cargamos automaticamente la estructura colores para trabajar con ella
+    %evalin('caller','load(''colores.mat'')');
+    load('colores.mat');
+    cd(olddir)
 catch
 end
 datadir=[];
@@ -50,13 +50,14 @@ end
 
     if raizdir 
         cd 'IVs';
-    else
     end
 %IVset=ImportFullIV(filesP);
 IVset=ImportRawIVs(filesP);
 %IVsetN=ImportFullIV(filesN);
 IVsetN=ImportRawIVs(filesN);
-cd ..
+    if raizdir
+        cd ..
+    end
 
     if isempty(circuit)
         vars=evalin('caller','who');
