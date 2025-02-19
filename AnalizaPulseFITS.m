@@ -1,11 +1,9 @@
 function PulseParameters=AnalizaPulseFITS(file,varargin)
 %%%%Funciona analoga a AnalizaPulseDir pero para fichero fits
 import matlab.io.*
-
-infor=fitsinfo(file);
-Npulsos=infor.BinaryTable.Rows
-L=infor.BinaryTable.FieldSize(1);
-%Npulsos=10000;
+%%%%%%%%%%%%%%%%%%%%%%%%%
+DataUnit=2;
+A=0;B=0;
 
 for i=1:nargin-1
     if isnumeric(varargin{i})
@@ -22,12 +20,7 @@ for i=1:nargin-1
         else
             oft=[];
         end
-        if isfield(OP,'index')
-            index=OP.index;
-            if isempty(index) index=1:Npulsos;end
-        else
-            index=1:Npulsos;
-        end
+
         %Ibias=OP.Ibias;
         %A=(I0-Ibias)*Rsh;
         %B=Rsh;
@@ -57,6 +50,13 @@ for i=1:nargin-1
         end
     end
 end
+
+%%%
+infor=fitsinfo(file);
+Npulsos=infor.BinaryTable(DataUnit-1).Rows
+L=infor.BinaryTable(DataUnit-1).FieldSize(1);
+%Npulsos=10000;
+
 %%%
 topt=t0ini+optfraction;
 %trunc_area_range=(1080:1440)';
@@ -65,10 +65,14 @@ if isfield(OP,'fit_range')
 else
     fit_range=t0ini*L/2:L/2;%9000:1e5;%Dic21:1000:10000;
 end
-%%%%%%%%%%%%%%%%%%%%%%%%%
-DataUnit=2;
-A=0;B=0;
 
+if isfield(OP,'index')
+    index=OP.index;
+    if isempty(index) index=1:Npulsos;end
+else
+    index=1:Npulsos;
+end
+        
 fptr=fits.openFile(file);
 %fits.movAbsHDU(fptr,3)%%%el fichero de la LNCS está en dos tablas.
 try
@@ -107,7 +111,7 @@ if isfield(OP,'MeanPulse')
     fhandle=@(p,x)p*interp1(Mpulse(:,1),Mpulse(:,2),x)
     p0=0.200;
 else
-    fhandle=BuildPulseHandle('2e');%
+    %fhandle=BuildPulseHandle('2e');%
 end
 minprominence=0.05;%0.005(dic21),0.05(Jan24,Rf=3e3).
 polarity=1;% 1: positivos, 0:negativos.

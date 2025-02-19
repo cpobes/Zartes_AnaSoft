@@ -3,10 +3,11 @@ function pulso=BuildMeanPulsefromFITS(file,varargin)
 %%% V0 no se resta el DC.
 
 import matlab.io.*
+DataUnit=3;%!
 info=fitsinfo(file);
-N=info.BinaryTable.Rows;
+N=info.BinaryTable(DataUnit-1).Rows;
 fptr=fits.openFile(file);
-fits.movAbsHDU(fptr,2);
+fits.movAbsHDU(fptr,DataUnit);
 SR=str2num(fits.readKey(fptr,'SR'));
 RL=str2num(fits.readKey(fptr,'RL'));
 fits.closeFile(fptr);
@@ -21,7 +22,7 @@ aux=zeros(RL,1);
 window=[];
 %window=hamming(RL);
 for i=index
-    auxpulse=readFITSpulse(file,i);%%%asumimos baselines en Dataunit=2
+    auxpulse=readFITSpulse(file,i,DataUnit);%%%asumimos baselines en Dataunit=2
 
     aux=aux(:)+auxpulse(:,2);%
 end

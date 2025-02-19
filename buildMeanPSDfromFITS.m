@@ -3,10 +3,11 @@ function MeanNoise=BuildMeanPSDfromFITS(file,varargin)
 %%% baselines para crear el filtro optimo.
 %%% 2-sided.
 import matlab.io.*
+DataUnit=3;%!default 2.
 info=fitsinfo(file);
-N=info.BinaryTable.Rows;
+N=info.BinaryTable(DataUnit-1).Rows;
 fptr=fits.openFile(file);
-fits.movAbsHDU(fptr,2);
+fits.movAbsHDU(fptr,DataUnit);%!
 SR=str2num(fits.readKey(fptr,'SR'));
 RL=str2num(fits.readKey(fptr,'RL'));
 fits.closeFile(fptr);
@@ -20,7 +21,7 @@ aux=zeros(RL,1);
 window=[];
 %window=hamming(RL);
 for i=index
-    noise=readFITSpulse(file,i);%%%asumimos baselines en Dataunit=2
+    noise=readFITSpulse(file,i,DataUnit);%%%asumimos baselines en Dataunit=2
     %%%noise contiene ya time y data
     %[psd,freqs]=PSD(noise,1);%%%lo hacemos 2-sided
     [psd,freqs]=periodogram(noise(:,2),window,RL,SR,'two-sided');
