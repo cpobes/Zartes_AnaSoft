@@ -1,5 +1,6 @@
 Descargo un toolkit llamado MatCL desde matlab. Es un wrapper(?) para poder programar con openCL que es la alternativa a CUDA para 
 tarjetas NO NVIDIA. En el PC control tenemos una AMD que podría usarse.
+web: https://es.mathworks.com/matlabcentral/fileexchange/66037-matcl-opencl-wrapper?status=SUCCESS
 Intento ejecutar el examples/test_mul y dice que no hay un compilador. Desde mathworks descargo el recomendado (me tengo que loguear con cpobes).
 Ahora intento compilar el toolkit con compile_windows pero no funciona. No encuentra files. Pregunto a Claude y sugiere buscar en Windows/System32
 y program files/AMD. En el primero encuentro openCL.dll que es una de las librerias que busca, pero tengo que cambiar el nombre a .lib.
