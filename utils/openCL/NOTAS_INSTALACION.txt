@@ -11,4 +11,5 @@ Ejecuto el test_mul y se ejecuta bien, aunque los tiempos no parecen mejores con
 Al ejecutar cl_get_devices encuentra 3.
 Ejecuto img_test y ahora sí parece que el cpu time son 295ms frente a openCL time 6.6ms.
 Estudiar los ejemplos y aprender a usar!
-Esto lo he hecho con matlab2023. Funciona con matlab2015?
+Esto lo he hecho con matlab2023. Funciona con matlab2015?Si, también, con cputime:274ms(26ms en segunda ejecucion), opencltime:6.8ms(8ms).
+(quiza queda algo en cache que reduce mucho el tiempo cpu al reejecutar que no sucede con la gpu. Aun así sigue siendo más rápido.)
