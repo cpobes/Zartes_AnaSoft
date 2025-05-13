@@ -113,7 +113,7 @@ if isfield(analizeOptions,'IVnskip')
         IVsetN(ivnskip(i)).good=0;
     end
 end
-NegativesFlag=1;
+NegativesFlag=0;
 if isfield(analizeOptions,'NegativesFlag')
     NegativesFlag=analizeOptions.NegativesFlag;
 end
@@ -184,35 +184,39 @@ end
 P=FitZset_remote(TESDATA,ZfitOpt);
 
 %%%Solucion temporal para analizar tb negativas.
-
-cd(strcat(datadir,'\Negative Bias'))
-TESDATAN.IVset=IVsetN;
-TESDATAN.circuit=TESDATA.circuit;
-TESDATAN.TES=TESN;
-%TESDATAN.TFS=TESDATA.TFS;
-%TFS=importTF('..\TFS.txt');
-TESDATAN.TFS=TFS;
-if ~isempty(TFN)
-    TESDATAN.TFN=TFN;
-end
 PN=P;
 if(NegativesFlag)
+    cd(strcat(datadir,'\Negative Bias'))
+    TESDATAN.IVset=IVsetN;
+    TESDATAN.circuit=TESDATA.circuit;
+    TESDATAN.TES=TESN;
+    %TESDATAN.TFS=TESDATA.TFS;
+    %TFS=importTF('..\TFS.txt');
+    TESDATAN.TFS=TFS;
+    if ~isempty(TFN)
+        TESDATAN.TFN=TFN;
+    end
     PN=FitZset_remote(TESDATAN,ZfitOpt);
+    cd ..
 end
 %PN=FitZset(IVsetN,circuit,TESN,TFS); 
-cd ..
+
 
 cd(olddir)
 
 AnalizedData.circuit=TESDATA.circuit;
 AnalizedData.IVset=IVset;
-AnalizedData.IVsetN=IVsetN;
+if(NegativesFlag)
+    AnalizedData.IVsetN=IVsetN;
+    AnalizedData.GsetN=GsetN;
+    AnalizedData.TESN=TESN;
+end
 AnalizedData.PTmodel=PTmodel;
 AnalizedData.Gset=Gset;
-AnalizedData.GsetN=GsetN;
+
 AnalizedData.RpTES=RpTES;
 AnalizedData.TES=TES;
-AnalizedData.TESN=TESN;
+
 AnalizedData.TFS=TFS;
 if ~isempty(TFN)
     AnalizedData.TFN=TFN;

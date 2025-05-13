@@ -3,7 +3,7 @@ function pulso=BuildMeanPulsefromFITS(file,varargin)
 %%% V0 no se resta el DC.
 
 import matlab.io.*
-DataUnit=3;%!
+DataUnit=2;%!
 info=fitsinfo(file);
 N=info.BinaryTable(DataUnit-1).Rows;
 fptr=fits.openFile(file);

@@ -3,7 +3,7 @@ function MeanNoise=BuildMeanPSDfromFITS(file,varargin)
 %%% baselines para crear el filtro optimo.
 %%% 2-sided.
 import matlab.io.*
-DataUnit=3;%!default 2.
+DataUnit=2;%!default 2.
 info=fitsinfo(file);
 N=info.BinaryTable(DataUnit-1).Rows;
 fptr=fits.openFile(file);
