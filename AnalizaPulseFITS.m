@@ -154,7 +154,7 @@ for i=1:Npulsos%
         
     dc(i)=mean(pulso(1:L*t0ini/2,2));
     dc_std(i)=std(pulso(1:L*t0ini/2,2));
-    area(i)=sum(medfilt1(pulso(int16(L*t0ini-10):end,2),wfilt)-dc(i));
+    area(i)=sum(medfilt1(pulso((L*t0ini-10):end,2),wfilt)-dc(i));
     optArea(i)=sum(medfilt1(pulso(int16(L*t0ini-10):L*topt,2),wfilt)-dc(i));
     [maux,miaux]=max(medfilt1(pulso(:,2),wfilt));
     amp(i)=maux-dc(i);
