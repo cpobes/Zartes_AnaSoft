@@ -2,9 +2,9 @@ function PulseParameters=AnalizaPulseFITS(file,varargin)
 %%%%Funciona analoga a AnalizaPulseDir pero para fichero fits
 import matlab.io.*
 
-infor=fitsinfo(file);
+%infor=fitsinfo(file);
 %%Npulsos=infor.BinaryTable.Rows
-L=infor.BinaryTable(1).FieldSize(1);
+%L=infor.BinaryTable(1).FieldSize(1);
 DataUnit=2;
 A=0;B=0;
 %Npulsos=10000;
@@ -62,13 +62,9 @@ end
 infor=fitsinfo(file);
 Npulsos=infor.BinaryTable(DataUnit-1).Rows
 L=infor.BinaryTable(DataUnit-1).FieldSize(1);
-%Npulsos=10000;
-
 %%%
 topt=t0ini+optfraction;
-%trunc_area_range=(1080:1440)';
-Npulsos=infor.BinaryTable(DataUnit-1).Rows
-L=infor.BinaryTable(DataUnit-1).FieldSize(1);
+
 if isfield(OP,'index')
     index=OP.index;
     if isempty(index) index=1:Npulsos;end
@@ -123,7 +119,7 @@ DT=1/SR;
 
 if isfield(OP,'MeanPulse')
     Mpulse=OP.MeanPulse;
-    fhandle=@(p,x)p*interp1(Mpulse(:,1),Mpulse(:,2),x)
+    fhandle=@(p,x)p*interp1(Mpulse(:,1),Mpulse(:,2),x);
     p0=0.200;
 else
 
@@ -173,7 +169,7 @@ for i=1:Npulsos%
         %OFT_Energy(i)=sum(pulso(:,2).*oft(:));
         %OFT_Energy(i)=OFTEcalcWjit(pulso,[pulso(:,1) oft(:)]);
         %%%temporal baseline filtering.
-        if isfield(OP,'filtopt')
+        if isfield(OP,'filtopt')% ojo, esto son filt options, no filtro optimo.
             filtopt=OP.filtopt;
         else
             filtopt.boolfilt=0;
