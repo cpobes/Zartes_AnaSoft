@@ -50,7 +50,8 @@ else %if ischar(varargin{1})
             if isfield(varargin{1},'Ns')
                 model.Ns=varargin{1}.Ns;
             else
-                model.Ns=[4 3];%intento de generalizar ley doble N.
+                %model.Ns=[4 3];%intento de generalizar ley doble N.
+                model.Ns=[1 4];%[1 4] para difusivo+radiativo.
             end
             ns=model.Ns;
             model.function=@(p,T)(p(1)*(p(3)^ns(1)-T.^ns(1))+p(2)*(p(3)^ns(2)-T.^ns(2)));

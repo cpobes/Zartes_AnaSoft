@@ -130,7 +130,13 @@ else
     end
 
 end
-minprominence=0.05;%0.005(dic21),0.05(Jan24,Rf=3e3).
+%minprominence=0.05;%0.005(dic21),0.05(Jan24,Rf=3e3).
+if isfield(OP,'minprominence')
+    minprominence=OP.minprominence;
+else
+    minprominence=0.05;%9000:1e5;%Dic21:1000:10000;
+end
+
 polarity=1;% 1: positivos, 0:negativos.
 
 for i=1:Npulsos%
