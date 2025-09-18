@@ -28,6 +28,6 @@ for i=index
     %size(aux),size(psd)
     aux=aux(:)+psd(:);
 end
-Mpsd=aux/N;
+Mpsd=aux/length(index);
 MeanNoise(:,1)=freqs;
 MeanNoise(:,2)=sqrt(abs(Mpsd));%devolver directamente sqrt(Mpsd)?
