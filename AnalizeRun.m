@@ -141,7 +141,7 @@ if isfield(analizeOptions,'TES_sides')
     rhoAs=[0.107 0.0983]; %valores de Rho/A para Mo y Au
     %hMo=45e-9; hAu=270e-9; %hAu=1.5e-6;%%%1Z11.!!!!!!!!!!!!!
     hMo=40e-9;hAu=220e-9;%3Z13.
-    hAu=2.4e-6;
+    hAu=2.5e-6;
     %CN=(gammas.*rhoAs)*([hMo ;hAu]*sides.^2).*TES.Tc; %%%Calculo directo
     CN=(gammas.*rhoAs).*([hMo hAu]*TES.sides.^2).*TES.Tc; %%%calculo de cada contribucion por separado.
     CN=sum(CN);

@@ -349,6 +349,7 @@ for i=1:length(dirs)
             f=logspace(0,6,1000);%%%Ojo, la definición de 'f' debe coincidir con la que hay dentro de noisesim!!!
             %noiseIrwin
             try
+                disp(thenoisefile);
                 sIaux=ppval(spline(f,noiseIrwin.sI),noisedata{1}(:,1));
                 NEP=sqrt(V2I(noisedata{1}(:,2),circuit).^2-noiseIrwin.squid.^2)./sIaux;
                 %[~,nep_index]=find(~isnan(NEP))
@@ -363,6 +364,7 @@ for i=1:length(dirs)
                 P(i).ExRes(jj)=0;
                 P(i).ThRes(jj)=0;
                 NEP=ones(1,length(noisedata{1}(:,1)))*Inf;
+                warning('error en NEP extraction. Res=0 forced.');
             end
             
             %%%Excess noise trials.
@@ -429,6 +431,7 @@ for i=1:length(dirs)
             %if sum(isinf(ydata))==0  %%%Algunos OP dan NEP Inf.pq?
                 ydata=filterNoise(NEP(findx)*1e18,noise_filt_model);
                 %if(jj==5) save('parameters','parameters');end%?debug?
+                %if sum(imag(ydata)) disp(jj),end%debug
                 maux=lsqcurvefit(@(x,xdata) fitjohnson(x,xdata,parameters),[0 0],xdata(:),ydata(:));
                 %maux=lsqcurvefit(@(x,xdata) fitnoise(x,xdata,TES,OP,circuit),[0 0],xdata,ydata);
                 P(i).M(jj)=maux(2);
@@ -436,6 +439,7 @@ for i=1:length(dirs)
             else
                 P(i).M(jj)=0;
                 P(i).Mph(jj)=0;
+                warning('Inf values in NEP. M=0 forced.')
             end
         end  %%%noisefit
          else %%%tanto si no hay ruidos como si no existe el file de ruido correspondiente.
@@ -443,6 +447,7 @@ for i=1:length(dirs)
             P(i).ThRes(jj)=0;
             P(i).M(jj)=0;
             P(i).Mph(jj)=0;
+            warning('No noise file found. M=0 forced.')
         end  %%%if not empty filesNoise       
     end
     %%%Pasamos ExRes y ThRes dentro de P.p

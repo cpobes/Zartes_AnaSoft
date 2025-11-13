@@ -26,8 +26,8 @@ elseif nargin==2
             param.G0=param.G;
             param.G100=param.n*param.K*0.1^(param.n-1);
             if isfield(model,'ci')
-                param.Errn=model.ci(2,2)-model.ci(2,1);
-                param.ErrK=model.ci(1,2)-model.ci(1,1);
+                param.Errn=(model.ci(2,2)-model.ci(2,1))/2;%!
+                param.ErrK=(model.ci(1,2)-model.ci(1,1))/2;%!
             end
         case 'Tcdirect'
             param.n=fit(2);
@@ -37,9 +37,9 @@ elseif nargin==2
             param.G0=param.G;
             param.G100=param.n*param.K*0.1^(param.n-1);
             if isfield(model,'ci')
-                param.Errn=model.ci(2,2)-model.ci(2,1);
-                param.ErrK=model.ci(1,2)-model.ci(1,1);
-                param.ErrTc=model.ci(3,2)-model.ci(3,1);
+                param.Errn=(model.ci(2,2)-model.ci(2,1))/2;
+                param.ErrK=(model.ci(1,2)-model.ci(1,1))/2;
+                param.ErrTc=(model.ci(3,2)-model.ci(3,1))/2;
             end
         case 'GTcdirect'
             param.n=fit(2);
@@ -49,9 +49,9 @@ elseif nargin==2
             param.G0=param.G;
             param.G100=param.n*param.K*0.1^(param.n-1);
             if isfield(model,'ci')
-                param.Errn=model.ci(2,2)-model.ci(2,1);
-                param.ErrG=model.ci(1,2)-model.ci(1,1);
-                param.ErrTc=model.ci(3,2)-model.ci(3,1);
+                param.Errn=(model.ci(2,2)-model.ci(2,1))/2;
+                param.ErrG=(model.ci(1,2)-model.ci(1,1))/2;
+                param.ErrTc=(model.ci(3,2)-model.ci(3,1))/2;
             end
         case 'Ic0'
             param.n=fit(2);
@@ -87,9 +87,9 @@ elseif nargin==2
             param.G100=4*param.K*0.1^3;
             if isfield(model,'ci')
                 %param.Errn=model.ci(2,2)-model.ci(2,1);
-                param.ErrK=model.ci(1,2)-model.ci(1,1);
-                param.ErrTc=model.ci(2,2)-model.ci(2,1);
-                param.ErrG=param.G*(param.ErrK/param.K+3*param.ErrTc/param.Tc);
+                param.ErrK=(model.ci(1,2)-model.ci(1,1))/2;
+                param.ErrTc=(model.ci(2,2)-model.ci(2,1))/2;
+                param.ErrG=param.G*sqrt((param.ErrK/param.K).^2+3*(param.ErrTc/param.Tc).^2);%!!!
             end
     end
 end

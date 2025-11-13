@@ -168,7 +168,7 @@ classdef NoiseDataClass < handle
         %%%%%
         %%% Fit Noise Data
         %%%%%
-        function FitNoise(obj)
+        function [maux,residual,jacob]=FitNoise(obj)
             %%%%Ajustar el ruido filtrado al modelo fijado previamente.
             if isempty(obj.fThermalModelClass)
                 error('Fijar modelo térmico');
@@ -188,7 +188,10 @@ classdef NoiseDataClass < handle
             fh=@(x,f)scale*FitFunction(f,x(1),x(2:end));%%%Ajustamos en pA.x(1)=Mjo, x(2:end)=MphArray.
             m0=ones(1,obj.fThermalModelClass.fNumberOfLinks+1);
             LB=zeros(1,obj.fThermalModelClass.fNumberOfLinks+1);
-            maux=lsqcurvefit(fh,m0,xdata(:),ydata(:),LB);
+            [maux,R1,residual,~,~,~,jacob]=lsqcurvefit(fh,m0,xdata(:),ydata(:),LB);
+            %maux
+            %R1
+            %residual
             obj.fThermalModelClass.fMjohnson=maux(1);
             obj.fThermalModelClass.fMphononArray=maux(2:end);
             obj.fOPClass.fMjohnson=maux(1);

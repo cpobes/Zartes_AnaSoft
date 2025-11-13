@@ -57,7 +57,7 @@ figure('windowstyle','docked')
 hist(EData,nbins);
 grid on
 hold
-E=[5875:0.1:5910];
+E=5875:0.1:5910;%poster Emanuele 5870:5915;
 plot(E,MnKaHandle(p,E),'r','linewidth',3)
 xlim([5875 5910]);
 set(gca,'fontsize',15)
