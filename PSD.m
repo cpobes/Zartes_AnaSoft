@@ -10,7 +10,7 @@ ft=fft(x);ft=ft(1:ceil(N/2));
 psd=abs(ft).^2/SF/N;
 psd(2:end-1)=2*psd(2:end-1);
 if SF>2
-    freq=1:SF/N:SF/2;%%%!!!
+    freq=SF/N:SF/N:SF/2;%%%!!!1?
 else
     freq=0:SF/N:SF/2;%%%Para señales de mHz(horas, dias, etc) SF es en general menor de 1 
 end
