@@ -124,9 +124,13 @@ if isfield(OP,'MeanPulse')
 else
 
     try
+        [~,name]=system('hostname');
+        if strcmp(name,'DESKTOP-DNDSVBJ')
+        else
         fhandle=BuildPulseHandle('2e');%
+        end
     catch
-        error('BuildPulseHandle not found')
+        error('BuildPulseHandle not found');
     end
 
 end
