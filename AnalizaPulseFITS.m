@@ -125,7 +125,7 @@ else
 
     try
         [~,name]=system('hostname');
-        if strcmp(name,'DESKTOP-DNDSVBJ')
+        if strcmp(name(1:end-1),'DESKTOP-DNDSVBJ')
         else
         fhandle=BuildPulseHandle('2e');%
         end
