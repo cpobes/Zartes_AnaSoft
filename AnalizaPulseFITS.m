@@ -65,12 +65,6 @@ L=infor.BinaryTable(DataUnit-1).FieldSize(1);
 %%%
 topt=t0ini+optfraction;
 
-if isfield(OP,'index')
-    index=OP.index;
-    if isempty(index) index=1:Npulsos;end
-else
-    index=1:Npulsos;
-end
 if isfield(OP,'fit_range')
     fit_range=OP.fit_range;
 else
@@ -86,7 +80,7 @@ end
         
 fptr=fits.openFile(file);
 %fits.movAbsHDU(fptr,3)%%%el fichero de la LNCS está en dos tablas.
-try
+%try
 fits.movAbsHDU(fptr,DataUnit);
 %Npulsos=fits.getNumRows(fptr)
 
@@ -206,10 +200,11 @@ for i=1:Npulsos%
     npeaks(i)=numel(v);
     ntimes(i).times=t;
     nAmps(i).amps=v-dc(i);%vector de amplitudes de cada pico.
-    %%%%
-    template=OP.MeanPulse;
-    [~,aa]=peak_detector(pulso(:,2),template,0.5,100);
-    nAmpsFit(i).amps=aa;
+    
+    %%%%test for laser pulses.
+    %template=OP.MeanPulse;
+    %[~,aa]=peak_detector(pulso(:,2),template,0.5,100);
+    %nAmpsFit(i).amps=aa;
     %%%%
     timestamp(i)=fits.readCol(fptr,2,i,1);
     tbath(i)=fits.readCol(fptr,3,i,1);
@@ -264,41 +259,41 @@ for i=1:Npulsos%
     if ~mod(i,10) ['pulso ' num2str(i)],end
 end
 fits.closeFile(fptr);
-    PulseParameters.area=area;
-    %PulseParameters.trunc_area=trunc_area;
-    PulseParameters.optArea=optArea;
-    PulseParameters.dc=dc;
-    PulseParameters.dc_std=dc_std;
-    PulseParameters.amp=amp;
-    PulseParameters.rango=rango;
-    PulseParameters.tmax=tmax;
-    PulseParameters.Amax=Amax;
-    PulseParameters.npeaks=npeaks;
-    PulseParameters.ntimes=ntimes;
-    PulseParameters.nAmps=nAmps;
-    PulseParameters.nAmpsFit=nAmpsFit;
-    PulseParameters.Eetf=Eetf;
-    %PulseParameters.energy=energy;
-    %PulseParameters.e0=energy0;
-    PulseParameters.timestamp=timestamp;
-    PulseParameters.tbath=tbath;
-    PulseParameters.rsensor=rsensor;
-    PulseParameters.minprominence=minprominence;
-    if ~isempty(oft)
-        PulseParameters.OFT_Energy=OFT_Energy;
-    end
-    if(boolfit)
-%     PulseParameters.fit.area_corrected=area_corrected;
-%     PulseParameters.fit.tau_rise=tau_rise;
-%     PulseParameters.fit.tau_fall=tau_fall;
-%     PulseParameters.fit.t0=t0;
-%     PulseParameters.fit.A=A;
-        PulseParameters.fit.dc=dcfit;
-        PulseParameters.fit.Afit=Afit;
-        PulseParameters.fit.t0fit=t0fit;
-        PulseParameters.fit.area_fit=area_fit;
-        PulseParameters.fit.parameters=fit_param;
-    end
-catch
-    fits.closeFile(fptr);
+PulseParameters.area=area;
+%PulseParameters.trunc_area=trunc_area;
+PulseParameters.optArea=optArea;
+PulseParameters.dc=dc;
+PulseParameters.dc_std=dc_std;
+PulseParameters.amp=amp;
+PulseParameters.rango=rango;
+PulseParameters.tmax=tmax;
+PulseParameters.Amax=Amax;
+PulseParameters.npeaks=npeaks;
+PulseParameters.ntimes=ntimes;
+PulseParameters.nAmps=nAmps;
+%PulseParameters.nAmpsFit=nAmpsFit;
+PulseParameters.Eetf=Eetf;
+%PulseParameters.energy=energy;
+%PulseParameters.e0=energy0;
+PulseParameters.timestamp=timestamp;
+PulseParameters.tbath=tbath;
+PulseParameters.rsensor=rsensor;
+PulseParameters.minprominence=minprominence;
+if ~isempty(oft)
+    PulseParameters.OFT_Energy=OFT_Energy;
 end
+if(boolfit)
+    %     PulseParameters.fit.area_corrected=area_corrected;
+    %     PulseParameters.fit.tau_rise=tau_rise;
+    %     PulseParameters.fit.tau_fall=tau_fall;
+    %     PulseParameters.fit.t0=t0;
+    %     PulseParameters.fit.A=A;
+    PulseParameters.fit.dc=dcfit;
+    PulseParameters.fit.Afit=Afit;
+    PulseParameters.fit.t0fit=t0fit;
+    PulseParameters.fit.area_fit=area_fit;
+    PulseParameters.fit.parameters=fit_param;
+end
+%catch
+%    fits.closeFile(fptr);
+%end
