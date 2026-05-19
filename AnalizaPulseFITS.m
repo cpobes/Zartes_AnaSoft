@@ -162,6 +162,7 @@ for i=1:Npulsos%
     amp(i)=maux-dc(i);
     tmax(i)=time(miaux);
     Amax(i)=maux;%
+    rango(i)=range(medfilt1(pulso(:,2),wfilt));
     
     %%%Self Calibrated Energy.E_ETF ec.58 Irwin.
     ipulse=V2I(pulso(:,2),OP.circuit);
@@ -195,11 +196,17 @@ for i=1:Npulsos%
     %ind=find(pulso(:,2)-dc(i)<AMPthr);%%%seleccionamos un rango que no esté saturado para hacer el ajuste.
     %ind=find(pulso(:,1)<0.12 & pulso(:,1)>0.1);
     
-    [v,t]=findpeaks(pulso(:,2),pulso(:,1),'minpeakprominence',minprominence);
+    %[v,t]=findpeaks(pulso(:,2),pulso(:,1),'minpeakprominence',minprominence);
+    [v,t]=findpeaks(pulso(:,2),pulso(:,1),'minpeakprominence',2.5e-3,'minpeakdistance',30e-6,'minpeakwidth',5e-6);
     %v=0;t=0;
     npeaks(i)=numel(v);
     ntimes(i).times=t;
-    
+    nAmps(i).amps=v-dc(i);%vector de amplitudes de cada pico.
+    %%%%
+    template=OP.MeanPulse;
+    [~,aa]=peak_detector(pulso(:,2),template,0.5,100);
+    nAmpsFit(i).amps=aa;
+    %%%%
     timestamp(i)=fits.readCol(fptr,2,i,1);
     tbath(i)=fits.readCol(fptr,3,i,1);
     rsensor(i)=fits.readCol(fptr,4,i,1);
@@ -259,10 +266,13 @@ fits.closeFile(fptr);
     PulseParameters.dc=dc;
     PulseParameters.dc_std=dc_std;
     PulseParameters.amp=amp;
+    PulseParameters.rango=rango;
     PulseParameters.tmax=tmax;
     PulseParameters.Amax=Amax;
     PulseParameters.npeaks=npeaks;
     PulseParameters.ntimes=ntimes;
+    PulseParameters.nAmps=nAmps;
+    PulseParameters.nAmpsFit=nAmpsFit;
     PulseParameters.Eetf=Eetf;
     %PulseParameters.energy=energy;
     %PulseParameters.e0=energy0;

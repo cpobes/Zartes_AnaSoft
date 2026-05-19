@@ -1,4 +1,4 @@
-function OFTs=GetAutomaticOFTs(Pdata,files)
+function OFTs=BuildAutomaticOFTs(Pdata,files)
 %%%funcion de analisis para sacar OFT automatico a partir del primer 
 %%%analisis de datos
 options=fitoptions('gauss3');

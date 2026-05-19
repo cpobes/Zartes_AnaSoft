@@ -1,33 +1,79 @@
-% instrucciones para formatear figura de espectro con Residuos.
-%%%
+function options=FormatKaSpectrumWithResidues(varargin)
+%%%instrucciones para formatear figura de espectro con Residuos.
+%%%VERSION EN utils github
+%%%Ojo, script tambien en "F:\ATHENA\medidas\BlueFors\2025\Enero\CH1\Pulsos\miercoles"
+if nargin ==0
+    nbins=40;
+    finecal=1.0;
+    xlimits=[5875 5910];%Original [5875 5910];
+    title_str='default %Rn';
+    p0=[120 3];
+    plot_format='errorbar';
+    options.nbins=nbins;
+    options.finecal=finecal;
+    options.xlimits=xlimits;
+    options.p0=p0;
+    options.title=title_str;
+    options.plot_format=plot_format;
+    warning('Need Ecal and Data as input');
+    return
+elseif nargin==1
+        options=varargin{1};
+end
+if ~isfield(options,'Data')
+    error('Need Ecal and Data');
+end
+
+%%%OPTIONS
+MnKaHandle=BuildMnKaHandle;
+nbins=options.nbins;
+finecal=options.finecal;
+xlimits=options.xlimits;
+title_str=options.title;
+p0=options.p0;
+EauxCal=options.Ecal;
+Pauxdata=options.Data;
+
 figure('windowstyle','docked')
 subplot(2,1,1);
 SpPosition=[0.1300    0.2641    0.7750    0.6609];
 %set(haux,'Position',SpPosition);
 %pintar histograma
-nbins=40;
+
 %need to select data in indx and calibrate.
-%Pauxdata=PX15data;
-%EauxCal=X15_Ecal;
-%calibrated_spectrum=EauxCal(Pauxdata.OFT_Energy(indx));
+%Pauxdata=Pch1_30mK_12Rn.OFT_Energy(indx(indx2));
+%Pauxdata=Pch2L08_15Rn.OFT_Energy(indx);
+%EauxCal=NL_Ecal;
+calibrated_spectrum=EauxCal(Pauxdata);
 %hist(calibrated_spectrum,nbins);
-%[h,x]=hist(calibrated_spectrum,nbins);
-%bar(x,h)
-x=xdata;h=ydata;
-%bar(x,h)
-x=1.0001*x;%%%!manual recalibration!
-errorbar(x,h,sqrt(h),'linestyle',':','linewidth',1)
+[h,x]=hist(calibrated_spectrum,nbins);
+x=finecal*x;%%%!manual recalibration!
+%indx=[1:14 16:40];%%%debug
+[p,~,residual,~,~,~,jacob]=lsqcurvefit(MnKaHandle,p0,x(:),h(:));
+ci= nlparci(p,residual,'jacobian',jacob);
+err=(ci(2,2)-ci(2,1))/2;%sigma.
+switch options.plot_format
+    case 'errorbar'
+        errorbar(x,h,sqrt(h),'-s','linestyle',':','linewidth',1,'marker','.','markersize',24)
+    case 'bar'
+        bar(x,h,'linewidth',1,'facecolor',[1 1 1]*0.8);
+end
 %formateo espectro
-xlim([5875 5910]);
+xlim(xlimits);
 set(gca,'fontsize',15)
 set(gca,'xtick',[]);%quitamos ejeX
 grid on
 hold on
 %superponer fit o linea. 
 E=[5840:0.1:5950];
-plot(E,MnKaHandle(p,E),'r','linewidth',2);
-legend({'K_{\alpha} data','3 eV Fit'});%modify text
-title('15% R_n')%modify text
+line_color=[0.6353 0.0784 0.1843];
+plot(E,MnKaHandle(p,E),'color',line_color,'linewidth',3);
+plot(E,MnKaHandle([p(1) 0.01],E),'--','color','k','linewidth',2);
+res=sprintf('%2.1f',p(2));
+sigma=sprintf('%2.1f',err);
+legend({' K_{\alpha} data',[' ',res,[' \pm' char(32)],sigma,' eV Fit']});%modify text
+title(title_str)%modify text
+%legend({'K_{\alpha} data','3 eV Fit'});%modify text
 %%%plot residuos
 %pause(1)
 subplot(2,1,2);
@@ -35,11 +81,12 @@ RsPosition=[0.1300    0.1100    0.7750    0.1270];
 set(gca,'Position',RsPosition);
 %define.[h,x]=hist(calibrated_spectrum,nbins)
 stem(x,h-MnKaHandle(p,x),'.-')
-xlim([5875 5910])
+xlim(xlimits);
 set(gca,'fontsize',15)
 xlabel('E(eV)')
 R=sqrt(sum((h-MnKaHandle(p,x)).^2));
-legend(strcat('R: ',num2str(R,4)));
+%legend(strcat('R: ',num2str(R,4)));
+legend(['R: ',' ',sprintf('%4.2f',R)]);
 legend boxoff
 subplot(2,1,1)
 set(gca,'Position',SpPosition);

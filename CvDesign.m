@@ -56,10 +56,16 @@ Si3N4.conductivity=0;
 Si3N4.f_obs_free=1;
 %%%TiO2.Ojo!!! CUORE es TeO2!!!
 TiO2.Ef=Inf;TiO2.Tf=Inf;%%%!!!
-TiO2.TD=232;TiO2.densidad=5.67e6;%4.23e3;%%%???
-TiO2.masa_molar=159.6;%79.866;
+TiO2.TD=232;TiO2.densidad=4.23e3;%%%???
+TiO2.masa_molar=79.866;%79.866;
 TiO2.f_obs_free=1;TiO2.att_length6K=0e-6;
 TiO2.conductivity=0;
+%%%TeO2.CUORE
+TeO2.Ef=Inf;TeO2.Tf=Inf;%%%!!!
+TeO2.TD=232;TeO2.densidad=5.67e6;%4.23e3;%%%???
+TeO2.masa_molar=159.6;%79.866;
+TeO2.f_obs_free=1;TeO2.att_length6K=0e-6;
+TeO2.conductivity=0;
 %%%Wolframio
 W.Ef=11.47;W.Tf=13.37e4;W.TD=383;
 W.densidad=19.316e6;W.masa_molar=183.84;
@@ -114,6 +120,8 @@ switch material_str
         material=Si3N4;
     case 'TiO2'
         material=TiO2;
+    case 'TeO2'
+        material=TeO2;
     case 'Wolframio'
         material=W;
 end
