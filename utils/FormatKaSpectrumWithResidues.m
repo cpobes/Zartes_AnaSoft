@@ -8,7 +8,7 @@ if nargin ==0
     xlimits=[5875 5910];%Original [5875 5910];
     title_str='default %Rn';
     p0=[120 3];
-    plot_format='errorbar';
+    plot_format='errorbar';% 'bar' or 'errorbar'.
     options.nbins=nbins;
     options.finecal=finecal;
     options.xlimits=xlimits;
@@ -46,10 +46,28 @@ SpPosition=[0.1300    0.2641    0.7750    0.6609];
 %EauxCal=NL_Ecal;
 calibrated_spectrum=EauxCal(Pauxdata);
 %hist(calibrated_spectrum,nbins);
-[h,x]=hist(calibrated_spectrum,nbins);
-x=finecal*x;%%%!manual recalibration!
+if isfield(options,'Ebins')
+    Ebins=options.Ebins;
+else
+    Ebins=[5870:0.5:5915];
+end
+%[h,x]=hist(calibrated_spectrum,nbins);
+[h,x]=hist(finecal*calibrated_spectrum,Ebins);
+%x=finecal*x;%%%!manual recalibration!
+
 %indx=[1:14 16:40];%%%debug
-[p,~,residual,~,~,~,jacob]=lsqcurvefit(MnKaHandle,p0,x(:),h(:));
+if isfield(options,'exclude')
+    exclude=options.exclude;
+else
+    exclude=[];
+end
+kk=[];
+for i=1:numel(exclude) kk=[kk find(x==exclude(i))];end
+index=setdiff(1:numel(x),kk)-1;
+index=index(index>0);
+%x(index)
+%index=find(x>exclude(1) & x<exclude(2));
+[p,~,residual,~,~,~,jacob]=lsqcurvefit(MnKaHandle,p0,x(index),h(index));
 ci= nlparci(p,residual,'jacobian',jacob);
 err=(ci(2,2)-ci(2,1))/2;%sigma.
 switch options.plot_format
@@ -69,6 +87,7 @@ E=[5840:0.1:5950];
 line_color=[0.6353 0.0784 0.1843];
 plot(E,MnKaHandle(p,E),'color',line_color,'linewidth',3);
 plot(E,MnKaHandle([p(1) 0.01],E),'--','color','k','linewidth',2);
+plot(exclude,h(kk),'xr','markersize',10)
 res=sprintf('%2.1f',p(2));
 sigma=sprintf('%2.1f',err);
 legend({' K_{\alpha} data',[' ',res,[' \pm' char(32)],sigma,' eV Fit']});%modify text

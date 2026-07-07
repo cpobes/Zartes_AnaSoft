@@ -14,8 +14,9 @@ normalizacion='amplitud';%amplitud o area.
 Low=-100;
 High=100;
 switch normalizacion
+    %%% p(1): Scale factor, p(2):fwhm.
     case 'amplitud'
-        Kbfhandle=@(p,y)p(1)*conv(fhMnKb(y),normpdf([Low:(y(2)-y(1)):High],0,p(2)/2.355)./max(conv(fhMnKb(y),normpdf([Low:(y(2)-y(1)):High],0,p(2)/2.355))),'same');
+        Kbfhandle=@(p,y)p(1)*conv(fhMnKb(y),normpdf([Low:(y(2)-y(1)):High],0,p(2)/2.35482)./max(conv(fhMnKb(y),normpdf([Low:(y(2)-y(1)):High],0,p(2)/2.35482))),'same');
     case 'area'
-        Kbfhandle=@(p,y)p(1)*conv(fhMnKb(y),normpdf([Low:(y(2)-y(1)):High],0,p(2)/2.355)./sum(conv(fhMnKb(y),normpdf([Low:(y(2)-y(1)):High],0,p(2)/2.355))),'same');
+        Kbfhandle=@(p,y)p(1)*conv(fhMnKb(y),normpdf([Low:(y(2)-y(1)):High],0,p(2)/2.35482)./sum(conv(fhMnKb(y),normpdf([Low:(y(2)-y(1)):High],0,p(2)/2.35482))),'same');
 end

@@ -151,7 +151,10 @@ for i=1:Npulsos%
     pulso(:,1)=(1:L)/SR;%%%
     
     pulso(:,2)=(-1)^(polarity+1)*raw;%%%Pulsos negativos! o Positivos!!!
-        
+    
+    if (L<200)
+        dc(i)=0;dc_std(i)=0;area(i)=0;optArea(i)=0;amp(i)=0;tmax(i)=0;Amax(i)=0;rango(i)=0;%
+    else
     dc(i)=mean(pulso(1:L*t0ini/2,2));
     dc_std(i)=std(pulso(1:L*t0ini/2,2));
     area(i)=sum(medfilt1(pulso((L*t0ini-10):end,2),wfilt)-dc(i));
@@ -161,7 +164,7 @@ for i=1:Npulsos%
     tmax(i)=time(miaux);
     Amax(i)=maux;%
     rango(i)=range(medfilt1(pulso(:,2),wfilt));
-    
+    end
     %%%Self Calibrated Energy.E_ETF ec.58 Irwin.
     ipulse=V2I(pulso(:,2),OP.circuit);
     idc=V2I(dc(i),OP.circuit);
@@ -195,8 +198,19 @@ for i=1:Npulsos%
     %ind=find(pulso(:,1)<0.12 & pulso(:,1)>0.1);
     
     %[v,t]=findpeaks(pulso(:,2),pulso(:,1),'minpeakprominence',minprominence);
-    [v,t]=findpeaks(pulso(:,2),pulso(:,1),'minpeakprominence',2.5e-3,'minpeakdistance',30e-6,'minpeakwidth',5e-6);
-    %v=0;t=0;
+    %%%Peak Detection Params:
+    if isfield(OP,'peakparam')
+        minprom=OP.peakparam.minprom;%2.5e-3;%4e-3
+        mindist=OP.peakparam.mindist;%30e-6;%0.5e-3
+        minwidth=OP.peakparam.minwidth;%3e-6;%1e-4.
+    else
+        minprom=2.5e-3;%4e-3
+        mindist=30e-6;%0.5e-3
+        minwidth=3e-6;%1e-4.
+    end
+    v=0;t=0;
+    if (L>200) [v,t]=findpeaks(pulso(:,2),pulso(:,1),'minpeakprominence',minprom,'minpeakdistance',mindist,'minpeakwidth',minwidth);end%
+    
     npeaks(i)=numel(v);
     ntimes(i).times=t;
     nAmps(i).amps=v-dc(i);%vector de amplitudes de cada pico.

@@ -1,6 +1,6 @@
 function pulso=readFITSpulse(file,index,varargin)
 %%%función para leer un pulso de un fichero FITS
-%%% suponemos que están en la bloque 2.
+%%% suponemos que están en el DataUnit 2.
 %%% 17Dic2021 incluimos varargin para pasar el DataUnit y leemos SR y RL
 %%% para devolver tambien los times en primera columna.
 

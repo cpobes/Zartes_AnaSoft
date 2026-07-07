@@ -1,5 +1,5 @@
 function fh=BuildVoigtHandle(file)
-%%%Funcion para crear un handle con una suma de gaussianas correspondientes
+%%%Funcion para crear un handle con una suma de lorenzianas correspondientes
 %%%a varias lineas de emision con ciertas Energy, fwhm e Intentity
 %%%guardadas en formato .json. Creado expresamente para el caso Mn55.
 %%%15-Nov-2023.
