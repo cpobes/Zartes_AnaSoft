@@ -109,3 +109,13 @@ legend(['R: ',' ',sprintf('%4.2f',R)]);
 legend boxoff
 subplot(2,1,1)
 set(gca,'Position',SpPosition);
+if isfield(options,'boolsave')
+    boolsave=options.boolsave;
+else
+    boolsave=0;
+end
+if boolsave
+    h=gcf;
+    N=h.Number;
+    print(['-f' num2str(N)],['Ka_' title_str '.png'],'-dpng');
+end

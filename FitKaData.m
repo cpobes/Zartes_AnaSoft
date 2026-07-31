@@ -22,22 +22,27 @@ KData=Pdata.OFT_Energy;%(Kaindex);
 %%%deshabilitarlo basta poner un número mayor que la duracion del run.
 t0=Pdata.timestamp(Kaindex(1));
 tend=Pdata.timestamp(Kaindex(end));
-DTminutes=600;%20;%delta T en minutos.
-DT=DTminutes/1440;
-N=ceil((tend-t0)/DT);
+DTminutes=10;%20;%delta T en minutos.
+DT=DTminutes*60;%DTminutes/1440;ojo al cambio de formato en timestamp de fraccion de dia a seg.
+N=ceil((tend-t0)/DT)
 t1=t0;t2=t1+DT;
 EData=[];
+%return
 for i=1:N
     i
     indT=find(Pdata.timestamp>t1 & Pdata.timestamp<t2);
     ind=intersect(indT,Kaindex);
     %max(ind)
     [h,x]=hist(KData(ind),nbins);
-    hist(KData(ind),nbins),pause(1)
     f = fit(x(:),h(:),'gauss2');
-    Ka_cal=polyfit([0 f.b2 f.b1],[0 Ka1 Ka2],2);
+    %Ka_cal=polyfit([0 f.b2 f.b1],[0 Ka1 Ka2],2);
+    Ka_cal=fit([0 f.b2 f.b1]',[0 Ka1 Ka2]','poly2');
     %calibrate data
-    EData=[EData polyval(Ka_cal,KData(ind))];
+    %EData=[EData polyval(Ka_cal,KData(ind))];
+    EData=[EData Ka_cal(KData(ind))'];
+    hold off
+    hist(KData(ind),nbins),pause(0.5),hold on
+    plot(x,f(x),'r')
     t1=t2;t2=t1+DT;
 end
 if nargout==1
@@ -47,7 +52,7 @@ end
 %MM=movingMean(EData,Twindow);
 %EData=EData-MM+5894.4;%
 [h,x]=hist(EData,nbins);
-hist(EData,nbins)
+%hist(EData,nbins)
 MnKaHandle=BuildMnKaHandle;
 p0=[100 5];
 p=lsqcurvefit(MnKaHandle,p0,x(:),h(:));

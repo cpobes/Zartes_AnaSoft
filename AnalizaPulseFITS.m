@@ -135,7 +135,11 @@ else
     minprominence=0.05;%9000:1e5;%Dic21:1000:10000;
 end
 
-polarity=1;% 1: positivos, 0:negativos.
+if isfield(OP,'polarity')
+    polarity=OP.polarity;% 1: positivos, 0:negativos.
+else
+    polarity=1;% 1: positivos, 0:negativos.
+end
 
 for i=1:Npulsos%
     if ~ismember(i,index)
@@ -155,15 +159,15 @@ for i=1:Npulsos%
     if (L<200)
         dc(i)=0;dc_std(i)=0;area(i)=0;optArea(i)=0;amp(i)=0;tmax(i)=0;Amax(i)=0;rango(i)=0;%
     else
-    dc(i)=mean(pulso(1:L*t0ini/2,2));
-    dc_std(i)=std(pulso(1:L*t0ini/2,2));
-    area(i)=sum(medfilt1(pulso((L*t0ini-10):end,2),wfilt)-dc(i));
-    optArea(i)=sum(medfilt1(pulso(int16(L*t0ini-10):L*topt,2),wfilt)-dc(i));
-    [maux,miaux]=max(medfilt1(pulso(:,2),wfilt));
-    amp(i)=maux-dc(i);
-    tmax(i)=time(miaux);
-    Amax(i)=maux;%
-    rango(i)=range(medfilt1(pulso(:,2),wfilt));
+        dc(i)=mean(pulso(1:L*t0ini/2,2));
+        dc_std(i)=std(pulso(1:L*t0ini/2,2));
+        area(i)=sum(medfilt1(pulso((L*t0ini-10):end,2),wfilt)-dc(i));
+        optArea(i)=sum(medfilt1(pulso(int16(L*t0ini-10):L*topt,2),wfilt)-dc(i));
+        [maux,miaux]=max(medfilt1(pulso(:,2),wfilt));
+        amp(i)=maux-dc(i);
+        tmax(i)=time(miaux);
+        Amax(i)=maux;%
+        rango(i)=range(medfilt1(pulso(:,2),wfilt));
     end
     %%%Self Calibrated Energy.E_ETF ec.58 Irwin.
     ipulse=V2I(pulso(:,2),OP.circuit);
@@ -273,6 +277,9 @@ for i=1:Npulsos%
     if ~mod(i,10) ['pulso ' num2str(i)],end
 end
 fits.closeFile(fptr);
+PulseParameters.filename=file;
+PulseParameters.circuit=OP.circuit;
+PulseParameters.polarity=polarity;
 PulseParameters.area=area;
 %PulseParameters.trunc_area=trunc_area;
 PulseParameters.optArea=optArea;
@@ -293,6 +300,9 @@ PulseParameters.timestamp=timestamp;
 PulseParameters.tbath=tbath;
 PulseParameters.rsensor=rsensor;
 PulseParameters.minprominence=minprominence;
+PulseParameters.SR=SR;
+PulseParameters.RL=RL;
+PulseParameters.t0ini=t0ini;
 if ~isempty(oft)
     PulseParameters.OFT_Energy=OFT_Energy;
 end

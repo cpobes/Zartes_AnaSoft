@@ -21,9 +21,8 @@ L=length(index);
 aux=zeros(RL,1);
 window=[];
 %window=hamming(RL);
-for i=index
+for i=index(:)'
     auxpulse=readFITSpulse(file,i,DataUnit);%%%asumimos baselines en Dataunit=2
-
     aux=aux(:)+auxpulse(:,2);%
 end
 pulso=double([auxpulse(:,1) aux(:)/L]);

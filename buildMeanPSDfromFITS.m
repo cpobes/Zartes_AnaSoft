@@ -20,7 +20,7 @@ end
 aux=zeros(RL,1);
 window=[];
 %window=hamming(RL);
-for i=index
+for i=index(:)'
     noise=readFITSpulse(file,i,DataUnit);%%%asumimos baselines en Dataunit=2
     %%%noise contiene ya time y data
     %[psd,freqs]=PSD(noise,1);%%%lo hacemos 2-sided
