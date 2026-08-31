@@ -113,7 +113,7 @@ if isfield(analizeOptions,'IVnskip')
         IVsetN(ivnskip(i)).good=0;
     end
 end
-NegativesFlag=0;
+NegativesFlag=1;
 if isfield(analizeOptions,'NegativesFlag')
     NegativesFlag=analizeOptions.NegativesFlag;
 end
@@ -175,7 +175,7 @@ elseif strcmp(ZfitOpt.TFdata,'PXI')
         TFN=[];
     end
 end
-%%%cargamos la TFGS adecuada.Ojo, hay que nombrarla así en el dir.
+%%%cargamos la TFS adecuada.Ojo, hay que nombrarla así en el dir.
 TESDATA.TFS=TFS;%%Esta TFS sobreescribe la TFS.txt que se carga por defecto en FitZset_remote
 if ~isempty(TFN)
     TESDATA.TFN=TFN;
